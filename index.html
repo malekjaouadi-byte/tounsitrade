@@ -1326,9 +1326,17 @@ function renderMarket(){
     </div>
     ${listed.length?`<div class="sec"><span class="sec-t">${mode==='live'?'شركات مدرجة':'شركات التدريب'}</span><span class="badge-real">${mode==='live'?'سوق حقيقي':'تدريب'}</span><span class="sec-line"></span></div><div class="stock-list">${listed.map(stockRow).join('')}</div>`:''}
     ${spon.length?`<div class="sec"><span class="sec-t">شركات مدعومة</span><span class="badge-spon">★ ترويج</span><span class="sec-line"></span></div><div class="stock-list">${spon.map(stockRow).join('')}</div>`:''}
-    <div class="disc">جميع أسماء الشركات خيالية ولا تمثّل شركات حقيقية. الأسعار افتراضية 100%.</div>
+    <div class="podium-wrap">
+  <div class="podium-head">
+    <div class="podium-title"><span class="ico">🏆</span> أفضل 5 متداولين <span class="tn">— الترتيب التونسي</span></div>
+    <button class="podium-view-all" onclick="switchToRank()">عرض الكل ←</button>
+  </div>
+  <div id="podiumList"><div class="podium-empty">جاري التحميل...</div></div>
+</div>
+<div class="disc">جميع أسماء الشركات خيالية ولا تمثّل شركات حقيقية. الأسعار افتراضية 100%.</div>
   `;
   view.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{currentFilter=c.dataset.f;renderMarket();});
+  loadPodium();
   view.querySelectorAll('.stock-row').forEach(el=>el.onclick=()=>openTrade(el.dataset.id));
 }
 
@@ -2182,7 +2190,36 @@ function openNotifications(){
 /* ================================================================
    26) RANK
    ================================================================ */
-async function renderRank(){
+/* ================================================================
+   PODIUM — أفضل 5 متداولين في الرئيسية
+   ================================================================ */
+async function loadPodium(){
+  const el = document.getElementById('podiumList');
+  if(!el) return;
+  try{
+    const list = await fetchRealLeaderboard();
+    const top5 = list.slice(0,5);
+    if(top5.length === 0){
+      el.innerHTML = '<div class="podium-empty">لا يوجد متداولون بعد — كن الأول! 🏆</div>';
+      return;
+    }
+    el.innerHTML = top5.map((p,i)=>{
+      const medal = i===0?'🥇':i===1?'🥈':i===2?'🥉':String(i+1);
+      const pctColor = p.profitPct>=0?'#0ecb81':'#f6465d';
+      const pctSign = p.profitPct>=0?'+':'';
+      const meTag = p.isMe?' <span style="color:#f0b90b">· أنت</span>':'';
+      return `<div class="podium-row" onclick="switchToRank()">
+        <div class="podium-medal">${medal}</div>
+        <div class="podium-name">${p.name}${meTag}</div>
+        <div class="podium-pct" style="color:${pctColor}">${pctSign}${p.profitPct.toFixed(2)}%</div>
+      </div>`;
+    }).join('');
+  }catch(e){
+    console.error('Podium error:', e);
+    el.innerHTML = '<div class="podium-empty">تعذّر تحميل الترتيب</div>';
+  }
+}
+  async function renderRank(){
   view.innerHTML=`<div class="pf-empty" style="padding:60px 20px"><div class="ico" style="font-size:30px">⏳</div><div>جاري التحميل...</div></div>`;
   await fetchRealStats();
   const list=await fetchRealLeaderboard();
