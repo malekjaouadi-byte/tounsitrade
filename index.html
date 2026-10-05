@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#0b0e11">
 <title>TounsiTrade — محاكي التداول التونسي</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23E70013'/><text x='50' y='68' font-size='58' font-weight='bold' fill='white' text-anchor='middle' font-family='Arial'>T</text></svg>">
@@ -17,6 +17,9 @@ body{font-family:-apple-system,"Segoe UI",Tahoma,system-ui,sans-serif;background
 @keyframes logoPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
 .splash-title{font-size:28px;font-weight:800;letter-spacing:-.5px;margin-top:24px;background:linear-gradient(90deg,#fff,#f0b90b);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .splash-tag{font-size:13px;color:#7b8494;margin-top:8px}
+.splash-quote{font-size:11px;color:#8b95a5;margin-top:14px;text-align:center;max-width:280px;line-height:1.75;font-style:italic;padding:0 20px;opacity:.9}
+.splash-quote::before{content:"«";color:#f0b90b;font-weight:900;margin-left:2px}
+.splash-quote::after{content:"»";color:#f0b90b;font-weight:900;margin-right:2px}
 .zellige-bg{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden;opacity:.06}
 .zellige-bg svg{position:absolute;top:50%;left:50%;width:200%;height:200%;transform:translate(-50%,-50%);animation:zelligeRotate 60s linear infinite}
 @keyframes zelligeRotate{from{transform:translate(-50%,-50%) rotate(0deg)}to{transform:translate(-50%,-50%) rotate(360deg)}}
@@ -32,6 +35,9 @@ body{font-family:-apple-system,"Segoe UI",Tahoma,system-ui,sans-serif;background
 .auth-tag{font-size:13.5px;color:#8b95a5;margin-top:8px;text-align:center;font-weight:600}
 .auth-moto{font-size:11px;color:#7b8494;margin-top:6px;text-align:center;letter-spacing:.5px}
 .auth-moto b{color:#f0b90b;font-weight:700}
+.auth-quote{font-size:10.5px;color:#8b95a5;margin-top:14px;text-align:center;line-height:1.75;font-style:italic;padding:10px 16px;background:rgba(240,185,11,.04);border:1px solid rgba(240,185,11,.15);border-radius:10px;max-width:340px;margin-left:auto;margin-right:auto;position:relative}
+.auth-quote::before{content:"«";color:#f0b90b;font-weight:900;font-size:13px;margin-left:2px}
+.auth-quote::after{content:"»";color:#f0b90b;font-weight:900;font-size:13px;margin-right:2px}
 .stats-card{display:flex;justify-content:space-around;background:linear-gradient(135deg,#12161b,#0e1216);border:1px solid #232a31;border-radius:16px;padding:16px 10px;margin:22px 0 18px}
 .stats-card .stat-item{flex:1;text-align:center;padding:0 4px}
 .stats-card .stat-num{font-size:19px;font-weight:900;color:#f0b90b;font-variant-numeric:tabular-nums;display:block}
@@ -356,6 +362,61 @@ main::-webkit-scrollbar{display:none}
 .sr-note{font-size:9px;color:#5e6673;margin-top:6px;text-align:center;line-height:1.5}
 .sr-note b{font-weight:800}
 .adapt-tag{font-size:9px;font-weight:800;padding:2px 7px;border-radius:5px;background:rgba(168,85,247,.15);color:#a855f7}
+
+/* IND-TOOLS — FIX #8 (متناسق) */
+.ind-tools{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:10px 0}
+.ind-btn{padding:0 4px;height:40px;border-radius:10px;background:#161c22;border:1.5px solid #232a31;color:#8b95a5;font-size:10.5px;font-weight:800;font-family:inherit;cursor:pointer;transition:.15s;display:flex;align-items:center;justify-content:center;gap:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1}
+.ind-btn .ind-emoji{font-size:13px;flex-shrink:0;display:inline-block}
+.ind-btn .ind-label{overflow:hidden;text-overflow:ellipsis}
+.ind-btn.on{background:rgba(240,185,11,.14);border-color:#f0b90b;color:#f0b90b}
+@media (max-width:380px){.ind-btn{font-size:9.5px;height:38px}.ind-btn .ind-emoji{font-size:11px}}
+
+/* PHILOSOPHY + SLOGAN CARDS */
+.philo-wrap{background:linear-gradient(135deg,#1a1f26,#12161b);border:1px solid #232a31;border-radius:16px;padding:18px;margin-bottom:14px;position:relative;overflow:hidden}
+.philo-wrap::before{content:"";position:absolute;top:-40px;right:-30px;width:140px;height:140px;background:radial-gradient(circle,rgba(240,185,11,.14),transparent 70%);pointer-events:none}
+.philo-title{font-size:17px;font-weight:900;color:#f0b90b;margin-bottom:14px;text-align:center;position:relative;z-index:2;letter-spacing:-.3px}
+.philo-line{font-size:13px;color:#eaecef;line-height:2;margin-bottom:10px;position:relative;z-index:2;text-align:center}
+.philo-line b{color:#f0b90b;font-weight:900}
+.philo-line em{color:#8b95a5;font-style:normal;font-size:11.5px}
+.philo-divider{height:1px;background:linear-gradient(90deg,transparent,#232a31,transparent);margin:16px 0}
+.philo-quote{font-size:12.5px;color:#0ecb81;line-height:1.9;text-align:center;padding:14px 12px;background:rgba(14,203,129,.05);border:1px solid rgba(14,203,129,.2);border-radius:12px;position:relative;z-index:2;font-weight:600}
+.philo-table{background:#0e1216;border:1px solid #1c222a;border-radius:12px;overflow:hidden;margin:12px 0;position:relative;z-index:2}
+.philo-table .ph-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:11px 14px;border-bottom:1px solid #161b21;font-size:11.5px}
+.philo-table .ph-row:last-child{border-bottom:none}
+.philo-table .ph-before{color:#8b95a5;position:relative;padding-right:16px}
+.philo-table .ph-before::before{content:"✗";color:#f6465d;position:absolute;right:0;font-weight:900}
+.philo-table .ph-after{color:#c3cad4;position:relative;padding-right:16px}
+.philo-table .ph-after::before{content:"✓";color:#0ecb81;position:absolute;right:0;font-weight:900}
+.philo-badges{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:14px 0;position:relative;z-index:2}
+.philo-badge{padding:11px 12px;border-radius:12px;background:#0e1216;border:1px solid #1c222a;text-align:center}
+.philo-badge .pb-ico{font-size:22px;display:block;margin-bottom:4px}
+.philo-badge .pb-title{font-size:11.5px;font-weight:900;color:#fff;display:block;margin-bottom:2px}
+.philo-badge .pb-sub{font-size:9.5px;color:#7b8494;font-weight:700}
+.philo-badge.crown{grid-column:span 2;background:linear-gradient(135deg,rgba(240,185,11,.12),rgba(240,185,11,.02));border-color:rgba(240,185,11,.4)}
+.philo-badge.crown .pb-title{color:#f0b90b}
+.philo-badge.crown .pb-sub{color:#f0b90b;opacity:.85}
+.philo-slogan-card{background:linear-gradient(135deg,rgba(240,185,11,.1),rgba(240,185,11,.02));border:1px solid rgba(240,185,11,.4);border-radius:14px;padding:16px 18px;margin-bottom:14px;position:relative;overflow:hidden}
+.philo-slogan-card::before{content:"";position:absolute;top:-40px;right:-30px;width:140px;height:140px;background:radial-gradient(circle,rgba(240,185,11,.18),transparent 70%);pointer-events:none}
+.philo-slogan-card .pss-main{font-size:14px;font-weight:900;color:#f0b90b;text-align:center;line-height:1.9;letter-spacing:.3px;position:relative;z-index:2}
+.philo-slogan-card .pss-sub{font-size:11.5px;color:#eaecef;text-align:center;line-height:1.85;margin-top:8px;position:relative;z-index:2;font-weight:600}
+.about-slogan-card{background:linear-gradient(135deg,rgba(240,185,11,.08),#0e1216);border:1px solid rgba(240,185,11,.35);border-radius:14px;padding:16px;margin-top:12px;text-align:center;position:relative;overflow:hidden}
+.about-slogan-card::before{content:"";position:absolute;top:-30px;left:50%;transform:translateX(-50%);width:180px;height:120px;background:radial-gradient(circle,rgba(240,185,11,.12),transparent 70%);pointer-events:none}
+.about-slogan-card .asc-main{font-size:15px;font-weight:900;color:#f0b90b;line-height:1.9;letter-spacing:.3px;position:relative;z-index:2}
+.about-slogan-card .asc-sub{font-size:11px;color:#8b95a5;margin-top:10px;line-height:1.7;position:relative;z-index:2}
+.about-slogan-card .asc-sub b{color:#0ecb81;font-weight:800}
+
+/* PRIVACY SWITCH */
+.priv-box{margin-top:16px;padding:14px 16px;background:linear-gradient(135deg,rgba(14,203,129,.06),rgba(14,203,129,.02));border:1px solid rgba(14,203,129,.3);border-radius:14px}
+.priv-title{font-size:12.5px;font-weight:900;color:#0ecb81;margin-bottom:6px}
+.priv-desc{font-size:10.5px;color:#8b95a5;line-height:1.7;margin-bottom:12px}
+.priv-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-top:1px solid rgba(14,203,129,.15)}
+.priv-row-label{font-size:11.5px;font-weight:700;color:#eaecef}
+.priv-toggle{width:52px;height:28px;border-radius:14px;border:none;background:#0ecb81;position:relative;cursor:pointer;transition:.2s;flex-shrink:0}
+.priv-toggle.off{background:#2e3742}
+.priv-toggle .knob{position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:.2s;box-shadow:0 2px 4px rgba(0,0,0,.2)}
+.priv-toggle.off .knob{left:calc(100% - 25px)}
+.priv-status{font-size:9.5px;color:#7b8494;margin-top:6px;line-height:1.5;text-align:center}
+
 @media (max-width:380px){
   .auth-title{font-size:28px}
   .auth-logo{width:110px;height:110px;border-radius:26px}
@@ -368,25 +429,37 @@ main::-webkit-scrollbar{display:none}
 @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 </style>
 <script>
-  // ⚠️ بدّل YOUR_FORM_ID بمعرّف Formspree من لوحتك
+  // ⚠️ بدّل YOUR_FORM_ID بمعرّف Formspree
   const FORMSPREE_ENDPOINT = "https://formspree.io/f/YOUR_FORM_ID";
 </script>
-</head>
-<body>
+</head><body>
+
+<!-- SVG مخفي للـzellige pattern (fix #10) -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <pattern id="zellige" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+      <polygon points="20,4 24,12 32,8 30,16 38,20 30,24 32,32 24,28 20,36 16,28 8,32 10,24 2,20 10,16 8,8 16,12" fill="none" stroke="#FFFFFF" stroke-width="0.6"/>
+      <rect x="18" y="18" width="4" height="4" transform="rotate(45 20 20)" fill="none" stroke="#FFFFFF" stroke-width="0.4"/>
+    </pattern>
+  </defs>
+</svg>
+
 <div id="splash">
   <div class="splash-logo"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><g transform="translate(20,18)"><path d="M2,6 L3.8,4.2 L5.6,6 L3.8,7.8 Z" fill="#FFFFFF"/><path d="M8,3 A4,4 0 1,0 8,9 A3,3 0 1,1 8,3 Z" fill="#FFFFFF"/></g><text x="50" y="68" font-size="48" font-weight="900" fill="#FFFFFF" text-anchor="middle" font-family="Arial Black, Arial, sans-serif">T</text></svg></div>
   <div class="splash-title">TounsiTrade</div>
   <div class="splash-tag">محاكي التداول التونسي</div>
+  <div class="splash-quote">المعرفة لا تُثريك بسرعة — لكنها تمنعك من الإفلاس</div>
 </div>
 
 <div class="auth-screen hide" id="authScreen">
-  <div class="zellige-bg"><svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><defs><pattern id="zellige" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse"><polygon points="20,4 24,12 32,8 30,16 38,20 30,24 32,32 24,28 20,36 16,28 8,32 10,24 2,20 10,16 8,8 16,12" fill="none" stroke="#FFFFFF" stroke-width="0.6"/><rect x="18" y="18" width="4" height="4" transform="rotate(45 20 20)" fill="none" stroke="#FFFFFF" stroke-width="0.4"/></pattern></defs><rect width="200" height="200" fill="url(#zellige)"/></svg></div>
+  <div class="zellige-bg"><svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><rect width="200" height="200" fill="url(#zellige)"/></svg></div>
   <div class="auth-content">
     <div class="auth-logo-wrap">
       <div class="auth-logo"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><g transform="translate(18,16)"><path d="M2,7 L4,5 L6,7 L4,9 Z" fill="#FFFFFF"/><path d="M9,4 A4.5,4.5 0 1,0 9,11 A3.5,3.5 0 1,1 9,4 Z" fill="#FFFFFF"/></g><text x="50" y="70" font-size="52" font-weight="900" fill="#FFFFFF" text-anchor="middle" font-family="Arial Black, Arial, sans-serif">T</text></svg></div>
       <div class="auth-title">Tounsi<span class="gold">Trade</span></div>
       <div class="auth-tag"><span class="flag">🇹🇳</span> محاكي التداول التونسي</div>
       <div class="auth-moto">تعلّم <b>•</b> تداول افتراضياً <b>•</b> نافس</div>
+      <div class="auth-quote">المعرفة لا تُثريك بسرعة — لكنها تمنعك من الإفلاس</div>
     </div>
     <div class="stats-card">
       <div class="stat-item"><span class="stat-num">15</span><span class="stat-lbl">شركة</span></div>
@@ -401,7 +474,7 @@ main::-webkit-scrollbar{display:none}
       <button type="button" class="btn-social gg" id="btnGoogle"><span class="spinner"></span><svg viewBox="0 0 24 24"><path fill="#4285f4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34a853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#fbbc05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#ea4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg><span class="label">المتابعة بحساب Google</span></button>
       <div class="auth-divider">أو</div>
       <button type="button" class="btn-social em-outline" onclick="showLogin()"><span style="font-size:18px">🔑</span><span class="label">لدي حساب — تسجيل الدخول</span></button>
-      <div class="edu-note"><div class="ico">🎓</div><div class="txt"><b>ملاحظة تعليمية:</b> في السوق الحقيقي، لا يستطيع المستثمر أن يتداول مباشرة. يجب أن يمرّ عبر <b>وسيط مرخّص من هيئة السوق المالية (CMF)</b>. أزرار الشراء والبيع في هذا التطبيق تحاكي دور الوسيط، وتُطبّق الرسوم الحقيقية المطبقة في بورصة تونس.</div></div>
+      <div class="edu-note"><div class="ico">🎓</div><div class="txt"><b>ملاحظة تعليمية:</b> في السوق الحقيقي، لا يستطيع المستثمر أن يتداول مباشرة. يجب أن يمرّ عبر <b>وسيط مرخّص من هيئة السوق المالية (CMF)</b>.</div></div>
     </div>
     <div class="auth-footer"><div class="made-in"><span>🇹🇳</span><span>صُنع في تونس</span></div><div class="legal">محاكي تعليمي · الأسعار افتراضية<br>جميع أسماء الشركات خيالية ولا تمثّل شركات حقيقية</div></div>
   </div>
@@ -460,15 +533,17 @@ main::-webkit-scrollbar{display:none}
 
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script><script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+<script>
 /* ============================================================
-   FIREBASE
+   FIREBASE + SECURITY HELPERS
    ============================================================ */
-/* ===== SECURITY HELPERS (XSS) ===== */
 function cleanText(s,max){max=max||30;return String(s==null?'':s).replace(/[<>&"'`\\]/g,'').replace(/\s+/g,' ').trim().slice(0,max);}
 function cleanUrl(u){if(typeof u!=='string')return null;return /^https:\/\/[^\s"'<>`\\]{1,500}$/.test(u)?u:null;}
 function cleanColor(c){return(typeof c==='string'&&/^#[0-9a-fA-F]{6}$/.test(c))?c:'#f0b90b';}
 function cleanNum(n,min,max,def){n=Number(n);return(isFinite(n)&&n>=min&&n<=max)?n:def;}
+
 const firebaseConfig={apiKey:"AIzaSyAvGMTxk8YMdfMIbYcO_nZQBGJ6I6MRrJA",authDomain:"tounsitrade-1f721.firebaseapp.com",projectId:"tounsitrade-1f721",storageBucket:"tounsitrade-1f721.firebasestorage.app",messagingSenderId:"953224886571",appId:"1:953224886571:web:53b6ae41db318393aa2d6e"};
 let fbAuth=null,fbDb=null;
 try{
@@ -516,9 +591,18 @@ function ttCalculateFees(p,q){
 }
 
 /* ============================================================
-   HOURS
+   HOURS + TIMEZONE (FIX #6)
    ============================================================ */
-function getTunisiaTime(){const n=new Date();const u=n.getTime()+(n.getTimezoneOffset()*60000);return new Date(u+3600000);}
+function getTunisiaTime(){
+  try{
+    const parts=new Intl.DateTimeFormat('en-GB',{timeZone:'Africa/Tunis',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).formatToParts(new Date());
+    const g=k=>parseInt(parts.find(p=>p.type===k).value,10);
+    return new Date(g('year'),g('month')-1,g('day'),g('hour'),g('minute'),g('second'));
+  }catch(e){
+    const n=new Date();
+    return new Date(n.getTime()+(n.getTimezoneOffset()*60000)+3600000);
+  }
+}
 function isMarketOpen(){const t=getTunisiaTime();const d=t.getDay();if(d<1||d>5)return false;const m=t.getHours()*60+t.getMinutes();return m>=540&&m<840;}
 function getAutoMode(){return isMarketOpen()?'live':'practice';}
 function isTradingAllowed(){const m=getMarketMode();if(m==='practice')return true;return isMarketOpen();}
@@ -542,12 +626,7 @@ const MAX_ORDERS=10,STARTING_CASH=10000;
 const SECTOR_ICONS={'بنوك':'🏦','نسيج':'👕','أغذية':'🌾','اتصالات':'📡','صناعة':'🏭','طاقة':'⚡','مالية':'💼','تكنولوجيا':'💻','بناء':'🧱','إسمنت':'🏗️'};
 function shade(h,p){const n=parseInt(h.replace('#',''),16);let r=(n>>16)+p,g=((n>>8)&0xff)+p,b=(n&0xff)+p;r=Math.max(0,Math.min(255,r));g=Math.max(0,Math.min(255,g));b=Math.max(0,Math.min(255,b));return'#'+((r<<16)|(g<<8)|b).toString(16).padStart(6,'0');}
 function showError(id,m){const e=document.getElementById(id);if(!e)return;e.textContent=m;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),8000);}
-// Fisher-Yates shuffle
-function shuffleArray(arr){
-  const a=[...arr];
-  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
-  return a;
-}
+function shuffleArray(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 
 /* ============================================================
    STOCKS
@@ -597,57 +676,15 @@ const WEEKLY_CHALLENGES=[
   {id:'w_winners',icon:'🏆',name:'3 صفقات رابحة',desc:'أغلق 3 مراكز بربح هذا الأسبوع',target:3,xp:70,unit:'صفقة',type:'winning_trades'}
 ];
 let weeklyState={weekKey:null,challengeId:null,baselineValue:0,tradesThisWeek:0,lessonsThisWeek:0,slPlacedThisWeek:0,winnersThisWeek:0,progress:0,claimed:false};
-
-function getWeekKey(d=new Date()){
-  const t=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));
-  const day=t.getUTCDay()||7;
-  t.setUTCDate(t.getUTCDate()+4-day);
-  const yStart=new Date(Date.UTC(t.getUTCFullYear(),0,1));
-  const wk=Math.ceil(((t-yStart)/86400000+1)/7);
-  return t.getUTCFullYear()+'-W'+String(wk).padStart(2,'0');
-}
+function getWeekKey(d=new Date()){const t=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));const day=t.getUTCDay()||7;t.setUTCDate(t.getUTCDate()+4-day);const yStart=new Date(Date.UTC(t.getUTCFullYear(),0,1));const wk=Math.ceil(((t-yStart)/86400000+1)/7);return t.getUTCFullYear()+'-W'+String(wk).padStart(2,'0');}
 function pickChallengeForWeek(weekKey){let h=0;for(let i=0;i<weekKey.length;i++)h=(h*31+weekKey.charCodeAt(i))>>>0;return WEEKLY_CHALLENGES[h%WEEKLY_CHALLENGES.length];}
-function rolloverWeeklyIfNeeded(){
-  const curKey=getWeekKey();
-  if(weeklyState.weekKey===curKey)return false;
-  const ch=pickChallengeForWeek(curKey);
-  weeklyState={weekKey:curKey,challengeId:ch.id,baselineValue:cash+holdingsValue(),tradesThisWeek:0,lessonsThisWeek:0,slPlacedThisWeek:0,winnersThisWeek:0,progress:0,claimed:false};
-  saveState();return true;
-}
+function rolloverWeeklyIfNeeded(){const curKey=getWeekKey();if(weeklyState.weekKey===curKey)return false;const ch=pickChallengeForWeek(curKey);weeklyState={weekKey:curKey,challengeId:ch.id,baselineValue:cash+holdingsValue(),tradesThisWeek:0,lessonsThisWeek:0,slPlacedThisWeek:0,winnersThisWeek:0,progress:0,claimed:false};saveState();return true;}
 function getWeeklyChallenge(){return WEEKLY_CHALLENGES.find(c=>c.id===weeklyState.challengeId)||WEEKLY_CHALLENGES[0];}
-function computeWeeklyProgress(){
-  const ch=getWeeklyChallenge();let p=0;
-  if(ch.type==='profit_abs')p=Math.max(0,(cash+holdingsValue())-weeklyState.baselineValue);
-  else if(ch.type==='trade_count')p=weeklyState.tradesThisWeek;
-  else if(ch.type==='lesson_count')p=weeklyState.lessonsThisWeek;
-  else if(ch.type==='sectors_held'){const s=new Set();Object.keys(holdings).forEach(id=>{const st=STOCKS.find(x=>x.id===id);if(st)s.add(st.sector);});p=s.size;}
-  else if(ch.type==='sl_placed')p=weeklyState.slPlacedThisWeek;
-  else if(ch.type==='winning_trades')p=weeklyState.winnersThisWeek;
-  weeklyState.progress=Math.min(p,ch.target);return weeklyState.progress;
-}
-function trackWeeklyEvent(kind,amount=1){
-  if(!weeklyState.weekKey)rolloverWeeklyIfNeeded();
-  if(kind==='trade')weeklyState.tradesThisWeek+=amount;
-  else if(kind==='lesson')weeklyState.lessonsThisWeek+=amount;
-  else if(kind==='sl')weeklyState.slPlacedThisWeek+=amount;
-  else if(kind==='winner')weeklyState.winnersThisWeek+=amount;
-  computeWeeklyProgress();saveState();
-}
+function computeWeeklyProgress(){const ch=getWeeklyChallenge();let p=0;if(ch.type==='profit_abs')p=Math.max(0,(cash+holdingsValue())-weeklyState.baselineValue);else if(ch.type==='trade_count')p=weeklyState.tradesThisWeek;else if(ch.type==='lesson_count')p=weeklyState.lessonsThisWeek;else if(ch.type==='sectors_held'){const s=new Set();Object.keys(holdings).forEach(id=>{const st=STOCKS.find(x=>x.id===id);if(st)s.add(st.sector);});p=s.size;}else if(ch.type==='sl_placed')p=weeklyState.slPlacedThisWeek;else if(ch.type==='winning_trades')p=weeklyState.winnersThisWeek;weeklyState.progress=Math.min(p,ch.target);return weeklyState.progress;}
+function trackWeeklyEvent(kind,amount=1){if(!weeklyState.weekKey)rolloverWeeklyIfNeeded();if(kind==='trade')weeklyState.tradesThisWeek+=amount;else if(kind==='lesson')weeklyState.lessonsThisWeek+=amount;else if(kind==='sl')weeklyState.slPlacedThisWeek+=amount;else if(kind==='winner')weeklyState.winnersThisWeek+=amount;computeWeeklyProgress();saveState();}
 function isWeeklyComplete(){const ch=getWeeklyChallenge();return weeklyState.progress>=ch.target;}
-function claimWeeklyReward(){
-  if(!isWeeklyComplete())return toast('لم يُكتمل التحدي بعد','warn');
-  if(weeklyState.claimed)return toast('استلمت المكافأة مسبقًا','warn');
-  const ch=getWeeklyChallenge();weeklyState.claimed=true;userXP+=ch.xp;
-  unlockBadge('weekly_champion');
-  pushNotification('rank','🏅 تحدي الأسبوع!','أكملت: '+ch.name+' (+'+ch.xp+' XP)');
-  toast('🏅 مبروك! +'+ch.xp+' XP','good');saveState();render();
-}
-function renderWeeklyCard(){
-  const ch=getWeeklyChallenge();const done=isWeeklyComplete();
-  const pct=Math.min(100,(weeklyState.progress/ch.target)*100);
-  const rem=weeklyState.claimed?'✓ تم الاستلام':(done?'🎁 جاهز للاستلام':`${weeklyState.progress}/${ch.target} ${ch.unit}`);
-  return`<div class="wk-card ${done&&weeklyState.claimed?'wk-done':''}"><div class="wk-head"><div class="wk-title"><span class="wk-badge">تحدي الأسبوع</span></div><div class="wk-timer">${weeklyState.weekKey||''}</div></div><div class="wk-body"><div class="wk-icon">${ch.icon}</div><div class="wk-info"><div class="wk-name">${ch.name}</div><div class="wk-desc">${ch.desc}</div><div class="wk-bar"><div class="wk-bar-fill" style="width:${pct}%"></div></div><div class="wk-foot"><span class="wk-progress">${rem}</span><span class="wk-reward">+${ch.xp} XP ⭐</span></div></div></div>${done&&!weeklyState.claimed?`<button class="wk-btn" onclick="claimWeeklyReward()">🎁 استلم المكافأة</button>`:''}${weeklyState.claimed?`<button class="wk-btn claimed" disabled>✓ تم استلام المكافأة</button>`:''}</div>`;
-}
+function claimWeeklyReward(){if(!isWeeklyComplete())return toast('لم يُكتمل التحدي بعد','warn');if(weeklyState.claimed)return toast('استلمت المكافأة مسبقًا','warn');const ch=getWeeklyChallenge();weeklyState.claimed=true;userXP+=ch.xp;unlockBadge('weekly_champion');pushNotification('rank','🏅 تحدي الأسبوع!','أكملت: '+ch.name+' (+'+ch.xp+' XP)');toast('🏅 مبروك! +'+ch.xp+' XP','good');saveState();render();}
+function renderWeeklyCard(){const ch=getWeeklyChallenge();const done=isWeeklyComplete();const pct=Math.min(100,(weeklyState.progress/ch.target)*100);const rem=weeklyState.claimed?'✓ تم الاستلام':(done?'🎁 جاهز للاستلام':`${weeklyState.progress}/${ch.target} ${ch.unit}`);return`<div class="wk-card ${done&&weeklyState.claimed?'wk-done':''}"><div class="wk-head"><div class="wk-title"><span class="wk-badge">تحدي الأسبوع</span></div><div class="wk-timer">${weeklyState.weekKey||''}</div></div><div class="wk-body"><div class="wk-icon">${ch.icon}</div><div class="wk-info"><div class="wk-name">${ch.name}</div><div class="wk-desc">${ch.desc}</div><div class="wk-bar"><div class="wk-bar-fill" style="width:${pct}%"></div></div><div class="wk-foot"><span class="wk-progress">${rem}</span><span class="wk-reward">+${ch.xp} XP ⭐</span></div></div></div>${done&&!weeklyState.claimed?`<button class="wk-btn" onclick="claimWeeklyReward()">🎁 استلم المكافأة</button>`:''}${weeklyState.claimed?`<button class="wk-btn claimed" disabled>✓ تم استلام المكافأة</button>`:''}</div>`;}
 
 /* ============================================================
    BADGES + XP
@@ -668,15 +705,12 @@ function addXP(amount,reason){const oldXP=userXP;userXP+=amount;if(oldXP<500&&us
 function unlockBadge(id){if(userBadges.includes(id))return;const b=BADGES.find(x=>x.id===id);if(!b)return;userBadges.push(id);addXP(b.xp,'badge');pushNotification('rank','🏆 شارة جديدة!',b.icon+' '+b.name);toast('🏆 '+b.name,'good');}
 
 /* ============================================================
-   STOCK STATE HELPERS
+   STOCK STATE HELPERS (FIX #9: spark 400)
    ============================================================ */
-function buildStocksFor(mode){return STOCKS_INIT.map(s=>({...s,price:s.initial,open:s.initial,chg:0,spark:Array.from({length:120},()=>s.initial)}));}
+function buildStocksFor(mode){return STOCKS_INIT.map(s=>({...s,price:s.initial,open:s.initial,chg:0,spark:Array.from({length:400},()=>s.initial)}));}
 function loadModeState(mode){
   if(!STATE[mode].stocks.length){STATE[mode].stocks=buildStocksFor(mode);STATE[mode].market={value:9850,open:9850,drift:0.0000008,vol:0.0012,ret:0};}
-  const s=STATE[mode];
-  cash=s.cash;holdings=s.holdings;pendingOrders=s.pendingOrders;alerts=s.alerts;
-  recentTrades=s.recentTrades;orderSeq=s.orderSeq;valueHistory=s.valueHistory;
-  STOCKS=s.stocks;MARKET=s.market;
+  const s=STATE[mode];cash=s.cash;holdings=s.holdings;pendingOrders=s.pendingOrders;alerts=s.alerts;recentTrades=s.recentTrades;orderSeq=s.orderSeq;valueHistory=s.valueHistory;STOCKS=s.stocks;MARKET=s.market;
   if(typeof MARKET.drift!=='number'||isNaN(MARKET.drift))MARKET.drift=0.0000008;
   if(typeof MARKET.vol!=='number'||isNaN(MARKET.vol))MARKET.vol=0.0012;
   if(typeof MARKET.ret!=='number'||isNaN(MARKET.ret))MARKET.ret=0;
@@ -687,7 +721,7 @@ STATE.live.stocks=buildStocksFor('live');
 loadModeState(getMarketMode());
 
 /* ============================================================
-   TICK ENGINE
+   TICK ENGINE (FIX #9: 400)
    ============================================================ */
 let tickCount=0;
 function tick(){
@@ -703,15 +737,15 @@ function tick(){
     s.price=Math.max(0.01,s.price*Math.exp(r));
     s.chg=(s.price/s.open-1)*100;
     s.spark.push(s.price);
-    if(s.spark.length>120)s.spark.shift();
+    if(s.spark.length>400)s.spark.shift();
   }
   if(currentUser){checkOrders();updateLiveUI();}
   tickCount++;
   if(tickCount%7===0)saveState();
 }
-
+</script><script>
 /* ============================================================
-   QUIZ BANK
+   QUIZ BANK (FIX E1)
    ============================================================ */
 const QUIZ_BANK={
 l1:[["ما هو السهم؟",["حصة ملكية في شركة","قرض بنكي","عملة رقمية","وثيقة تأمين"],0],["كيف تربح من السهم؟",["نمو رأس المال + التوزيعات","الفائدة البنكية","لا شيء","الرهان"],0],["100 سهم بـ 10 TND صارت 12 TND. الربح؟",["+200 TND","+20 TND","+1200 TND","−200 TND"],0]],
@@ -743,43 +777,43 @@ a2:[["P/E < 15 يعني؟",["فرصة محتملة","مرتفع","خطر","لا 
 function getQuizFor(lessonId){return QUIZ_BANK[lessonId]||null;}
 
 /* ============================================================
-   LESSONS
+   LESSONS (25)
    ============================================================ */
 const LESSONS=[
 {cat:'basics',catName:'الأساسيات',catIcon:'🎯',id:'l1',icon:'📊',title:'ما هي الأسهم؟',time:'6 د',content:`<p><b>السهم</b> هو <b>حصة صغيرة من ملكية شركة</b>. عندما تشتري سهمًا، تصبح شريكًا صغيرًا في الشركة.</p><p><b>📚 لماذا تشتري الأسهم؟</b></p><ul><li><b>نمو رأس المال:</b> السهم يرتفع مع نجاح الشركة</li><li><b>التوزيعات:</b> جزء من الأرباح يُوزّع سنويًا</li><li><b>الحماية من التضخم:</b> الأسهم تحافظ على القيمة</li></ul><p><b>🔢 مثال:</b> اشتريت 100 سهم × 10 TND = 1,000 TND. بعد سنة صار 12 TND → ربحت <b>200 TND (+20%)</b>.</p><p><b>⚠️ المخاطر:</b> لو نزل إلى 8 TND → خسارة 200 TND.</p><p><b>✅ الخلاصة:</b> السهم = شراكة صغيرة. اربح من النمو + التوزيعات.</p>`},
 {cat:'basics',catName:'الأساسيات',catIcon:'🎯',id:'l2',icon:'💹',title:'كيف يتحرك السعر؟',time:'7 د',content:`<p>سعر السهم يتحدد بـ <b>العرض والطلب</b>.</p><p><b>🔢 القاعدة:</b></p><ul><li>المشترون أكثر → السعر <b>يرتفع</b></li><li>البائعون أكثر → السعر <b>ينخفض</b></li></ul><p><b>🎯 5 عوامل:</b> أخبار الشركة، حالة القطاع، الاقتصاد، المؤشر العام، النفسية.</p><p><b>🔢 مثال:</b> QRN أعلنت نتائج ممتازة → 92 → 96 TND في دقيقة → 101 TND بعد يومين.</p><p><b>⚠️ مفاهيم:</b> Ask (أقل سعر بيع)، Bid (أعلى سعر شراء)، Spread (الفرق).</p><p><b>✅ الخلاصة:</b> السعر = لعبة العرض والطلب.</p>`},
-{cat:'basics',catName:'الأساسيات',catIcon:'🎯',id:'l3',icon:'🏛️',title:'بورصة تونس (BVMT)',time:'6 د',content:`<p><b>بورصة تونس</b> تأسست سنة <b>1969</b>، مقرها تونس العاصمة.</p><p><b>📊 أرقام:</b></p><ul><li>~80 شركة مدرجة</li><li>~30 وسيطًا مرخّصًا</li><li>ساعات: الإثنين-الجمعة 9-14</li></ul><p><b>📈 المؤشرات:</b> TUNINDEX و TUNINDEX20.</p><p><b>🏦 القطاعات:</b> بنوك (~35%)، صناعة (~20%)، نسيج (~10%)، أغذية (~8%)، اتصالات (~7%).</p><p><b>⚠️ لا تخلط:</b> البورصة (BVMT)، CMF (المراقب)، الوسيط (المنفّذ).</p><p><b>✅ الخلاصة:</b> BVMT سوق عريق (55+ سنة).</p>`},
+{cat:'basics',catName:'الأساسيات',catIcon:'🎯',id:'l3',icon:'🏛️',title:'بورصة تونس (BVMT)',time:'6 د',content:`<p><b>بورصة تونس</b> تأسست سنة <b>1969</b>، مقرها تونس العاصمة.</p><p><b>📊 أرقام:</b></p><ul><li>~80 شركة مدرجة</li><li>~30 وسيطًا مرخّصًا</li><li>ساعات: الإثنين-الجمعة 9-14</li></ul><p><b>📈 المؤشرات:</b> TUNINDEX و TUNINDEX20.</p><p><b>🏦 القطاعات:</b> بنوك (~35%)، صناعة (~20%)، نسيج (~10%)، أغذية (~8%)، اتصالات (~7%).</p><p><b>✅ الخلاصة:</b> BVMT سوق عريق (55+ سنة).</p>`},
 {cat:'basics',catName:'الأساسيات',catIcon:'🎯',id:'l4',icon:'💼',title:'دور الوسيط المالي',time:'6 د',content:`<p>لا يمكن للمستثمر أن يتداول مباشرة — يمرّ عبر <b>وسيط مرخّص من CMF</b>.</p><p><b>🎯 3 مهام:</b> تنفيذ الأوامر، حفظ الأوراق، تقديم المعلومات.</p><p><b>🔢 مثال:</b> اشتريت 100 سهم × 50 TND = 5,000 TND:</p><ul><li>عمولة الوسيط (0.8%) = 40 TND</li><li>عمولة BVMT (0.15%) = 7.5 TND</li><li>رسم CMF = 1.72 TND</li><li>رسوم RUS = 0.75 TND</li><li><b>الإجمالي ≈ 50 TND</b></li></ul><p><b>✅ الخلاصة:</b> الوسيط = جسر بينك وبين البورصة.</p>`},
-{cat:'basics',catName:'الأساسيات',catIcon:'🎯',id:'l5',icon:'📋',title:'مصطلحات أساسية',time:'6 د',content:`<p><b>📊 التداول:</b> Ask، Bid، Spread، Volume، Liquidity.</p><p><b>💰 الربح:</b> Profit، Loss، P&L، Portfolio، Position.</p><p><b>🎯 الأوامر:</b> Market Order، Limit Order، Stop-Loss.</p><p><b>📈 التقييم:</b> P/E، P/B، ROE، Dividend Yield.</p><p><b>✅ الخلاصة:</b> كل مصطلح يبدو غريبًا في البداية. مع الممارسة يصبح طبيعيًا.</p>`},
-{cat:'risk',catName:'إدارة المخاطر',catIcon:'⚠️',id:'r1',icon:'🛑',title:'وقف الخسارة',time:'7 د',content:`<p><b>وقف الخسارة</b> أمر تلقائي يُنفَّذ عند وصول السعر لحد معيّن — حزام الأمان.</p><p><b>📚 لماذا؟</b> يمنع الخسائر الكبيرة، يُلغي العامل النفسي، يجعل التداول منضبطًا.</p><p><b>🔢 مثال:</b> اشتريت 100 سهم × 92.50 = 9,250 TND. وقف الخسارة عند 90.00 (-2.7%). لو نزل السهم → خسارة 250 TND فقط.</p><p><b>⚠️ بدون وقف:</b> السهم ينهار إلى 70 → خسارة 2,250 TND!</p><p><b>⚖️ القاعدة:</b> لا تخسر أكثر من <b>1-2%</b> من رأس المال في صفقة واحدة.</p><p><b>✅ الخلاصة:</b> وقف الخسارة علامة احتراف، ليس ضعفًا.</p>`},
-{cat:'risk',catName:'إدارة المخاطر',catIcon:'⚠️',id:'r2',icon:'⚖️',title:'المخاطرة / المكافأة',time:'6 د',content:`<p>قبل كل صفقة، حدد: كم تخاطر؟ وكم تتوقع أن تربح؟</p><p><b>🎯 القاعدة:</b> نسبة <b>1:2 على الأقل</b> — خاطر بـ 100، اهدف لـ 200.</p><p><b>🔢 مثال:</b> شراء 50 TND، وقف 48 (-4%)، هدف 54 (+8%). النسبة 1:2 ✅</p><p><b>📊 المعنى:</b> 1:2 → 33% ربح كافٍ للتعادل.</p><p><b>✅ الخلاصة:</b> الجودة ليست بعدد الصفقات الرابحة، بل بمتوسط الربح مقابل الخسارة.</p>`},
-{cat:'risk',catName:'إدارة المخاطر',catIcon:'⚠️',id:'r3',icon:'🧺',title:'التنويع',time:'5 د',content:`<p><b>لا تضع كل بيضك في سلة واحدة</b>.</p><p><b>❌ مثال سيء:</b> 10,000 TND كلها في سهم واحد.</p><p><b>✅ مثال جيد:</b> 3,000 بنوك + 2,500 صناعة + 2,000 أغذية + 1,500 طاقة + 1,000 كاش.</p><p><b>🎯 3 مستويات:</b> بين القطاعات، بين الأنواع، بين الأحجام.</p><p><b>⚠️ لا تفرط:</b> 3-7 أسهم مثالي.</p><p><b>✅ الخلاصة:</b> وزّع على 3-5 قطاعات.</p>`},
-{cat:'risk',catName:'إدارة المخاطر',catIcon:'⚠️',id:'r4',icon:'💰',title:'الرسوم والعمولات',time:'7 د',content:`<p>الرسوم <b>تكلفة خفية</b> تأكل أرباحك.</p><p><b>📊 مكونات في بورصة تونس:</b></p><ul><li>عمولة الوسيط: 0.80%</li><li>عمولة BVMT: 0.15%</li><li>رسم CMF: 23% من عمولة BVMT</li><li>رسوم RUS: 0.015%</li></ul><p><b>⚠️ مشكلة التداول المكثّف:</b> 10 صفقات = ~500 TND رسوم.</p><p><b>✅ الخلاصة:</b> احسب الرسوم قبل الدخول.</p>`},
-{cat:'tech',catName:'التحليل التقني',catIcon:'📊',id:'t1',icon:'📉',title:'مؤشر RSI',time:'7 د',content:`<p><b>RSI</b> يقيس سرعة وحجم التحركات (0-100).</p><p><b>🎯 التفسير:</b></p><ul><li>RSI > 70 → تشبع شرائي</li><li>RSI < 30 → تشبع بيعي</li><li>30-70 → متوازن</li></ul><p><b>⚠️ تحذيرات:</b> قد يبقى في التشبع طويلًا.</p><p><b>✅ الخلاصة:</b> يساعدك في تحديد "غالي" أو "رخيص".</p>`},
-{cat:'tech',catName:'التحليل التقني',catIcon:'📊',id:'t2',icon:'🎯',title:'الدعم والمقاومة',time:'7 د',content:`<p><b>الدعم:</b> سعر يصعب النزول تحته. <b>المقاومة:</b> سعر يصعب الصعود فوقه.</p><p><b>🔢 مثال:</b> QRN نزل لـ 85 TND 3 مرات = دعم. صعد لـ 105 مرتين = مقاومة.</p><p><b>🎯 الاستفادة:</b></p><ul><li>قريب من الدعم → فرصة شراء</li><li>قريب من المقاومة → فرصة بيع</li></ul><p><b>✅ الخلاصة:</b> اشتر قرب الدعم، بِع قرب المقاومة.</p>`},
-{cat:'tech',catName:'التحليل التقني',catIcon:'📊',id:'t3',icon:'🕯️',title:'الشموع اليابانية',time:'8 د',content:`<p><b>الشموع</b> طريقة لتصوير حركة السعر خلال فترة.</p><p><b>🎯 4 أسعار:</b> Open، Close، High، Low.</p><p><b>🎨 الألوان:</b> أخضر (Close > Open)، أحمر (Close < Open).</p><p><b>🎯 أشكال مهمة:</b> Doji، Hammer، Shooting Star، Marubozu.</p><p><b>✅ الخلاصة:</b> الشمعة = ملخص معركة بين المشترين والبائعين.</p>`},
-{cat:'tech',catName:'التحليل التقني',catIcon:'📊',id:'t4',icon:'🌊',title:'حجم التداول',time:'6 د',content:`<p><b>الحجم</b> عدد الأسهم المتداولة في فترة.</p><p><b>🎯 القواعد:</b></p><ul><li>سعر يرتفع + حجم مرتفع → اتجاه قوي ✅</li><li>سعر يرتفع + حجم منخفض → صعود ضعيف ⚠️</li></ul><p><b>✅ الخلاصة:</b> لا تصدّق صعودًا بلا حجم.</p>`},
-{cat:'psy',catName:'علم النفس',catIcon:'🧠',id:'p1',icon:'😰',title:'الخوف والطمع',time:'6 د',content:`<p>السوق يتحرك بالأخبار، لكن أكثر بـ <b>المشاعر</b>.</p><p><b>😰 الخوف:</b> تبيع سهمًا جيدًا عند أول انخفاض.</p><p><b>🤑 الطمع:</b> تحتفظ بعد تحقيق الهدف.</p><p><b>💡 حلول:</b> خطة مكتوبة، لا تنظر للسعر كل دقيقة.</p><p><b>✅ الخلاصة:</b> الانضباط يغلب العاطفة.</p>`},
-{cat:'psy',catName:'علم النفس',catIcon:'🧠',id:'p2',icon:'😤',title:'الانتقام من السوق',time:'5 د',content:`<p>بعد خسارة، تريد استعادتها فورًا — خطأ قاتل.</p><p><b>⚠️ لماذا؟</b> الكبرياء الجريح، وهم "سأستعيد".</p><p><b>💡 حلول:</b> توقف ساعة، راجع أخطاءك، ارجع صغيرًا.</p><p><b>✅ الخلاصة:</b> الخسارة ليست عارًا — الانتقام يدمّر الحساب.</p>`},
+{cat:'basics',catName:'الأساسيات',catIcon:'🎯',id:'l5',icon:'📋',title:'مصطلحات أساسية',time:'6 د',content:`<p><b>📊 التداول:</b> Ask، Bid، Spread، Volume، Liquidity.</p><p><b>💰 الربح:</b> Profit، Loss، P&L، Portfolio، Position.</p><p><b>🎯 الأوامر:</b> Market Order، Limit Order، Stop-Loss.</p><p><b>📈 التقييم:</b> P/E، P/B، ROE، Dividend Yield.</p><p><b>✅ الخلاصة:</b> كل مصطلح يبدو غريبًا في البداية.</p>`},
+{cat:'risk',catName:'إدارة المخاطر',catIcon:'⚠️',id:'r1',icon:'🛑',title:'وقف الخسارة',time:'7 د',content:`<p><b>وقف الخسارة</b> أمر تلقائي يُنفَّذ عند وصول السعر لحد معيّن.</p><p><b>📚 لماذا؟</b> يمنع الخسائر الكبيرة، يُلغي العامل النفسي.</p><p><b>🔢 مثال:</b> اشتريت 100 سهم × 92.50 = 9,250 TND. وقف الخسارة عند 90.00 (-2.7%).</p><p><b>⚠️ بدون وقف:</b> السهم ينهار إلى 70 → خسارة 2,250 TND!</p><p><b>⚖️ القاعدة:</b> لا تخسر أكثر من <b>1-2%</b> من رأس المال في صفقة واحدة.</p><p><b>✅ الخلاصة:</b> وقف الخسارة علامة احتراف، ليس ضعفًا.</p>`},
+{cat:'risk',catName:'إدارة المخاطر',catIcon:'⚠️',id:'r2',icon:'⚖️',title:'المخاطرة / المكافأة',time:'6 د',content:`<p>قبل كل صفقة، حدد: كم تخاطر؟ وكم تتوقع أن تربح؟</p><p><b>🎯 القاعدة:</b> نسبة <b>1:2 على الأقل</b>.</p><p><b>🔢 مثال:</b> شراء 50 TND، وقف 48 (-4%)، هدف 54 (+8%). النسبة 1:2 ✅</p><p><b>📊 المعنى:</b> 1:2 → 33% ربح كافٍ للتعادل.</p><p><b>✅ الخلاصة:</b> الجودة ليست بعدد الصفقات الرابحة.</p>`},
+{cat:'risk',catName:'إدارة المخاطر',catIcon:'⚠️',id:'r3',icon:'🧺',title:'التنويع',time:'5 د',content:`<p><b>لا تضع كل بيضك في سلة واحدة</b>.</p><p><b>❌ مثال سيء:</b> 10,000 TND كلها في سهم واحد.</p><p><b>✅ مثال جيد:</b> 3,000 بنوك + 2,500 صناعة + 2,000 أغذية + 1,500 طاقة + 1,000 كاش.</p><p><b>⚠️ لا تفرط:</b> 3-7 أسهم مثالي.</p><p><b>✅ الخلاصة:</b> وزّع على 3-5 قطاعات.</p>`},
+{cat:'risk',catName:'إدارة المخاطر',catIcon:'⚠️',id:'r4',icon:'💰',title:'الرسوم والعمولات',time:'7 د',content:`<p>الرسوم <b>تكلفة خفية</b> تأكل أرباحك.</p><p><b>📊 مكونات في بورصة تونس:</b></p><ul><li>عمولة الوسيط: 0.80%</li><li>عمولة BVMT: 0.15%</li><li>رسم CMF: 23% من عمولة BVMT</li><li>رسوم RUS: 0.015%</li></ul><p><b>✅ الخلاصة:</b> احسب الرسوم قبل الدخول.</p>`},
+{cat:'tech',catName:'التحليل التقني',catIcon:'📊',id:'t1',icon:'📉',title:'مؤشر RSI',time:'7 د',content:`<p><b>RSI</b> يقيس سرعة وحجم التحركات (0-100).</p><p><b>🎯 التفسير:</b></p><ul><li>RSI > 70 → تشبع شرائي</li><li>RSI < 30 → تشبع بيعي</li><li>30-70 → متوازن</li></ul><p><b>✅ الخلاصة:</b> يساعدك في تحديد "غالي" أو "رخيص".</p>`},
+{cat:'tech',catName:'التحليل التقني',catIcon:'📊',id:'t2',icon:'🎯',title:'الدعم والمقاومة',time:'7 د',content:`<p><b>الدعم:</b> سعر يصعب النزول تحته. <b>المقاومة:</b> سعر يصعب الصعود فوقه.</p><p><b>🔢 مثال:</b> QRN نزل لـ 85 TND 3 مرات = دعم. صعد لـ 105 مرتين = مقاومة.</p><p><b>✅ الخلاصة:</b> اشتر قرب الدعم، بِع قرب المقاومة.</p>`},
+{cat:'tech',catName:'التحليل التقني',catIcon:'📊',id:'t3',icon:'🕯️',title:'الشموع اليابانية',time:'8 د',content:`<p><b>الشموع</b> طريقة لتصوير حركة السعر خلال فترة.</p><p><b>🎯 4 أسعار:</b> Open، Close، High، Low.</p><p><b>🎨 الألوان:</b> أخضر (Close > Open)، أحمر (Close < Open).</p><p><b>🎯 أشكال:</b> Doji، Hammer، Shooting Star، Marubozu.</p><p><b>✅ الخلاصة:</b> الشمعة = ملخص معركة.</p>`},
+{cat:'tech',catName:'التحليل التقني',catIcon:'📊',id:'t4',icon:'🌊',title:'حجم التداول',time:'6 د',content:`<p><b>الحجم</b> عدد الأسهم المتداولة.</p><p><b>🎯 القواعد:</b></p><ul><li>سعر يرتفع + حجم مرتفع → اتجاه قوي ✅</li><li>سعر يرتفع + حجم منخفض → صعود ضعيف ⚠️</li></ul><p><b>✅ الخلاصة:</b> لا تصدّق صعودًا بلا حجم.</p>`},
+{cat:'psy',catName:'علم النفس',catIcon:'🧠',id:'p1',icon:'😰',title:'الخوف والطمع',time:'6 د',content:`<p>السوق يتحرك بالأخبار، لكن أكثر بـ <b>المشاعر</b>.</p><p><b>😰 الخوف:</b> تبيع سهمًا جيدًا عند أول انخفاض.</p><p><b>🤑 الطمع:</b> تحتفظ بعد تحقيق الهدف.</p><p><b>✅ الخلاصة:</b> الانضباط يغلب العاطفة.</p>`},
+{cat:'psy',catName:'علم النفس',catIcon:'🧠',id:'p2',icon:'😤',title:'الانتقام من السوق',time:'5 د',content:`<p>بعد خسارة، تريد استعادتها فورًا — خطأ قاتل.</p><p><b>💡 حلول:</b> توقف ساعة، راجع أخطاءك، ارجع صغيرًا.</p><p><b>✅ الخلاصة:</b> الانتقام يدمّر الحساب.</p>`},
 {cat:'psy',catName:'علم النفس',catIcon:'🧠',id:'p3',icon:'⏳',title:'الصبر',time:'5 د',content:`<p>التداول ليس سباقًا. الناجح <b>ينتظر الفرص</b>.</p><p><b>🎯 حقيقة:</b> 80% من الأرباح تأتي من 20% من الصفقات.</p><p><b>✅ الخلاصة:</b> الصبر ميزة تنافسية.</p>`},
-{cat:'psy',catName:'علم النفس',catIcon:'🧠',id:'p4',icon:'😱',title:'FOMO',time:'6 د',content:`<p><b>FOMO</b> — الخوف من فقدان الفرصة. السبب الأول لخسائر المبتدئين.</p><p><b>🎯 النمط:</b> ترى سهمًا صعد 20%، تشتري، ينزل فورًا.</p><p><b>💡 حلول:</b> الأسواق لا تنتهي، حدّد سعر دخول مسبقًا.</p><p><b>✅ الخلاصة:</b> انتظر دخولك.</p>`},
+{cat:'psy',catName:'علم النفس',catIcon:'🧠',id:'p4',icon:'😱',title:'FOMO',time:'6 د',content:`<p><b>FOMO</b> — الخوف من فقدان الفرصة.</p><p><b>🎯 النمط:</b> ترى سهمًا صعد 20%، تشتري، ينزل فورًا.</p><p><b>✅ الخلاصة:</b> انتظر دخولك.</p>`},
 {cat:'str',catName:'الاستراتيجيات',catIcon:'💼',id:'s1',icon:'⚡',title:'التداول اليومي',time:'7 د',content:`<p><b>التداول اليومي</b> شراء وبيع في <b>نفس اليوم</b>.</p><p><b>⚠️ عيوب:</b> ضغط نفسي، وقت كامل، رسوم.</p><p><b>⚠️ نصيحة:</b> غير مناسب للمبتدئين.</p><p><b>✅ الخلاصة:</b> للاحتراف فقط.</p>`},
-{cat:'str',catName:'الاستراتيجيات',catIcon:'💼',id:'s2',icon:'🌊',title:'التداول المتأرجح',time:'7 د',content:`<p><b>التداول المتأرجح</b> الاحتفاظ من <b>أيام إلى أسابيع</b>.</p><p><b>🎯 مميزات:</b> وقت كافٍ للتحليل، ضغط أقل.</p><p><b>💡 نصيحة:</b> مثالي للمبتدئين.</p><p><b>✅ الخلاصة:</b> توازن جيد بين الربح والضغط.</p>`},
-{cat:'str',catName:'الاستراتيجيات',catIcon:'💼',id:'s3',icon:'🏔️',title:'التداول طويل المدى',time:'6 د',content:`<p><b>طويل المدى</b> شراء والاحتفاظ <b>لسنوات</b>.</p><p><b>🎯 مميزات:</b> ضغط نفسي أقل، توزيعات مركّبة.</p><p><b>💡 نصيحة ذهبية:</b> الوقت = صديق المستثمر.</p><p><b>✅ الخلاصة:</b> الأكثر أمانًا على المدى الطويل.</p>`},
-{cat:'tn',catName:'السوق التونسي',catIcon:'🇹🇳',id:'tn1',icon:'🏛️',title:'تاريخ بورصة تونس',time:'6 د',content:`<p><b>بورصة تونس (BVMT)</b> — 55+ سنة.</p><p><b>📅 محطات:</b></p><ul><li>1969: التأسيس</li><li>1995: إنشاء CMF</li><li>1998: إطلاق TUNINDEX</li><li>2012: التداول الإلكتروني</li></ul><p><b>✅ الخلاصة:</b> قصة 55 عامًا من التطوير.</p>`},
-{cat:'tn',catName:'السوق التونسي',catIcon:'🇹🇳',id:'tn2',icon:'🏦',title:'القطاعات الرائدة',time:'6 د',content:`<p>البورصة تنقسم لـ <b>قطاعات</b>.</p><p><b>📊 الأهم:</b></p><ul><li>🏦 بنوك: ~35%</li><li>🏭 صناعة: ~20%</li><li>👕 نسيج: ~10%</li><li>🌾 أغذية: ~8%</li></ul><p><b>💡 نصيحة:</b> قبل الشراء، اسأل: في أي قطاع؟</p><p><b>✅ الخلاصة:</b> القطاع = السياق.</p>`},
-{cat:'tn',catName:'السوق التونسي',catIcon:'🇹🇳',id:'tn3',icon:'⏰',title:'ساعات التداول',time:'5 د',content:`<p><b>🕐 في BVMT:</b> الإثنين → الجمعة 9:00 – 14:00.</p><p><b>⚠️ عطلة نهاية الأسبوع:</b> السبت والأحد مغلق.</p><p><b>💡 نصيحة:</b> لا تتداول 9:00-9:30 (تذبذب عنيف).</p><p><b>✅ الخلاصة:</b> احترم الأوقات.</p>`},
-{cat:'adv',catName:'محتوى متقدم',catIcon:'🚀',id:'a1',icon:'📊',title:'التحليل الأساسي',time:'8 د',content:`<p><b>التحليل الأساسي</b> تقييم الشركة من <b>داخلها</b>.</p><p><b>📊 5 عناصر:</b> القوائم المالية، الإدارة، القطاع، الميزة التنافسية، التوقعات.</p><p><b>💡 الجمع:</b> الأساسي للاختيار، التقني للتوقيت.</p><p><b>✅ الخلاصة:</b> اختر شركات قوية أساسيًا.</p>`},
-{cat:'adv',catName:'محتوى متقدم',catIcon:'🚀',id:'a2',icon:'💎',title:'نسب التقييم',time:'7 د',content:`<p><b>1️⃣ P/E:</b> السعر ÷ الربح. <15 فرصة، >25 مرتفع.</p><p><b>2️⃣ P/B:</b> السعر ÷ القيمة الدفترية. <1 تحت القيمة.</p><p><b>3️⃣ ROE:</b> >15% ممتاز.</p><p><b>4️⃣ Dividend Yield:</b> التوزيعات ÷ السعر × 100.</p><p><b>✅ الخلاصة:</b> النسب أدوات، ليست إجابات.</p>`}
+{cat:'str',catName:'الاستراتيجيات',catIcon:'💼',id:'s2',icon:'🌊',title:'التداول المتأرجح',time:'7 د',content:`<p><b>التداول المتأرجح</b> الاحتفاظ من <b>أيام إلى أسابيع</b>.</p><p><b>💡 نصيحة:</b> مثالي للمبتدئين.</p><p><b>✅ الخلاصة:</b> توازن جيد.</p>`},
+{cat:'str',catName:'الاستراتيجيات',catIcon:'💼',id:'s3',icon:'🏔️',title:'التداول طويل المدى',time:'6 د',content:`<p><b>طويل المدى</b> شراء والاحتفاظ <b>لسنوات</b>.</p><p><b>💡 نصيحة ذهبية:</b> الوقت = صديق المستثمر.</p><p><b>✅ الخلاصة:</b> الأكثر أمانًا على المدى الطويل.</p>`},
+{cat:'tn',catName:'السوق التونسي',catIcon:'🇹🇳',id:'tn1',icon:'🏛️',title:'تاريخ بورصة تونس',time:'6 د',content:`<p><b>بورصة تونس (BVMT)</b> — 55+ سنة.</p><p><b>📅 محطات:</b></p><ul><li>1969: التأسيس</li><li>1995: إنشاء CMF</li><li>1998: إطلاق TUNINDEX</li><li>2012: التداول الإلكتروني</li></ul><p><b>✅ الخلاصة:</b> قصة 55 عامًا.</p>`},
+{cat:'tn',catName:'السوق التونسي',catIcon:'🇹🇳',id:'tn2',icon:'🏦',title:'القطاعات الرائدة',time:'6 د',content:`<p>البورصة تنقسم لـ <b>قطاعات</b>.</p><p><b>📊 الأهم:</b></p><ul><li>🏦 بنوك: ~35%</li><li>🏭 صناعة: ~20%</li><li>👕 نسيج: ~10%</li><li>🌾 أغذية: ~8%</li></ul><p><b>✅ الخلاصة:</b> القطاع = السياق.</p>`},
+{cat:'tn',catName:'السوق التونسي',catIcon:'🇹🇳',id:'tn3',icon:'⏰',title:'ساعات التداول',time:'5 د',content:`<p><b>🕐 في BVMT:</b> الإثنين → الجمعة 9:00 – 14:00.</p><p><b>💡 نصيحة:</b> لا تتداول 9:00-9:30 (تذبذب).</p><p><b>✅ الخلاصة:</b> احترم الأوقات.</p>`},
+{cat:'adv',catName:'محتوى متقدم',catIcon:'🚀',id:'a1',icon:'📊',title:'التحليل الأساسي',time:'8 د',content:`<p><b>التحليل الأساسي</b> تقييم الشركة من <b>داخلها</b>.</p><p><b>💡 الجمع:</b> الأساسي للاختيار، التقني للتوقيت.</p><p><b>✅ الخلاصة:</b> اختر شركات قوية أساسيًا.</p>`},
+{cat:'adv',catName:'محتوى متقدم',catIcon:'🚀',id:'a2',icon:'💎',title:'نسب التقييم',time:'7 د',content:`<p><b>1️⃣ P/E:</b> السعر ÷ الربح. <15 فرصة، >25 مرتفع.</p><p><b>2️⃣ P/B:</b> <1 تحت القيمة.</p><p><b>3️⃣ ROE:</b> >15% ممتاز.</p><p><b>4️⃣ Dividend Yield:</b> التوزيعات ÷ السعر × 100.</p><p><b>✅ الخلاصة:</b> النسب أدوات، ليست إجابات.</p>`}
 ];
 
 /* ============================================================
-   TERMS
+   TERMS (50)
    ============================================================ */
 const TERMS=[
 {cat:'أساسيات',en:'Ask',ar:'أقل سعر للبيع',def:'أقل سعر يقبل به البائع.',ex:'سعر QRN Ask = 92.50 TND'},
 {cat:'أساسيات',en:'Bid',ar:'أعلى سعر للشراء',def:'أعلى سعر يقبل به المشتري.',ex:'Bid = 92.30 TND'},
-{cat:'أساسيات',en:'Spread',ar:'فارق السعر',def:'الفرق بين Ask و Bid.',ex:'Ask 92.50 - Bid 92.30 = 0.20'},
+{cat:'أساسيات',en:'Spread',ar:'فارق السعر',def:'الفرق بين Ask و Bid.',ex:'0.20 TND'},
 {cat:'أساسيات',en:'Volume',ar:'حجم التداول',def:'عدد الأسهم المتداولة.',ex:'200,000 سهم اليوم'},
 {cat:'أساسيات',en:'Liquidity',ar:'السيولة',def:'سهولة بيع وشراء السهم.',ex:'سهم سائل: تبيع فورًا'},
 {cat:'أساسيات',en:'Portfolio',ar:'المحفظة',def:'مجموع استثماراتك.',ex:'3 أسهم + 5,000 كاش'},
@@ -836,112 +870,42 @@ const TERMS=[
    ============================================================ */
 function computeRSI(prices,period=14){if(prices.length<period+1)return 50;let g=0,l=0;for(let i=prices.length-period;i<prices.length;i++){const d=prices[i]-prices[i-1];if(d>0)g+=d;else l-=d;}if(l===0)return 100;const rs=(g/period)/(l/period);return 100-(100/(1+rs));}
 function computeRSISeries(spark,period=14){const result=[];const slice=spark.slice(-60);for(let i=period;i<slice.length;i++){let g=0,l=0;for(let j=i-period+1;j<=i;j++){const d=slice[j]-slice[j-1];if(d>0)g+=d;else l-=d;}if(l===0)result.push(100);else{const rs=(g/period)/(l/period);result.push(100-(100/(1+rs)));}}return result;}
-function computeEMA(prices,period){
-  if(prices.length<period)return[];
-  const k=2/(period+1);
-  const ema=[prices.slice(0,period).reduce((a,b)=>a+b,0)/period];
-  for(let i=period;i<prices.length;i++)ema.push(prices[i]*k+ema[ema.length-1]*(1-k));
-  return ema;
-}
-function computeMACD(prices){
-  if(prices.length<35)return null;
-  const ema12=computeEMA(prices,12);
-  const ema26=computeEMA(prices,26);
-  const offset=ema12.length-ema26.length;
-  const macdLine=ema26.map((v,i)=>ema12[i+offset]-v);
-  const signal=computeEMA(macdLine,9);
-  const sigOffset=macdLine.length-signal.length;
-  const histogram=signal.map((s,i)=>macdLine[i+sigOffset]-s);
-  return{macdLine,signal,histogram};
-}
-function computeBollinger(prices,period=20,mult=2){
-  if(prices.length<period)return null;
-  const slice=prices.slice(-period);
-  const mean=slice.reduce((a,b)=>a+b,0)/period;
-  const variance=slice.reduce((a,b)=>a+Math.pow(b-mean,2),0)/period;
-  const sd=Math.sqrt(variance);
-  return{upper:mean+mult*sd,middle:mean,lower:mean-mult*sd,sd,mean};
-}
+function computeEMA(prices,period){if(prices.length<period)return[];const k=2/(period+1);const ema=[prices.slice(0,period).reduce((a,b)=>a+b,0)/period];for(let i=period;i<prices.length;i++)ema.push(prices[i]*k+ema[ema.length-1]*(1-k));return ema;}
+function computeMACD(prices){if(prices.length<35)return null;const ema12=computeEMA(prices,12);const ema26=computeEMA(prices,26);const offset=ema12.length-ema26.length;const macdLine=ema26.map((v,i)=>ema12[i+offset]-v);const signal=computeEMA(macdLine,9);const sigOffset=macdLine.length-signal.length;const histogram=signal.map((s,i)=>macdLine[i+sigOffset]-s);return{macdLine,signal,histogram};}
+function computeBollinger(prices,period=20,mult=2){if(prices.length<period)return null;const slice=prices.slice(-period);const mean=slice.reduce((a,b)=>a+b,0)/period;const variance=slice.reduce((a,b)=>a+Math.pow(b-mean,2),0)/period;const sd=Math.sqrt(variance);return{upper:mean+mult*sd,middle:mean,lower:mean-mult*sd,sd,mean};}
+
+/* FIX #9: generateCandles بدون تعبئة عشوائية */
 function generateCandles(s,tf='1m',c=35){
-  const src=s.spark.slice(-120);
-  const cs=tf==='1m'?3:tf==='5m'?5:tf==='1h'?10:20;
+  const cs=tf==='1m'?2:tf==='5m'?4:tf==='1h'?8:16;
+  const src=s.spark.slice(-cs*c);
   const ca=[];
-  for(let i=0;i<src.length-cs;i+=cs){const ch=src.slice(i,i+cs);const o=ch[0],cl=ch[ch.length-1];const hi=Math.max(...ch),lo=Math.min(...ch);ca.push({open:o,high:hi,low:lo,close:cl,volume:Math.random()*100+20});}
-  while(ca.length<c){const last=ca[0]||{close:s.price};const base=last.close||s.price;const d=(Math.random()-0.5)*0.01;const o=base,cl=base*(1+d);const hi=Math.max(o,cl)*(1+Math.random()*0.005),lo=Math.min(o,cl)*(1-Math.random()*0.005);ca.unshift({open:o,high:hi,low:lo,close:cl,volume:Math.random()*100+20});}
-  return ca.slice(-c);
-}
-function findPivots(spark,lookback=3){
-  const pivots=[];const n=spark.length;
-  for(let i=lookback;i<n-lookback;i++){
-    let isHigh=true,isLow=true;
-    for(let j=1;j<=lookback;j++){
-      if(spark[i]<=spark[i-j]||spark[i]<=spark[i+j])isHigh=false;
-      if(spark[i]>=spark[i-j]||spark[i]>=spark[i+j])isLow=false;
-    }
-    if(isHigh)pivots.push({i,v:spark[i],type:'high'});
-    if(isLow)pivots.push({i,v:spark[i],type:'low'});
+  for(let i=0;i+cs<=src.length;i+=cs){
+    const ch=src.slice(i,i+cs);
+    const o=ch[0],cl=ch[ch.length-1];
+    const hi=Math.max(...ch),lo=Math.min(...ch);
+    ca.push({open:o,high:hi,low:lo,close:cl,volume:Math.random()*100+20});
   }
-  return pivots;
+  return ca;
 }
-function clusterLevels(pivots,threshold=0.008){
-  const levels=[];
-  pivots.forEach(p=>{
-    const ex=levels.find(l=>Math.abs(l.v-p.v)/l.v<threshold);
-    if(ex){ex.touches++;ex.v=(ex.v*ex.touches+p.v)/(ex.touches+1);}
-    else levels.push({v:p.v,touches:1,type:p.type});
-  });
-  return levels.filter(l=>l.touches>=2).sort((a,b)=>b.v-a.v);
-}
+
+function findPivots(spark,lookback=3){const pivots=[];const n=spark.length;for(let i=lookback;i<n-lookback;i++){let isHigh=true,isLow=true;for(let j=1;j<=lookback;j++){if(spark[i]<=spark[i-j]||spark[i]<=spark[i+j])isHigh=false;if(spark[i]>=spark[i-j]||spark[i]>=spark[i+j])isLow=false;}if(isHigh)pivots.push({i,v:spark[i],type:'high'});if(isLow)pivots.push({i,v:spark[i],type:'low'});}return pivots;}
+function clusterLevels(pivots,threshold=0.008){const levels=[];pivots.forEach(p=>{const ex=levels.find(l=>Math.abs(l.v-p.v)/l.v<threshold);if(ex){ex.touches++;ex.v=(ex.v*ex.touches+p.v)/(ex.touches+1);}else levels.push({v:p.v,touches:1,type:p.type});});return levels.filter(l=>l.touches>=2).sort((a,b)=>b.v-a.v);}
 
 /* ============================================================
    ADAPTIVE
    ============================================================ */
 let adaptiveState={attempts:{},lastUpdate:0};
-function adaptTrackAnswer(lessonId,pct){
-  if(!adaptiveState.attempts)adaptiveState.attempts={};
-  if(!adaptiveState.attempts[lessonId])adaptiveState.attempts[lessonId]={count:0,sum:0,last:0};
-  const a=adaptiveState.attempts[lessonId];
-  a.count++;a.sum+=pct;a.last=pct;a.at=Date.now();
-  adaptiveState.lastUpdate=Date.now();
-  saveState();
-}
-function adaptGetMastery(){
-  const a=adaptiveState.attempts||{};
-  const ids=Object.keys(a);
-  if(!ids.length)return{overall:0,byLesson:{},weak:[]};
-  const byLesson={};let total=0;
-  ids.forEach(id=>{const avg=a[id].sum/a[id].count;byLesson[id]=avg;total+=avg;});
-  const overall=total/ids.length;
-  const weak=ids.filter(id=>byLesson[id]<70).sort((x,y)=>byLesson[x]-byLesson[y]);
-  return{overall,byLesson,weak};
-}
-function adaptGetNextQuestion(){
-  const m=adaptGetMastery();
-  let target=null;
-  if(m.weak.length)target=m.weak[Math.floor(Math.random()*Math.min(3,m.weak.length))];
-  else{
-    const all=LESSONS.map(l=>l.id);
-    const undone=all.filter(id=>!(lessonProgress.completed||{})[id]);
-    if(undone.length)target=undone[0];
-  }
-  return target;
-}
+function adaptTrackAnswer(lessonId,pct){if(!adaptiveState.attempts)adaptiveState.attempts={};if(!adaptiveState.attempts[lessonId])adaptiveState.attempts[lessonId]={count:0,sum:0,last:0};const a=adaptiveState.attempts[lessonId];a.count++;a.sum+=pct;a.last=pct;a.at=Date.now();adaptiveState.lastUpdate=Date.now();saveState();}
+function adaptGetMastery(){const a=adaptiveState.attempts||{};const ids=Object.keys(a);if(!ids.length)return{overall:0,byLesson:{},weak:[]};const byLesson={};let total=0;ids.forEach(id=>{const avg=a[id].sum/a[id].count;byLesson[id]=avg;total+=avg;});const overall=total/ids.length;const weak=ids.filter(id=>byLesson[id]<70).sort((x,y)=>byLesson[x]-byLesson[y]);return{overall,byLesson,weak};}
+function adaptGetNextQuestion(){const m=adaptGetMastery();let target=null;if(m.weak.length)target=m.weak[Math.floor(Math.random()*Math.min(3,m.weak.length))];else{const all=LESSONS.map(l=>l.id);const undone=all.filter(id=>!(lessonProgress.completed||{})[id]);if(undone.length)target=undone[0];}return target;}
 
 /* ============================================================
    LESSON → STOCK MAP
    ============================================================ */
-const LESSON_STOCK_MAP={
-  l1:'TN1',l2:'TN1',l3:'TN2',l4:'TN2',l5:'TN3',
-  r1:'TN4',r2:'TN4',r3:'TN5',r4:'TN6',
-  t1:'TN7',t2:'TN8',t3:'TN9',t4:'TN10',
-  p1:'S1',p2:'S1',p3:'S2',p4:'S2',
-  s1:'S3',s2:'S3',s3:'S4',
-  tn1:'TN1',tn2:'TN3',tn3:'TN4',
-  a1:'S4',a2:'S5'
-};
+const LESSON_STOCK_MAP={l1:'TN1',l2:'TN1',l3:'TN2',l4:'TN2',l5:'TN3',r1:'TN4',r2:'TN4',r3:'TN5',r4:'TN6',t1:'TN7',t2:'TN8',t3:'TN9',t4:'TN10',p1:'S1',p2:'S1',p3:'S2',p4:'S2',s1:'S3',s2:'S3',s3:'S4',tn1:'TN1',tn2:'TN3',tn3:'TN4',a1:'S4',a2:'S5'};
 </script><script>
 /* ============================================================
-   SPLASH + AUTH
+   SPLASH + AUTH FLOW
    ============================================================ */
 setTimeout(()=>{
   const sp=document.getElementById('splash');if(sp)sp.classList.add('hide');
@@ -950,17 +914,28 @@ setTimeout(()=>{
     if(user){
       if(appStarted&&currentUser&&currentUser.id===user.uid)return;
       appStarted=true;
-      currentUser={id:user.uid,name:cleanText(user.displayName||(user.email?user.email.split('@')[0]:''))||'لاعب',email:cleanText(user.email,120)||null,photo:cleanUrl(user.photoURL),provider:(user.providerData[0]&&user.providerData[0].providerId)||'password',avatarColor:'#f0b90b',joined:user.metadata&&user.metadata.creationTime?new Date(user.metadata.creationTime).getTime():Date.now()};
+      currentUser={
+        id:user.uid,
+        name:cleanText(user.displayName||(user.email?user.email.split('@')[0]:''))||'لاعب',
+        email:cleanText(user.email,120)||null,
+        photo:cleanUrl(user.photoURL),
+        provider:(user.providerData[0]&&user.providerData[0].providerId)||'password',
+        avatarColor:'#f0b90b',
+        joined:user.metadata&&user.metadata.creationTime?new Date(user.metadata.creationTime).getTime():Date.now(),
+        privacyHidden:false
+      };
       startApp();
     }else{appStarted=false;currentUser=null;showAuthScreen();}
   });
 },1800);
+
 function hideAllAuth(){['authScreen','registerScreen','loginScreen'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.add('hide');});const ma=document.getElementById('mainApp');if(ma)ma.style.display='none';}
 function showAuthScreen(){hideAllAuth();const el=document.getElementById('authScreen');if(el)el.classList.remove('hide');}
 function showRegister(){hideAllAuth();const el=document.getElementById('registerScreen');if(el)el.classList.remove('hide');}
 function showLogin(){hideAllAuth();const el=document.getElementById('loginScreen');if(el)el.classList.remove('hide');}
 function backToAuth(){showAuthScreen();}
 function setNameMode(m){nameMode=m;const p=document.getElementById('choicePseudo'),r=document.getElementById('choiceReal');if(p)p.classList.toggle('on',m==='pseudo');if(r)r.classList.toggle('on',m==='real');const rn=document.getElementById('regName');if(rn)rn.placeholder=m==='pseudo'?'Trader_Tounsi':'محمد بن علي';}
+
 document.getElementById('btnGoogle').addEventListener('click',async function(){
   if(!fbAuth)return showError('authError','Firebase غير جاهز');
   this.classList.add('loading');
@@ -976,6 +951,7 @@ document.getElementById('btnGoogle').addEventListener('click',async function(){
   }
   this.classList.remove('loading');
 });
+
 async function registerEmail(){
   if(!fbAuth)return showError('regError','Firebase غير جاهز');
   const e=document.getElementById('regEmail').value.trim(),p=document.getElementById('regPass').value,n=cleanText(document.getElementById('regName').value);
@@ -987,6 +963,7 @@ async function registerEmail(){
   catch(err){let msg='';if(err.code==='auth/email-already-in-use')msg='البريد مستعمل.';else if(err.code==='auth/weak-password')msg='كلمة المرور ضعيفة.';else msg=err.message||err.code;showError('regError',msg);}
   btn.disabled=false;btn.textContent='إنشاء الحساب والدخول';
 }
+
 async function loginEmail(){
   if(!fbAuth)return showError('loginError','Firebase غير جاهز');
   const e=document.getElementById('loginEmail').value.trim(),p=document.getElementById('loginPass').value;
@@ -997,7 +974,9 @@ async function loginEmail(){
   catch(err){let msg='';if(err.code==='auth/user-not-found')msg='لا يوجد حساب.';else if(err.code==='auth/wrong-password'||err.code==='auth/invalid-credential')msg='كلمة المرور خاطئة.';else msg=err.message||err.code;showError('loginError',msg);}
   btn.disabled=false;btn.textContent='تسجيل الدخول';
 }
+
 async function logout(){if(!confirm('تسجيل الخروج؟ سيتم حفظ تقدمك.'))return;saveState();closeSheet();try{await fbAuth.signOut();}catch(e){}appStarted=false;clearLocalState();toast('تم تسجيل الخروج','good');}
+
 function clearLocalState(){
   ['practice','live'].forEach(m=>{STATE[m]={cash:STARTING_CASH,holdings:{},pendingOrders:[],alerts:[],recentTrades:[],orderSeq:1,valueHistory:[{t:Date.now(),v:STARTING_CASH}],stocks:buildStocksFor(m),market:{value:9850,open:9850,drift:0.0000008,vol:0.0012,ret:0}};});
   notifications=[];sentMessages=[];lessonProgress={completed:{},quiz:{}};rankPeriod='all';userXP=0;userBadges=[];stateLoaded=false;
@@ -1006,6 +985,7 @@ function clearLocalState(){
   loadModeState(getMarketMode());
   if(presenceInterval){clearInterval(presenceInterval);presenceInterval=null;}
 }
+
 function resetState(){
   if(!confirm('إعادة تعيين اللعبة؟ سيتم حذف تقدمك في هذا الوضع والعودة إلى 10,000 TND.'))return;
   const m=getMarketMode();
@@ -1016,56 +996,78 @@ function resetState(){
 }
 
 /* ============================================================
-   PRESENCE
+   PRESENCE + STATS
    ============================================================ */
 async function updatePresence(){
   if(!currentUser||!fbDb)return;
   try{
     const v=cash+holdingsValue();
     const p=((v-STARTING_CASH)/STARTING_CASH)*100;
-    await fbDb.collection('users').doc(currentUser.id).set({name:currentUser.name,email:firebase.firestore.FieldValue.delete(),photo:currentUser.photo||null,provider:currentUser.provider,avatarColor:currentUser.avatarColor||'#f0b90b',joined:currentUser.joined||Date.now(),lastSeen:Date.now(),totalValue:v,profitPct:p,xp:userXP,badges:userBadges},{merge:true});
+    await fbDb.collection('users').doc(currentUser.id).set({
+      name:currentUser.name,
+      photo:currentUser.photo||null,
+      provider:currentUser.provider,
+      avatarColor:currentUser.avatarColor||'#f0b90b',
+      joined:currentUser.joined||Date.now(),
+      lastSeen:Date.now(),
+      totalValue:v,
+      profitPct:p,
+      xp:userXP,
+      badges:userBadges,
+      privacyHidden:currentUser.privacyHidden===true,
+      updatedAt:Date.now()
+    },{merge:true});
   }catch(e){}
 }
 async function fetchRealStats(){if(!fbDb)return;try{const t=await fbDb.collection('users').count().get();realStats.totalUsers=t.data().count;const f=Date.now()-5*60*1000;const o=await fbDb.collection('users').where('lastSeen','>',f).count().get();realStats.onlineNow=o.data().count;updateRealCountersUI();}catch(e){}}
 
-/* ============================================================
-   ✅ منطق العدّاد الجديد (لا يعرض —)
-   ============================================================ */
 function updateRealCountersUI(){
-  const t = realStats.totalUsers || 0;
-  const o = realStats.onlineNow || 0;
-  const MIN_CREDIBLE = 5;
-
-  // Topbar
-  const a = document.getElementById('onlineCounter');
-  const al = document.getElementById('onlineLabel');
-  if(a){
-    if(o >= 1){a.textContent = o.toLocaleString('en-US');if(al)al.textContent = 'متصل الآن';}
-    else{a.textContent = '●';if(al)al.textContent = 'متصل';}
-  }
-
-  // Users strip
-  const b = document.getElementById('usersStrip');
-  if(b){
-    if(t >= MIN_CREDIBLE)b.textContent = t.toLocaleString('en-US') + ' متداول في TounsiTrade';
-    else b.textContent = 'انضم إلى مجتمع TounsiTrade';
-  }
-
-  // Auth screen stat
-  const c = document.getElementById('liveUsersCount');
-  const cl = document.getElementById('liveUsersLabel');
-  if(c){
-    if(t >= MIN_CREDIBLE){c.textContent = t.toLocaleString('en-US');if(cl)cl.textContent = 'متداول';}
-    else{c.textContent = '👥';if(cl)cl.textContent = 'انضم للمجتمع';}
-  }
+  const t=realStats.totalUsers||0;
+  const o=realStats.onlineNow||0;
+  const MIN_CREDIBLE=5;
+  const a=document.getElementById('onlineCounter');
+  const al=document.getElementById('onlineLabel');
+  if(a){if(o>=1){a.textContent=o.toLocaleString('en-US');if(al)al.textContent='متصل الآن';}else{a.textContent='●';if(al)al.textContent='متصل';}}
+  const b=document.getElementById('usersStrip');
+  if(b){if(t>=MIN_CREDIBLE)b.textContent=t.toLocaleString('en-US')+' متداول في TounsiTrade';else b.textContent='انضم إلى مجتمع TounsiTrade';}
+  const c=document.getElementById('liveUsersCount');
+  const cl=document.getElementById('liveUsersLabel');
+  if(c){if(t>=MIN_CREDIBLE){c.textContent=t.toLocaleString('en-US');if(cl)cl.textContent='متداول';}else{c.textContent='👥';if(cl)cl.textContent='انضم للمجتمع';}}
 }
 
-async function fetchRealLeaderboard(){if(!fbDb)return[];try{const s=await fbDb.collection('users').orderBy('totalValue','desc').limit(50).get();const l=[];s.forEach(d=>{const x=d.data();l.push({uid:d.id,name:cleanText(x.name)||'لاعب',photo:cleanUrl(x.photo),avatarColor:cleanColor(x.avatarColor),totalValue:cleanNum(x.totalValue,0,5e6,STARTING_CASH),profitPct:cleanNum(x.profitPct,-100,5000,0),joined:x.joined||Date.now(),lastSeen:x.lastSeen||0,isMe:d.id===(currentUser&&currentUser.id)});});return l;}catch(e){return[];}}
+/* FIX #25: fetchRealLeaderboard مع privacy */
+async function fetchRealLeaderboard(){
+  if(!fbDb)return[];
+  try{
+    const s=await fbDb.collection('users').orderBy('totalValue','desc').limit(50).get();
+    const l=[];
+    s.forEach(d=>{
+      const x=d.data();
+      const isMe=d.id===(currentUser&&currentUser.id);
+      const hidden=x.privacyHidden===true;
+      l.push({
+        uid:d.id,
+        name:hidden?'متداول محمي':(cleanText(x.name)||'لاعب'),
+        photo:hidden?null:cleanUrl(x.photo),
+        avatarColor:hidden?'#5e6673':cleanColor(x.avatarColor),
+        totalValue:hidden?null:Math.max(0,Math.min(1e8,Number(x.totalValue)||STARTING_CASH)),
+        profitPct:hidden?null:Math.max(-100,Math.min(5000,Number(x.profitPct)||0)),
+        joined:x.joined||Date.now(),
+        lastSeen:hidden?0:(x.lastSeen||0),
+        xp:Math.max(0,Math.min(100000,Number(x.xp)||0)),
+        badgesCount:Array.isArray(x.badges)?x.badges.length:0,
+        hidden:hidden,
+        isMe:isMe
+      });
+    });
+    return l;
+  }catch(e){return[];}
+}
 function timeAgo(ts){if(!ts)return'فترة';const d=Date.now()-ts;const m=Math.floor(d/60000),h=Math.floor(d/3600000),dy=Math.floor(d/86400000);if(m<1)return'الآن';if(m<60)return`${m} دقيقة`;if(h<24)return`${h} ساعة`;if(dy<30)return`${dy} يوم`;return`${Math.floor(dy/30)} شهر`;}
 function startPresenceSystem(){if(presenceInterval)clearInterval(presenceInterval);updatePresence();fetchRealStats();updateRealCountersUI();presenceInterval=setInterval(updatePresence,45000);setInterval(fetchRealStats,180000);let la=0;const on=()=>{const n=Date.now();if(n-la>30000){la=n;updatePresence();}};['click','touchstart','keydown'].forEach(e=>document.addEventListener(e,on,{passive:true}));}
 
 /* ============================================================
-   SYNC
+   SYNC (saveState + loadState)
    ============================================================ */
 function stateDocPath(){return'userStates/'+currentUser.id;}
 function saveState(){
@@ -1083,7 +1085,7 @@ function saveState(){
       weekly:weeklyState,adaptive:adaptiveState,
       updatedAt:Date.now()
     };
-    fbDb.doc(stateDocPath()).set(state,{merge:false}).catch(e=>{console.error('save',e);const n=Date.now();if(n-(window._lastSaveErr||0)>60000){window._lastSaveErr=n;toast('⚠️ تعذّر حفظ التقدم، تحقق من الاتصال','warn');}});
+    fbDb.doc(stateDocPath()).set(state,{merge:false}).catch(e=>{console.error('save',e);const n=Date.now();if(n-(window._lastSaveErr||0)>60000){window._lastSaveErr=n;toast('⚠️ تعذّر حفظ التقدم','warn');}});
   },2000);
 }
 async function loadState(){
@@ -1107,10 +1109,17 @@ async function loadState(){
     userBadges=s.userBadges||[];
     if(s.weekly&&s.weekly.weekKey)weeklyState=s.weekly;
     if(s.adaptive)adaptiveState=s.adaptive;
+    // جلب privacyHidden من users collection
+    try{
+      const u=await fbDb.collection('users').doc(currentUser.id).get();
+      if(u.exists && u.data().privacyHidden===true) currentUser.privacyHidden=true;
+    }catch(e){}
     loadModeState(getMarketMode());
     return true;
   }catch(e){return false;}
 }
+
+/* FIX #2: startApp بدون silent failure */
 async function startApp(){
   try{
     hideAllAuth();
@@ -1120,8 +1129,16 @@ async function startApp(){
     const av=document.getElementById('heroAvatar');
     if(av){if(currentUser.photo){av.innerHTML=`<img src="${currentUser.photo}" alt=""><div class="online-badge"></div>`;}else{av.innerHTML=`<span>${l}</span><div class="online-badge"></div>`;av.style.background=`linear-gradient(135deg,${currentUser.avatarColor},${shade(currentUser.avatarColor,-30)})`;}}
     clearLocalState();
-    try{await Promise.race([loadState(),new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),8000))]);}catch(e){}
-    stateLoaded=true;loadModeState(getMarketMode());
+    let loadOK=false;
+    try{
+      await Promise.race([loadState(),new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),8000))]);
+      loadOK=true;
+    }catch(e){
+      console.warn('loadState failed:',e);
+      toast('⚠️ تعذّر تحميل بياناتك — تحقق من الاتصال','warn');
+    }
+    stateLoaded=loadOK;
+    loadModeState(getMarketMode());
     rolloverWeeklyIfNeeded();
     computeWeeklyProgress();
     currentTab='market';
@@ -1217,7 +1234,7 @@ function renderMarket(){
     ${listed.length?`<div class="sec"><span class="sec-t">${mode==='live'?'شركات مدرجة':'شركات التدريب'}</span><span class="badge-real">${mode==='live'?'سوق حقيقي':'تدريب'}</span><span class="sec-line"></span></div><div class="stock-list">${listed.map(stockRow).join('')}</div>`:''}
     ${spon.length?`<div class="sec"><span class="sec-t">شركات مدعومة</span><span class="badge-spon">★ ترويج</span><span class="sec-line"></span></div><div class="stock-list">${spon.map(stockRow).join('')}</div>`:''}
     <div class="podium-wrap"><div class="podium-head"><div class="podium-title">🏆 أفضل 5 متداولين <span style="font-size:10px;color:#7b8494;font-weight:600;margin-right:4px">— الترتيب التونسي</span></div><button class="podium-view-all" onclick="switchToRank()">عرض الكل ←</button></div><div id="podiumList"><div class="podium-empty">جاري التحميل...</div></div></div>
-    <div class="disc">جميع أسماء الشركات خيالية ولا تمثّل شركات حقيقية. الأسعار افتراضية 100%.</div>`;
+    <div class="disc">جميع أسماء الشركات خيالية. الأسعار افتراضية 100%.</div>`;
   view.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{currentFilter=c.dataset.f;renderMarket();});
   view.querySelectorAll('.stock-row').forEach(el=>el.onclick=()=>openTrade(el.dataset.id));
   loadPodium();
@@ -1250,7 +1267,7 @@ function updateHero(){
 }
 
 /* ============================================================
-   PODIUM
+   PODIUM (FIX #25 privacy)
    ============================================================ */
 async function loadPodium(){
   const el=document.getElementById('podiumList');if(!el)return;
@@ -1260,34 +1277,74 @@ async function loadPodium(){
     if(!top.length){el.innerHTML='<div class="podium-empty">لا يوجد متداولون بعد — كن الأول! 🏆</div>';return;}
     el.innerHTML=top.map((p,i)=>{
       const m=i===0?'🥇':i===1?'🥈':i===2?'🥉':String(i+1);
+      const me=p.isMe?' <span style="color:#f0b90b">· أنت</span>':'';
+      if(p.hidden&&!p.isMe){
+        return`<div class="podium-row" onclick="switchToRank()"><div class="podium-medal">${m}</div><div class="podium-name" style="color:#5e6673">${p.name}${me}</div><div class="podium-pct" style="color:#5e6673;font-size:10px">🔒</div></div>`;
+      }
       const col=p.profitPct>=0?'#0ecb81':'#f6465d';
       const sg=p.profitPct>=0?'+':'';
-      const me=p.isMe?' <span style="color:#f0b90b">· أنت</span>':'';
       return`<div class="podium-row" onclick="switchToRank()"><div class="podium-medal">${m}</div><div class="podium-name">${p.name}${me}</div><div class="podium-pct" style="color:${col}">${sg}${p.profitPct.toFixed(2)}%</div></div>`;
     }).join('');
   }catch(e){el.innerHTML='<div class="podium-empty">تعذّر التحميل</div>';}
 }
+
+/* FIX #7: renderRank مع الترتيب الشخصي + FIX #25 privacy */
 async function renderRank(){
   view.innerHTML=`<div class="pf-empty" style="padding:60px 20px"><div class="ico" style="font-size:30px">⏳</div><div>جاري التحميل...</div></div>`;
-  await fetchRealStats();const list=await fetchRealLeaderboard();
+  await fetchRealStats();
+  const list=await fetchRealLeaderboard();
+  // FIX #7: حساب الترتيب الفعلي
+  let myRank=null;
+  let totalUsers=0;
+  if(currentUser&&fbDb){
+    try{
+      const myValue=cash+holdingsValue();
+      const higher=await fbDb.collection('users').where('totalValue','>',myValue).count().get();
+      myRank=higher.data().count+1;
+      totalUsers=realStats.totalUsers||myRank;
+    }catch(e){console.warn('rank calc failed',e);}
+  }
   const header=`<div class="index-strip" style="margin-bottom:12px"><div><div class="nm">مستخدم مسجل</div><div class="vv">${Math.max(1,realStats.totalUsers).toLocaleString('en-US')}</div></div><div style="text-align:left"><div class="nm">نشط الآن</div><div class="vv" style="color:#0ecb81">${Math.max(1,realStats.onlineNow).toLocaleString('en-US')}</div></div></div><div class="sec"><span class="sec-t">🏆 أفضل 50 متداول</span><span class="sec-line"></span></div>`;
   if(!list.length){view.innerHTML=header+`<div class="pf-empty" style="padding:60px 20px"><div class="ico">🏆</div><div>لا يوجد لاعبون بعد</div></div><button class="btn-primary" style="margin-top:14px;background:#1e252d;color:#eaecef;box-shadow:none" onclick="backToMore()">رجوع</button>`;return;}
-  view.innerHTML=header+list.map((p,i)=>{
-    const on=(Date.now()-p.lastSeen)<5*60*1000;
+  const listHTML=list.map((p,i)=>{
+    const on=(!p.hidden)&&(Date.now()-p.lastSeen)<5*60*1000;
     const l=p.name.charAt(0).toUpperCase();
     const ab=p.photo?'':`background:linear-gradient(135deg,${p.avatarColor},${shade(p.avatarColor,-30)})`;
     const ac=p.photo?`<img src="${p.photo}" alt="">`:l;
-    let st;if(p.isMe)st='أنت الآن';else if(on)st='نشط الآن';else st='آخر ظهور: '+timeAgo(p.lastSeen);
+    let st;
+    if(p.hidden&&!p.isMe)st='🔒 محمي';
+    else if(p.isMe)st='أنت الآن';
+    else if(on)st='نشط الآن';
+    else st='آخر ظهور: '+timeAgo(p.lastSeen);
     const jn=timeAgo(p.joined);
     const mc=i===0?'gold':i===1?'silver':i===2?'bronze':'';
-    return`<div class="rank-card ${p.isMe?'me':''}"><div class="rank-num ${mc}">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</div><div class="rank-avatar" style="${ab}">${ac}<div class="status-dot ${on?'online':''}"></div></div><div class="rank-info">${p.name} ${p.isMe?'<span style="color:#f0b90b">· أنت</span>':''}<div class="meta">${st} · عضو منذ ${jn}</div></div><div class="rank-value"><div class="v">${fmt(p.totalValue)} TND</div><div class="pct" style="color:${p.profitPct>=0?'#0ecb81':'#f6465d'}">${p.profitPct>=0?'+':''}${p.profitPct.toFixed(2)}%</div></div></div>`;
-  }).join('')+`<div class="disc">الترتيب يعرض المستخدمين الحقيقيين فقط.</div><button class="btn-primary" style="margin-top:14px;background:#1e252d;color:#eaecef;box-shadow:none" onclick="backToMore()">رجوع</button>`;
+    const valueDisplay=p.hidden?'<span style="color:#5e6673">🔒 مخفي</span>':fmt(p.totalValue)+' TND';
+    const pctDisplay=p.hidden?'<span style="color:#5e6673;font-size:10px">🔒</span>':`<span style="color:${p.profitPct>=0?'#0ecb81':'#f6465d'}">${p.profitPct>=0?'+':''}${p.profitPct.toFixed(2)}%</span>`;
+    return`<div class="rank-card ${p.isMe?'me':''}"><div class="rank-num ${mc}">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</div><div class="rank-avatar" style="${ab}">${ac}<div class="status-dot ${on?'online':''}"></div></div><div class="rank-info">${p.name} ${p.isMe?'<span style="color:#f0b90b">· أنت</span>':''}<div class="meta">${st} · عضو منذ ${jn}${p.xp>0?` · ${p.xp} XP`:''}</div></div><div class="rank-value"><div class="v">${valueDisplay}</div><div class="pct">${pctDisplay}</div></div></div>`;
+  }).join('');
+  // FIX #7: عرض ترتيب المستخدم إذا كان خارج أفضل 50
+  let myRankHTML='';
+  if(myRank&&myRank>50){
+    const myVal=cash+holdingsValue();
+    const myPnl=((myVal-STARTING_CASH)/STARTING_CASH)*100;
+    myRankHTML=`
+      <div class="sec" style="margin-top:16px"><span class="sec-t">ترتيبك</span><span class="sec-line"></span></div>
+      <div class="rank-card me" style="border-color:#f0b90b">
+        <div class="rank-num gold" style="font-size:14px">#${myRank}</div>
+        <div class="rank-avatar" style="background:linear-gradient(135deg,#f0b90b,#b88700)">${currentUser.name.charAt(0).toUpperCase()}<div class="status-dot online"></div></div>
+        <div class="rank-info">${currentUser.name} <span style="color:#f0b90b">· أنت</span><div class="meta">الترتيب <b>#${myRank}</b> من ${totalUsers.toLocaleString('en-US')}</div></div>
+        <div class="rank-value"><div class="v">${fmt(myVal)} TND</div><div class="pct" style="color:${myPnl>=0?'#0ecb81':'#f6465d'}">${myPnl>=0?'+':''}${myPnl.toFixed(2)}%</div></div>
+      </div>
+      ${myRank>50?`<div style="text-align:center;font-size:11px;color:#7b8494;margin-top:10px;line-height:1.6">🎯 لتدخل أفضل 50، تحتاج <b style="color:#f0b90b">+${fmt((list[49]?.totalValue||STARTING_CASH)-myVal)} TND</b></div>`:''}
+    `;
+  }
+  view.innerHTML=header+listHTML+myRankHTML+`<div class="disc">الترتيب يعرض المستخدمين الحقيقيين فقط.</div><button class="btn-primary" style="margin-top:14px;background:#1e252d;color:#eaecef;box-shadow:none" onclick="backToMore()">رجوع</button>`;
 }
 function switchToRank(){currentTab='rank';document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));renderRank();}
 function backToMore(){currentTab='more';document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x.dataset.tab==='more'));renderMore();}
 
 /* ============================================================
-   TRADE SHEET
+   TRADE SHEET (FIX E2 + E3 + #5 + #8)
    ============================================================ */
 function openTrade(id){openStockId=id;inputVal=1;buyMode='qty';activePanel=null;currentTimeframe='1m';sheetIndicator='candle';renderSheet();sheet.classList.add('on');backdrop.classList.add('on');startSheetLive();}
 function closeSheet(){openStockId=null;activePanel=null;sheet.classList.remove('on');backdrop.classList.remove('on');stopSheetLive();}
@@ -1297,10 +1354,12 @@ function currentQty(){const s=STOCKS.find(x=>x.id===openStockId);if(!s)return 0;
 function setTimeframe(tf){currentTimeframe=tf;renderSheet();}
 function setSheetIndicator(kind){sheetIndicator=kind;renderSheet();}
 
-function drawCandleChart(){const s=STOCKS.find(x=>x.id===openStockId);if(!s)return'';const ca=generateCandles(s,currentTimeframe,35);const W=320,H=140;const mL=Math.min(...ca.map(c=>c.low)),mH=Math.max(...ca.map(c=>c.high)),r=(mH-mL)||1;const cw=W/ca.length,bw=Math.max(cw*0.7,4),pd=4;let sv=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="height:140px">`;for(let i=0;i<=4;i++){const y=pd+(H-2*pd)*i/4;sv+=`<line x1="0" y1="${y}" x2="${W}" y2="${y}" stroke="#1a2028" stroke-width="0.5"/>`;}ca.forEach((c,i)=>{const x=i*cw+cw/2;const yH=pd+((mH-c.high)/r)*(H-2*pd),yL=pd+((mH-c.low)/r)*(H-2*pd),yO=pd+((mH-c.open)/r)*(H-2*pd),yC=pd+((mH-c.close)/r)*(H-2*pd);const co=c.close>=c.open?'#0ecb81':'#f6465d';const bT=Math.min(yO,yC),bB=Math.max(yO,yC);sv+=`<line x1="${x}" y1="${yH}" x2="${x}" y2="${yL}" stroke="${co}" stroke-width="1.2"/>`;sv+=`<rect x="${x-bw/2}" y="${bT}" width="${bw}" height="${Math.max(bB-bT,1)}" fill="${co}" opacity="0.9"/>`;});sv+='</svg>';return sv;}
+function drawCandleChart(){const s=STOCKS.find(x=>x.id===openStockId);if(!s)return'';const ca=generateCandles(s,currentTimeframe,35);if(!ca.length)return'';const W=320,H=140;const mL=Math.min(...ca.map(c=>c.low)),mH=Math.max(...ca.map(c=>c.high)),r=(mH-mL)||1;const cw=W/ca.length,bw=Math.max(cw*0.7,4),pd=4;let sv=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="height:140px">`;for(let i=0;i<=4;i++){const y=pd+(H-2*pd)*i/4;sv+=`<line x1="0" y1="${y}" x2="${W}" y2="${y}" stroke="#1a2028" stroke-width="0.5"/>`;}ca.forEach((c,i)=>{const x=i*cw+cw/2;const yH=pd+((mH-c.high)/r)*(H-2*pd),yL=pd+((mH-c.low)/r)*(H-2*pd),yO=pd+((mH-c.open)/r)*(H-2*pd),yC=pd+((mH-c.close)/r)*(H-2*pd);const co=c.close>=c.open?'#0ecb81':'#f6465d';const bT=Math.min(yO,yC),bB=Math.max(yO,yC);sv+=`<line x1="${x}" y1="${yH}" x2="${x}" y2="${yL}" stroke="${co}" stroke-width="1.2"/>`;sv+=`<rect x="${x-bw/2}" y="${bT}" width="${bw}" height="${Math.max(bB-bT,1)}" fill="${co}" opacity="0.9"/>`;});sv+='</svg>';return sv;}
+
 function drawBollingerChart(){
   const s=STOCKS.find(x=>x.id===openStockId);if(!s)return'';
-  const ca=generateCandles(s,currentTimeframe,35);const prices=ca.map(c=>c.close);
+  const ca=generateCandles(s,currentTimeframe,35);if(!ca.length)return'';
+  const prices=ca.map(c=>c.close);
   const bb=computeBollinger(prices,20,2);
   const W=320,H=140,pd=6;
   const mH=Math.max(...ca.map(c=>c.high),bb?bb.upper:0);
@@ -1309,28 +1368,15 @@ function drawBollingerChart(){
   const y=v=>pd+((mH-v)/r)*(H-2*pd);
   let sv=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="height:140px">`;
   for(let i=0;i<=4;i++){const y2=pd+(H-2*pd)*i/4;sv+=`<line x1="0" y1="${y2}" x2="${W}" y2="${y2}" stroke="#1a2028" stroke-width="0.5"/>`;}
-  if(bb){
-    const off=ca.length-20;
-    const yU=y(bb.upper),yM=y(bb.middle),yL=y(bb.lower);
-    const xS=off*cw+cw/2,xE=W-cw/2;
-    sv+=`<rect x="${xS}" y="${yU}" width="${xE-xS}" height="${yL-yU}" fill="#3b82f6" opacity="0.06"/>`;
-    sv+=`<line x1="${xS}" y1="${yU}" x2="${xE}" y2="${yU}" stroke="#3b82f6" stroke-width="1.2" opacity="0.75" stroke-dasharray="4,3"/>`;
-    sv+=`<line x1="${xS}" y1="${yM}" x2="${xE}" y2="${yM}" stroke="#f0b90b" stroke-width="1.2" opacity="0.8"/>`;
-    sv+=`<line x1="${xS}" y1="${yL}" x2="${xE}" y2="${yL}" stroke="#3b82f6" stroke-width="1.2" opacity="0.75" stroke-dasharray="4,3"/>`;
-  }
-  ca.forEach((c,i)=>{
-    const x=i*cw+cw/2;
-    const yH=y(c.high),yL=y(c.low),yO=y(c.open),yC=y(c.close);
-    const co=c.close>=c.open?'#0ecb81':'#f6465d';
-    const bT=Math.min(yO,yC),bB=Math.max(yO,yC);
-    sv+=`<line x1="${x}" y1="${yH}" x2="${x}" y2="${yL}" stroke="${co}" stroke-width="1"/>`;
-    sv+=`<rect x="${x-bw/2}" y="${bT}" width="${bw}" height="${Math.max(bB-bT,1)}" fill="${co}" opacity="0.9"/>`;
-  });
+  if(bb){const off=ca.length-20;const yU=y(bb.upper),yM=y(bb.middle),yL=y(bb.lower);const xS=off*cw+cw/2,xE=W-cw/2;sv+=`<rect x="${xS}" y="${yU}" width="${xE-xS}" height="${yL-yU}" fill="#3b82f6" opacity="0.06"/>`;sv+=`<line x1="${xS}" y1="${yU}" x2="${xE}" y2="${yU}" stroke="#3b82f6" stroke-width="1.2" opacity="0.75" stroke-dasharray="4,3"/>`;sv+=`<line x1="${xS}" y1="${yM}" x2="${xE}" y2="${yM}" stroke="#f0b90b" stroke-width="1.2" opacity="0.8"/>`;sv+=`<line x1="${xS}" y1="${yL}" x2="${xE}" y2="${yL}" stroke="#3b82f6" stroke-width="1.2" opacity="0.75" stroke-dasharray="4,3"/>`;}
+  ca.forEach((c,i)=>{const x=i*cw+cw/2;const yH=y(c.high),yL=y(c.low),yO=y(c.open),yC=y(c.close);const co=c.close>=c.open?'#0ecb81':'#f6465d';const bT=Math.min(yO,yC),bB=Math.max(yO,yC);sv+=`<line x1="${x}" y1="${yH}" x2="${x}" y2="${yL}" stroke="${co}" stroke-width="1"/>`;sv+=`<rect x="${x-bw/2}" y="${bT}" width="${bw}" height="${Math.max(bB-bT,1)}" fill="${co}" opacity="0.9"/>`;});
   sv+='</svg>';return sv;
 }
+
 function drawMACDChart(){
   const s=STOCKS.find(x=>x.id===openStockId);if(!s)return'';
-  const ca=generateCandles(s,currentTimeframe,60);const prices=ca.map(c=>c.close);
+  const ca=generateCandles(s,currentTimeframe,60);if(ca.length<35)return'<div style="text-align:center;color:#5e6673;font-size:11px;padding:20px">بيانات غير كافية</div>';
+  const prices=ca.map(c=>c.close);
   const m=computeMACD(prices);
   if(!m)return'<div style="text-align:center;color:#5e6673;font-size:11px;padding:20px">بيانات غير كافية</div>';
   const W=320,H=100,pd=6;
@@ -1340,11 +1386,7 @@ function drawMACDChart(){
   const zeroY=y(0);const cw=W/(m.macdLine.length);
   let sv=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="height:100px">`;
   sv+=`<line x1="0" y1="${zeroY}" x2="${W}" y2="${zeroY}" stroke="#2e3742" stroke-width="0.7"/>`;
-  m.histogram.forEach((v,i)=>{
-    const x=i*cw+cw/2;const col=v>=0?'#0ecb81':'#f6465d';
-    const yy=y(v);const h=Math.abs(yy-zeroY);
-    sv+=`<rect x="${x-cw*0.3}" y="${Math.min(yy,zeroY)}" width="${cw*0.6}" height="${Math.max(h,0.5)}" fill="${col}" opacity="0.55"/>`;
-  });
+  m.histogram.forEach((v,i)=>{const x=i*cw+cw/2;const col=v>=0?'#0ecb81':'#f6465d';const yy=y(v);const h=Math.abs(yy-zeroY);sv+=`<rect x="${x-cw*0.3}" y="${Math.min(yy,zeroY)}" width="${cw*0.6}" height="${Math.max(h,0.5)}" fill="${col}" opacity="0.55"/>`;});
   const ptsM=m.macdLine.map((v,i)=>`${(i*cw+cw/2).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
   sv+=`<polyline points="${ptsM}" fill="none" stroke="#3b82f6" stroke-width="1.5"/>`;
   const off=m.macdLine.length-m.signal.length;
@@ -1352,9 +1394,10 @@ function drawMACDChart(){
   sv+=`<polyline points="${ptsS}" fill="none" stroke="#f0b90b" stroke-width="1.5"/>`;
   sv+='</svg>';return sv;
 }
+
 function drawSupportResistanceOverlay(){
   const s=STOCKS.find(x=>x.id===openStockId);if(!s)return'';
-  const ca=generateCandles(s,currentTimeframe,35);
+  const ca=generateCandles(s,currentTimeframe,35);if(!ca.length)return'';
   const pivots=findPivots(s.spark,3);
   const levels=clusterLevels(pivots,0.008).slice(0,6);
   const W=320,H=140,pd=6;
@@ -1363,19 +1406,8 @@ function drawSupportResistanceOverlay(){
   const y=v=>pd+((mH-v)/r)*(H-2*pd);
   let sv=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="height:140px">`;
   const cw=W/ca.length,bw=Math.max(cw*0.7,4);
-  levels.forEach(l=>{
-    const yy=y(l.v);if(yy<pd||yy>H-pd)return;
-    const col=l.v<s.price?'#0ecb81':'#f6465d';
-    sv+=`<line x1="0" y1="${yy}" x2="${W}" y2="${yy}" stroke="${col}" stroke-width="1" stroke-dasharray="3,3" opacity="0.6"/>`;
-  });
-  ca.forEach((c,i)=>{
-    const x=i*cw+cw/2;
-    const yH=y(c.high),yL=y(c.low),yO=y(c.open),yC=y(c.close);
-    const co=c.close>=c.open?'#0ecb81':'#f6465d';
-    const bT=Math.min(yO,yC),bB=Math.max(yO,yC);
-    sv+=`<line x1="${x}" y1="${yH}" x2="${x}" y2="${yL}" stroke="${co}" stroke-width="1"/>`;
-    sv+=`<rect x="${x-bw/2}" y="${bT}" width="${bw}" height="${Math.max(bB-bT,1)}" fill="${co}" opacity="0.9"/>`;
-  });
+  levels.forEach(l=>{const yy=y(l.v);if(yy<pd||yy>H-pd)return;const col=l.v<s.price?'#0ecb81':'#f6465d';sv+=`<line x1="0" y1="${yy}" x2="${W}" y2="${yy}" stroke="${col}" stroke-width="1" stroke-dasharray="3,3" opacity="0.6"/>`;});
+  ca.forEach((c,i)=>{const x=i*cw+cw/2;const yH=y(c.high),yL=y(c.low),yO=y(c.open),yC=y(c.close);const co=c.close>=c.open?'#0ecb81':'#f6465d';const bT=Math.min(yO,yC),bB=Math.max(yO,yC);sv+=`<line x1="${x}" y1="${yH}" x2="${x}" y2="${yL}" stroke="${co}" stroke-width="1"/>`;sv+=`<rect x="${x-bw/2}" y="${bT}" width="${bw}" height="${Math.max(bB-bT,1)}" fill="${co}" opacity="0.9"/>`;});
   sv+='</svg>';return sv;
 }
 function renderIndicatorChart(){
@@ -1384,14 +1416,12 @@ function renderIndicatorChart(){
   if(sheetIndicator==='sr')return drawSupportResistanceOverlay();
   return drawCandleChart();
 }
-function drawVolume(){const s=STOCKS.find(x=>x.id===openStockId);if(!s)return'';const ca=generateCandles(s,currentTimeframe,35);const W=320,H=32;const mV=Math.max(...ca.map(c=>c.volume));const cw=W/ca.length;let sv=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">`;ca.forEach((c,i)=>{const x=i*cw;const h=(c.volume/mV)*(H-4);const co=c.close>=c.open?'#0ecb81':'#f6465d';sv+=`<rect x="${x+1}" y="${H-h}" width="${Math.max(cw-2,1)}" height="${h}" fill="${co}" opacity="0.5"/>`;});sv+='</svg>';return sv;}
+function drawVolume(){const s=STOCKS.find(x=>x.id===openStockId);if(!s)return'';const ca=generateCandles(s,currentTimeframe,35);if(!ca.length)return'';const W=320,H=32;const mV=Math.max(...ca.map(c=>c.volume));const cw=W/ca.length;let sv=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">`;ca.forEach((c,i)=>{const x=i*cw;const h=(c.volume/mV)*(H-4);const co=c.close>=c.open?'#0ecb81':'#f6465d';sv+=`<rect x="${x+1}" y="${H-h}" width="${Math.max(cw-2,1)}" height="${h}" fill="${co}" opacity="0.5"/>`;});sv+='</svg>';return sv;}
 function drawRSIChart(){const s=STOCKS.find(x=>x.id===openStockId);if(!s)return'';const series=computeRSISeries(s.spark,14);if(series.length<2)return'';const W=320,H=60,pd=4;const pts=series.map((v,i)=>{const x=pd+(W-2*pd)*(i/(series.length-1));const y=pd+(H-2*pd)*(1-v/100);return`${x.toFixed(1)},${y.toFixed(1)}`;}).join(' ');const y30=pd+(H-2*pd)*(1-30/100);const y70=pd+(H-2*pd)*(1-70/100);const last=series[series.length-1];const color=last<30?'#0ecb81':last>70?'#f6465d':'#f0b90b';return`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="height:60px"><line x1="0" y1="${y70}" x2="${W}" y2="${y70}" stroke="#f6465d" stroke-width="0.5" stroke-dasharray="3,3" opacity="0.4"/><line x1="0" y1="${y30}" x2="${W}" y2="${y30}" stroke="#0ecb81" stroke-width="0.5" stroke-dasharray="3,3" opacity="0.4"/><polyline points="${pts}" fill="none" stroke="${color}" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/></svg>`;}
 function generateOrderBook(s){const bids=[],asks=[];const sp=s.price*0.0005;for(let i=0;i<5;i++){bids.push({p:s.price-sp*(i+1)*(1+Math.random()*0.3),q:Math.floor(Math.random()*900)+100});asks.push({p:s.price+sp*(i+1)*(1+Math.random()*0.3),q:Math.floor(Math.random()*900)+100});}return{bids,asks};}
 function renderOrderBook(s){const ob=generateOrderBook(s);const mQ=Math.max(...ob.bids.map(b=>b.q),...ob.asks.map(a=>a.q));return`<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0"><div style="background:#0e1216;border:1px solid #1c222a;border-radius:10px;padding:8px 10px"><div style="font-size:10px;font-weight:700;text-align:center;padding-bottom:6px;border-bottom:1px solid #1c222a;margin-bottom:6px;color:#0ecb81">طلبات الشراء</div>${ob.bids.map(b=>`<div style="display:flex;justify-content:space-between;font-size:10.5px;padding:3px 0;position:relative"><div style="position:absolute;top:0;bottom:0;right:0;background:#0ecb81;opacity:.15;border-radius:3px;width:${(b.q/mQ*100).toFixed(0)}%"></div><span style="font-weight:800;position:relative;z-index:2;color:#0ecb81">${fmt(b.p,s.price<1?4:3)}</span><span style="color:#8b95a5;position:relative;z-index:2;font-size:10px">${b.q}</span></div>`).join('')}</div><div style="background:#0e1216;border:1px solid #1c222a;border-radius:10px;padding:8px 10px"><div style="font-size:10px;font-weight:700;text-align:center;padding-bottom:6px;border-bottom:1px solid #1c222a;margin-bottom:6px;color:#f6465d">طلبات البيع</div>${ob.asks.map(a=>`<div style="display:flex;justify-content:space-between;font-size:10.5px;padding:3px 0;position:relative"><div style="position:absolute;top:0;bottom:0;right:0;background:#f6465d;opacity:.15;border-radius:3px;width:${(a.q/mQ*100).toFixed(0)}%"></div><span style="font-weight:800;position:relative;z-index:2;color:#f6465d">${fmt(a.p,s.price<1?4:3)}</span><span style="color:#8b95a5;position:relative;z-index:2;font-size:10px">${a.q}</span></div>`).join('')}</div></div>`;}
 
-/* ============================================================
-   ✅ E2 FIX: الرسوم تتحدّث تلقائياً عبر IDs
-   ============================================================ */
+/* FIX E2: renderFeeBox مع IDs */
 function renderFeeBox(fees,q){
   return`<div style="background:rgba(240,185,11,.05);border:1px solid rgba(240,185,11,.2);border-radius:10px;padding:10px 12px;margin:10px 0;font-size:10.5px;color:#8b95a5;line-height:1.6">
     <div style="font-weight:800;color:#f0b90b;margin-bottom:4px">الرسوم المقدّرة (<span id="feeQty">${fmtQty(q)}</span> سهم)</div>
@@ -1431,10 +1461,10 @@ function renderSheet(){
     <div class="sh-chg ${cls(s.chg)}" id="shChg">${fmtPct(s.chg)} اليوم</div>
     <div class="tf-row" style="display:flex;gap:5px;margin:10px 0 6px;justify-content:center">${['1m','5m','1h','1D'].map(tf=>`<button onclick="setTimeframe('${tf}')" style="flex:1;padding:6px;border-radius:8px;background:${currentTimeframe===tf?'rgba(240,185,11,.16)':'#161c22'};border:1px solid ${currentTimeframe===tf?'#f0b90b':'#232a31'};color:${currentTimeframe===tf?'#f0b90b':'#8b95a5'};font-size:10.5px;font-weight:700;font-family:inherit;cursor:pointer">${tf}</button>`).join('')}</div>
     <div class="ind-tools">
-      <button class="ind-btn ${sheetIndicator==='candle'?'on':''}" onclick="setSheetIndicator('candle')">🕯️ شموع</button>
-      <button class="ind-btn ${sheetIndicator==='bb'?'on':''}" onclick="setSheetIndicator('bb')">📊 Bollinger</button>
-      <button class="ind-btn ${sheetIndicator==='macd'?'on':''}" onclick="setSheetIndicator('macd')">📈 MACD</button>
-      <button class="ind-btn ${sheetIndicator==='sr'?'on':''}" onclick="setSheetIndicator('sr')">🎯 دعم/مقاومة</button>
+      <button class="ind-btn ${sheetIndicator==='candle'?'on':''}" onclick="setSheetIndicator('candle')"><span class="ind-emoji">🕯️</span><span class="ind-label">شموع</span></button>
+      <button class="ind-btn ${sheetIndicator==='bb'?'on':''}" onclick="setSheetIndicator('bb')"><span class="ind-emoji">📊</span><span class="ind-label">BB</span></button>
+      <button class="ind-btn ${sheetIndicator==='macd'?'on':''}" onclick="setSheetIndicator('macd')"><span class="ind-emoji">📈</span><span class="ind-label">MACD</span></button>
+      <button class="ind-btn ${sheetIndicator==='sr'?'on':''}" onclick="setSheetIndicator('sr')"><span class="ind-emoji">🎯</span><span class="ind-label">SR</span></button>
     </div>
     <div style="background:#0a0e14;border:1px solid #1c222a;border-radius:12px;padding:8px;margin:8px 0" id="candleBox">${renderIndicatorChart()}</div>
     <div style="height:36px;background:#0a0e14;border:1px solid #1c222a;border-radius:0 0 12px 12px;margin-top:-1px;padding:6px 8px" id="volumeBox">${drawVolume()}</div>
@@ -1465,6 +1495,7 @@ function renderSheet(){
     <div class="disc" style="margin-top:14px">سعر افتراضي. جميع الأسماء خيالية.</div>`;
 }
 
+/* FIX E3 + #5: updateSheetLive يحدّث SR + أزرار الشراء/البيع */
 function updateSheetLive(){
   const s=STOCKS.find(x=>x.id===openStockId);if(!s)return;
   const dc=s.price<1?4:3;
@@ -1477,9 +1508,18 @@ function updateSheetLive(){
   const rsi=computeRSI(s.spark);
   const rv=document.getElementById('rsiVal');if(rv){rv.textContent=rsi.toFixed(1);rv.style.color=rsi<30?'#0ecb81':rsi>70?'#f6465d':'#f0b90b';}
   const ob=document.getElementById('orderBookBox');if(ob)ob.innerHTML=renderOrderBook(s);
-  // ✅ E3 FIX: تحديث SR حي
   const sr=document.getElementById('srBox');
   if(sr&&sheetIndicator==='sr')sr.innerHTML=renderSupportResistance();
+  // FIX #5: تحديث حالة أزرار الشراء/البيع
+  const q=currentQty();
+  const total=q*s.price;
+  const tOk=isTradingAllowed();
+  const h=holdings[s.id];
+  const canBuy=(total<=cash&&q>0)&&tOk;
+  const canSell=(h&&h.qty>=q-0.0001)&&tOk;
+  const btns=document.querySelectorAll('.actions .btn');
+  if(btns[0])btns[0].disabled=!canBuy;
+  if(btns[1])btns[1].disabled=!canSell;
 }
 
 function setMode(m){buyMode=m;inputVal=m==='qty'?1:50;renderSheet();}
@@ -1505,24 +1545,16 @@ function setInputMax(){const s=STOCKS.find(x=>x.id===openStockId);if(!s)return;c
 function onInputChange(v){inputVal=Math.max(0,parseFloat(v)||0);updateSheetPrice();}
 function syncInput(){const f=document.getElementById('inputField');if(f)f.value=inputVal;updateSheetPrice();}
 
-/* ============================================================
-   ✅ E2 FIX الحقيقي: تحديث الرسوم والقيم مباشرة
-   ============================================================ */
+/* FIX E2: تحديث الرسوم والقيم */
 function updateSheetPrice(){
   const s=STOCKS.find(x=>x.id===openStockId);if(!s)return;
   const dc=s.price<1?4:3;
   const q=currentQty(),total=q*s.price;
   const f=ttCalculateFees(s.price,q);
-
-  // المبلغ الإجمالي
   const t=document.getElementById('ordTotal');
   if(t)t.textContent=fmt(total+f.totalFees)+' TND';
-
-  // hint
   const h=document.getElementById('unitHint');
   if(h){h.innerHTML=buyMode==='qty'?`ستشتري <b>${fmtQty(q)}</b> سهم بقيمة <b>${fmt(total)}</b> TND`:`ستحصل على <b>${fmtQty(q)}</b> سهم بسعر ${fmt(s.price,dc)} TND`;}
-
-  // ✅ قسم الرسوم — تحديث كل قيمة بـ ID
   const feeQty=document.getElementById('feeQty');
   const feeBroker=document.getElementById('feeBroker');
   const feeBvmt=document.getElementById('feeBvmt');
@@ -1569,7 +1601,7 @@ function doSell(){
 }
 
 /* ============================================================
-   PORTFOLIO
+   PORTFOLIO (FIX #1 + E5)
    ============================================================ */
 function renderPortfolio(){
   const entries=Object.entries(holdings);
@@ -1578,15 +1610,15 @@ function renderPortfolio(){
   entries.forEach(([id,h])=>{const s=STOCKS.find(x=>x.id===id);if(!s)return;const v=s.price*h.qty,c=h.avg*h.qty,p=v-c;if(p>0){wc++;wp+=p;wcost+=c;}else if(p<0){lc++;lp+=p;lcst+=c;}});
   const wpct=wcost>0?(wp/wcost)*100:0,lpct=lcst>0?(lp/lcst)*100:0,exitAmount=cash+hv;
   view.innerHTML=`
-    <div class="pf-total-bar"><div><div class="pt-l">إجمالي الأصول</div><div style="font-size:13px;font-weight:800;margin-top:3px">${fmt(total)} TND</div></div><div style="text-align:left"><div class="pt-l">صافي الربح/الخسارة</div><div class="pt-r ${cls(totalPnl)}" style="margin-top:3px">${totalPnl>=0?'+':''}${fmt(totalPnl)} TND</div><div style="font-size:10px;color:#7b8494;margin-top:2px">(${totalPct>=0?'+':''}${totalPct.toFixed(2)}%)</div></div></div>
+    <div class="pf-total-bar"><div><div class="pt-l">إجمالي الأصول</div><div style="font-size:13px;font-weight:800;margin-top:3px" id="pfTotalAssets">${fmt(total)} TND</div></div><div style="text-align:left"><div class="pt-l">صافي الربح/الخسارة</div><div class="pt-r ${cls(totalPnl)}" id="pfTotalPnl" style="margin-top:3px">${totalPnl>=0?'+':''}${fmt(totalPnl)} TND</div><div id="pfTotalPct" style="font-size:10px;color:#7b8494;margin-top:2px">(${totalPct>=0?'+':''}${totalPct.toFixed(2)}%)</div></div></div>
     ${entries.length===0?`<div class="pf-empty" style="padding:60px 20px"><div class="ico" style="font-size:38px">📊</div><div style="font-size:12.5px">لا تملك أي مركز بعد</div><div class="sub">اذهب إلى «السوق» وابدأ التداول</div></div>`:`
       <div class="pf-list">${entries.map(([id,h])=>{const s=STOCKS.find(x=>x.id===id);if(!s)return'';const v=s.price*h.qty,c=h.avg*h.qty,p=v-c,pct=(p/c)*100;const sl=pendingOrders.find(o=>o.type==='sl'&&o.stockId===id);const ico=SECTOR_ICONS[s.sector]||'📊';return`<div class="pf-row" data-pfid="${id}" onclick="openTrade('${id}')"><div class="pr-ico">${ico}</div><div class="pr-sym">${displayId(s)}${sl?' 🛑':''}</div><div class="pr-cols"><div><span style="font-size:9px;color:#5e6673;display:block;margin-bottom:2px">الكمية</span><span style="font-size:11.5px;font-weight:800;color:#eaecef">${fmtQty(h.qty)}</span></div><div><span style="font-size:9px;color:#5e6673;display:block;margin-bottom:2px">متوسط الشراء</span><span style="font-size:11.5px;font-weight:800;color:#eaecef">${fmt(h.avg,3)}</span></div></div><div class="pr-pnl"><div class="pv ${cls(p)}">${p>=0?'+':''}${fmt(p)}</div><div class="pp ${cls(p)}">${pct>=0?'+':''}${pct.toFixed(2)}%</div></div></div>`;}).join('')}</div>`}
     ${entries.length>0?`
       ${(wc>0||lc>0)?`<div class="pf-grid-2">
-        ${wc>0?`<button class="pf-btn-mini green" onclick="sellWinners()"><div class="pm-title">بيع الرابحة (${wc})</div><div class="pm-main">+${fmt(wp)} TND</div><div class="pm-sub">${wpct.toFixed(2)}%+ · ${fmt(wp+wcost)}</div></button>`:''}
-        ${lc>0?`<button class="pf-btn-mini red" onclick="sellLosers()"><div class="pm-title">بيع الخاسرة (${lc})</div><div class="pm-main">${fmt(lp)} TND</div><div class="pm-sub">${lpct.toFixed(2)}% · ${fmt(lp+lcst)}</div></button>`:''}
+        ${wc>0?`<button class="pf-btn-mini green" onclick="sellWinners()"><div class="pm-title" id="pfWinTitle">بيع الرابحة (${wc})</div><div class="pm-main" id="pfWinMain">+${fmt(wp)} TND</div><div class="pm-sub" id="pfWinSub">${wpct.toFixed(2)}%+ · ${fmt(wp+wcost)}</div></button>`:''}
+        ${lc>0?`<button class="pf-btn-mini red" onclick="sellLosers()"><div class="pm-title" id="pfLoseTitle">بيع الخاسرة (${lc})</div><div class="pm-main" id="pfLoseMain">${fmt(lp)} TND</div><div class="pm-sub" id="pfLoseSub">${lpct.toFixed(2)}% · ${fmt(lp+lcst)}</div></button>`:''}
       </div>`:''}
-      <button class="pf-btn-blue" onclick="sellAll()"><div class="pb-left"><div class="pb-title">بيع الكل والخروج</div><div class="pb-amount">${fmt(exitAmount)} TND</div><div class="pb-sub">صافي: ${totalPnl>=0?'+':''}${fmt(totalPnl)} TND</div></div><div class="pb-arrow">›</div></button>
+      <button class="pf-btn-blue" onclick="sellAll()"><div class="pb-left"><div class="pb-title">بيع الكل والخروج</div><div class="pb-amount" id="pfSellAllAmount">${fmt(exitAmount)} TND</div><div class="pb-sub" id="pfSellAllSub">صافي: ${totalPnl>=0?'+':''}${fmt(totalPnl)} TND</div></div><div class="pb-arrow">›</div></button>
     `:''}
     <div class="sec" style="margin-top:16px"><span class="sec-t">الأوامر النشطة</span><span class="badge-real">${totalActiveOrders()}/${MAX_ORDERS}</span><span class="sec-line"></span></div>
     ${(pendingOrders.length+alerts.length)===0?`<div class="pf-empty"><div class="ico">🎯</div><div>لا توجد أوامر نشطة</div><div class="sub">اضغط على أي بطاقة لإنشاء أمر</div></div>`:
@@ -1597,8 +1629,49 @@ function renderPortfolio(){
     <div class="disc">يتم حفظ تقدمك على Firebase.</div>`;
   updateHero();
 }
-function updatePortfolioLive(){document.querySelectorAll('[data-pfid]').forEach(el=>{const id=el.dataset.pfid;const h=holdings[id];const s=STOCKS.find(x=>x.id===id);if(!h||!s)return;const v=s.price*h.qty,c=h.avg*h.qty,p=v-c,pct=(p/c)*100;const pv=el.querySelector('.pv'),pp=el.querySelector('.pp');if(pv){pv.textContent=(p>=0?'+':'')+fmt(p);pv.className='pv '+cls(p);}if(pp){pp.textContent=(pct>=0?'+':'')+pct.toFixed(2)+'%';pp.className='pp '+cls(p);}});}
 
+/* FIX #1: updatePortfolioLive كامل */
+function updatePortfolioLive(){
+  document.querySelectorAll('[data-pfid]').forEach(el=>{
+    const id=el.dataset.pfid;
+    const h=holdings[id];
+    const s=STOCKS.find(x=>x.id===id);
+    if(!h||!s)return;
+    const v=s.price*h.qty,c=h.avg*h.qty,p=v-c,pct=(p/c)*100;
+    const pv=el.querySelector('.pv'),pp=el.querySelector('.pp');
+    if(pv){pv.textContent=(p>=0?'+':'')+fmt(p);pv.className='pv '+cls(p);}
+    if(pp){pp.textContent=(pct>=0?'+':'')+pct.toFixed(2)+'%';pp.className='pp '+cls(p);}
+  });
+  const hv=holdingsValue();
+  const total=cash+hv;
+  const totalPnl=total-STARTING_CASH;
+  const totalPct=(totalPnl/STARTING_CASH)*100;
+  const ta=document.getElementById('pfTotalAssets');
+  if(ta)ta.textContent=fmt(total)+' TND';
+  const tp=document.getElementById('pfTotalPnl');
+  if(tp){tp.textContent=(totalPnl>=0?'+':'')+fmt(totalPnl)+' TND';tp.className='pt-r '+cls(totalPnl);}
+  const tpc=document.getElementById('pfTotalPct');
+  if(tpc)tpc.textContent='('+(totalPct>=0?'+':'')+totalPct.toFixed(2)+'%)';
+  const sa=document.getElementById('pfSellAllAmount');
+  if(sa)sa.textContent=fmt(total)+' TND';
+  const ss=document.getElementById('pfSellAllSub');
+  if(ss)ss.textContent='صافي: '+(totalPnl>=0?'+':'')+fmt(totalPnl)+' TND';
+  let wc=0,lc=0,wp=0,lp=0,wcost=0,lcst=0;
+  Object.entries(holdings).forEach(([id,h])=>{
+    const s=STOCKS.find(x=>x.id===id);
+    if(!s)return;
+    const v=s.price*h.qty,c=h.avg*h.qty,p=v-c;
+    if(p>0){wc++;wp+=p;wcost+=c;}else if(p<0){lc++;lp+=p;lcst+=c;}
+  });
+  const wt=document.getElementById('pfWinTitle');if(wt)wt.textContent=`بيع الرابحة (${wc})`;
+  const wm=document.getElementById('pfWinMain');if(wm)wm.textContent=`+${fmt(wp)} TND`;
+  const ws=document.getElementById('pfWinSub');if(ws){const wpct=wcost>0?(wp/wcost)*100:0;ws.textContent=`${wpct.toFixed(2)}%+ · ${fmt(wp+wcost)}`;}
+  const lt=document.getElementById('pfLoseTitle');if(lt)lt.textContent=`بيع الخاسرة (${lc})`;
+  const lm=document.getElementById('pfLoseMain');if(lm)lm.textContent=`${fmt(lp)} TND`;
+  const ls=document.getElementById('pfLoseSub');if(ls){const lpct=lcst>0?(lp/lcst)*100:0;ls.textContent=`${lpct.toFixed(2)}% · ${fmt(lp+lcst)}`;}
+}
+
+/* FIX E5: sellAll يحذف buy orders */
 function sellAll(){
   if(!isTradingAllowed())return toast('السوق مغلق','warn');
   const entries=Object.entries(holdings);
@@ -1608,7 +1681,6 @@ function sellAll(){
   if(!confirm(`بيع الكل؟\nستستلم: ${fmt(net)} TND\nرصيدك الجديد: ${fmt(exit)} TND`))return;
   const ids=entries.map(([id])=>id);
   entries.forEach(([id,h])=>{const s=STOCKS.find(x=>x.id===id);if(s)addTrade(id,'sell',h.qty,s.price);delete holdings[id];});
-  // ✅ E5 FIX: احذف SL + أوامر الشراء للأسهم المبيعة
   pendingOrders=pendingOrders.filter(o=>{
     if(o.type==='sl')return false;
     if(o.type==='buy'&&ids.includes(o.stockId))return false;
@@ -1622,7 +1694,7 @@ function sellWinners(){
   if(!ids.length)return toast('لا يوجد أسهم رابحة');
   let ts=0,tf=0;ids.forEach(id=>{const s=STOCKS.find(x=>x.id===id);if(s){ts+=s.price*holdings[id].qty;const f=ttCalculateFees(s.price,holdings[id].qty);tf+=f.totalFees;}});
   const net=ts-tf,cost=ids.reduce((sm,id)=>sm+holdings[id].avg*holdings[id].qty,0);
-  const profit=net-cost,pct=(profit/cost)*100;
+  const profit=net-cost;
   if(!confirm(`بيع الرابحة؟\nستستلم: ${fmt(net)} TND\nالربح: +${fmt(profit)} TND`))return;
   ids.forEach(id=>{const s=STOCKS.find(x=>x.id===id);if(s)addTrade(id,'sell',holdings[id].qty,s.price);delete holdings[id];});
   pendingOrders=pendingOrders.filter(o=>o.type!=='sl'||!ids.includes(o.stockId));
@@ -1634,7 +1706,7 @@ function sellLosers(){
   if(!ids.length)return toast('لا يوجد أسهم خاسرة');
   let ts=0,tf=0;ids.forEach(id=>{const s=STOCKS.find(x=>x.id===id);if(s){ts+=s.price*holdings[id].qty;const f=ttCalculateFees(s.price,holdings[id].qty);tf+=f.totalFees;}});
   const net=ts-tf,cost=ids.reduce((sm,id)=>sm+holdings[id].avg*holdings[id].qty,0);
-  const loss=net-cost,pct=(loss/cost)*100;
+  const loss=net-cost;
   if(!confirm(`بيع الخاسرة؟\nستستلم: ${fmt(net)} TND\nالخسارة: ${fmt(loss)} TND`))return;
   ids.forEach(id=>{const s=STOCKS.find(x=>x.id===id);if(s)addTrade(id,'sell',holdings[id].qty,s.price);delete holdings[id];});
   pendingOrders=pendingOrders.filter(o=>o.type!=='sl'||!ids.includes(o.stockId));
@@ -1689,7 +1761,7 @@ function applyLessonConcept(lessonId){
 }
 
 /* ============================================================
-   ✅ E1 FIX: QUIZ مع shuffle
+   QUIZ (FIX E1)
    ============================================================ */
 let activeQuiz={lessonId:null,idx:0,answers:[],score:0,total:0,mixed:null,shuffledOptions:null,newCorrectIdx:0};
 
@@ -1700,12 +1772,10 @@ function openQuiz(lessonId){
   closeSheet();
   setTimeout(()=>renderQuizModal(),50);
 }
-
 function renderQuizModal(){
   const bank=getQuizFor(activeQuiz.lessonId);
   const q=bank[activeQuiz.idx];
   const correctText=q[1][q[2]];
-  // ✅ خلط الخيارات
   const shuffled=shuffleArray(q[1]);
   const newCorrectIdx=shuffled.indexOf(correctText);
   activeQuiz.shuffledOptions=shuffled;
@@ -1728,11 +1798,7 @@ function answerQuiz(i){
   const correctIdx=activeQuiz.newCorrectIdx;
   const correct=(i===correctIdx);
   const btns=document.querySelectorAll('#quizOpts .quiz-opt');
-  btns.forEach((b,j)=>{
-    b.classList.add('disabled');
-    if(j===correctIdx)b.classList.add('correct');
-    else if(j===i)b.classList.add('wrong');
-  });
+  btns.forEach((b,j)=>{b.classList.add('disabled');if(j===correctIdx)b.classList.add('correct');else if(j===i)b.classList.add('wrong');});
   activeQuiz.answers.push({idx:i,correct});
   if(correct)activeQuiz.score++;
   const correctText=q[1][q[2]];
@@ -1912,7 +1978,7 @@ function openTermsGlossary(){
 }
 
 /* ============================================================
-   MORE
+   MORE + PHILOSOPHY
    ============================================================ */
 function renderMore(){
   const mv=cash+holdingsValue(),mp=((mv-STARTING_CASH)/STARTING_CASH)*100;
@@ -1920,6 +1986,11 @@ function renderMore(){
   view.innerHTML=`
     <div class="xp-wrap"><div class="xp-head"><div class="xp-level">${lv.icon} ${lv.name}</div><div class="xp-val">${userXP} XP · ${userBadges.length}/${BADGES.length} 🏆</div></div><div class="xp-bar"><div class="xp-bar-fill" style="width:${Math.min(100,(userXP%500)/5)}%"></div></div></div>
     <div class="index-strip" style="margin-bottom:14px"><div><div class="nm">محفظتي</div><div class="vv">${fmt(mv)} TND</div></div><div style="text-align:left"><div class="nm">الأداء</div><div class="vv ${cls(mp)}">${mp>=0?'+':''}${mp.toFixed(2)}%</div></div></div>
+    <div class="more-item" onclick="openPhilosophy()" style="border-color:rgba(240,185,11,.35);background:linear-gradient(135deg,rgba(240,185,11,.06),#12161b)">
+      <div style="width:38px;height:38px;border-radius:10px;display:grid;place-items:center;font-size:18px;background:linear-gradient(135deg,#f0b90b,#b88700)">📜</div>
+      <div style="flex:1"><div style="font-size:12.5px;font-weight:800;color:#f0b90b">فلسفتنا التعليمية</div><div style="font-size:10px;color:#7b8494;margin-top:2px">لماذا وُجد TounsiTrade؟</div></div>
+      <div style="color:#f0b90b;font-size:14px">›</div>
+    </div>
     <div class="more-item" onclick="openBadges()"><div style="width:38px;height:38px;border-radius:10px;display:grid;place-items:center;font-size:18px;background:linear-gradient(135deg,#1e252d,#161b21);border:1px solid #262b30">🏆</div><div style="flex:1"><div style="font-size:12.5px;font-weight:800">شاراتي (${userBadges.length}/${BADGES.length})</div><div style="font-size:10px;color:#7b8494;margin-top:2px">إنجازاتك في اللعبة</div></div><div style="color:#5e6673;font-size:14px">›</div></div>
     <div class="more-item" onclick="switchToRank()"><div style="width:38px;height:38px;border-radius:10px;display:grid;place-items:center;font-size:18px;background:linear-gradient(135deg,#1e252d,#161b21);border:1px solid #262b30">👥</div><div style="flex:1"><div style="font-size:12.5px;font-weight:800">الترتيب التونسي</div><div style="font-size:10px;color:#7b8494;margin-top:2px">قارن أداءك</div></div><div style="color:#5e6673;font-size:14px">›</div></div>
     <div class="more-item" onclick="openAdaptive()"><div style="width:38px;height:38px;border-radius:10px;display:grid;place-items:center;font-size:18px;background:linear-gradient(135deg,#1e252d,#161b21);border:1px solid #262b30">🎯</div><div style="flex:1"><div style="font-size:12.5px;font-weight:800">التدريب الذكي</div><div style="font-size:10px;color:#7b8494;margin-top:2px">أسئلة تكيّفية</div></div><div style="color:#5e6673;font-size:14px">›</div></div>
@@ -1932,29 +2003,43 @@ function renderMore(){
     <div class="more-item" onclick="openProfile()"><div style="width:38px;height:38px;border-radius:10px;display:grid;place-items:center;font-size:18px;background:linear-gradient(135deg,#1e252d,#161b21);border:1px solid #262b30">👤</div><div style="flex:1"><div style="font-size:12.5px;font-weight:800">حسابي</div><div style="font-size:10px;color:#7b8494;margin-top:2px">${currentUser?.name||''}</div></div><div style="color:#5e6673;font-size:14px">›</div></div>
     <div class="disc">TounsiTrade · محاكي التداول التونسي · صُنع في تونس 🇹🇳</div>`;
 }
+
+function openPhilosophy(){
+  sheetBody.innerHTML=`
+    <div class="sh-head"><div><div class="sh-tk">📜 فلسفتنا التعليمية</div><div class="sh-nm">TounsiTrade · رؤيتنا</div></div><button class="sh-close" onclick="closeSheet()">×</button></div>
+    <div class="philo-slogan-card"><div class="pss-main">«المعرفة لا تُثريك بسرعة<br>لكنها تمنعك من الإفلاس»</div><div class="pss-sub">المقامر يفوز 5 مرات… ويفقد كل شيء في السادسة.<br>المتعلّم يفوز 6 ويخسر 4… ويعيش للأبد.</div></div>
+    <div class="philo-wrap"><div class="philo-title">لماذا وُجد TounsiTrade؟</div><div class="philo-line">TounsiTrade <em>ليست</em> لعبة تداول.</div><div class="philo-line"><b>بل مدرسة تُخرّج متداولين حقيقيين.</b></div><div class="philo-divider"></div><div class="philo-line">في الأسواق المالية، التاج يُلبس لمن يجمع:</div><div class="philo-line">🎓 معرفة راسخة <em>+</em> 🎯 تطبيقاً منضبطاً <em>+</em> 🏅 استمرارية</div></div>
+    <div class="philo-wrap"><div class="philo-title">الفرق قبل / بعد</div><div class="philo-table"><div class="ph-row"><span class="ph-before">المحظوظ يتوَّج بالمال</span><span class="ph-after">المحظوظ لا يتوَّج محترفاً</span></div><div class="ph-row"><span class="ph-before">العالِم لا يُعترف به</span><span class="ph-after">للعالِم لقب خاص</span></div><div class="ph-row"><span class="ph-before">الربح = المعيار الوحيد</span><span class="ph-after">4 معايير متوازنة</span></div><div class="ph-row"><span class="ph-before">لا حافز للتوازن</span><span class="ph-after">المحترف الكامل = الأرفع</span></div></div></div>
+    <div class="philo-wrap"><div class="philo-title">4 ألقاب… لا تاج واحد</div><div class="philo-badges"><div class="philo-badge"><span class="pb-ico">📚</span><span class="pb-title">العالِم المالي</span><span class="pb-sub">للمعرفة</span></div><div class="philo-badge"><span class="pb-ico">💰</span><span class="pb-title">المتداول الذكي</span><span class="pb-sub">للربح</span></div><div class="philo-badge"><span class="pb-ico">🎯</span><span class="pb-title">الاستراتيجي</span><span class="pb-sub">للانضباط</span></div><div class="philo-badge crown"><span class="pb-ico">🏆</span><span class="pb-title">المحترف الكامل</span><span class="pb-sub">للتاج الوحيد · للتوازن</span></div></div></div>
+    <div class="philo-quote">"الربح دون معرفة… حظ مؤقت.<br>المعرفة دون تطبيق… علم بلا فعل.<br><b style="color:#f0b90b">التوازن هو الطريق.</b>"</div>
+    <div class="disc">🇹🇳 صُنع في تونس · TounsiTrade</div>`;
+  sheet.classList.add('on');backdrop.classList.add('on');
+}
+
 function openBadges(){
   sheetBody.innerHTML=`<div class="sh-head"><div><div class="sh-tk">🏆 شاراتي</div><div class="sh-nm">${userBadges.length} من ${BADGES.length}</div></div><button class="sh-close" onclick="closeSheet()">×</button></div><div class="badges-grid">${BADGES.map(b=>{const own=userBadges.includes(b.id);return`<div class="badge-card ${own?'owned':''}"><div class="badge-icon">${b.icon}</div><div class="badge-name">${b.name}</div></div>`;}).join('')}</div><div style="background:#12161b;border:1px solid #1c222a;border-radius:12px;padding:12px;margin-top:14px;font-size:11.5px;color:#8b95a5;line-height:1.7"><b style="color:#f0b90b">كيف تكسب الشارات؟</b><br>• أكمل أول صفقة شراء<br>• حقّق ربحًا<br>• استعمل وقف الخسارة<br>• اقرأ الدروس<br>• انجح في الاختبارات</div>`;
   sheet.classList.add('on');backdrop.classList.add('on');
 }
 function openTunisianMarket(){
   sheetBody.innerHTML=`<div class="sh-head"><div><div class="sh-tk">🇹🇳 السوق التونسي</div><div class="sh-nm">كيف يعمل · الرسوم · القوانين</div></div><button class="sh-close" onclick="closeSheet()">×</button></div>
-    <div class="info-card" style="margin-top:16px"><div class="ic-head"><div class="ic-icon">🏛️</div><div class="ic-title">كيف يعمل السوق؟</div></div><div class="ic-body">في تونس، لا يمكن للمستثمر أن يتداول مباشرة في البورصة. يجب أن يمرّ عبر <b>وسيط مرخّص من هيئة السوق المالية (CMF)</b>. الوسيط ينفّذ الأوامر نيابة عنك، يحتفظ بالأوراق المالية، ويتقاضى عمولة.</div></div>
-    <div class="info-card"><div class="ic-head"><div class="ic-icon">📚</div><div class="ic-title">ملاحظة تعليمية</div></div><div class="ic-body">أزرار الشراء والبيع في هذا التطبيق تحاكي دور <b>الوسيط المالي</b>. جميع الرسوم المطبقة هي نفسها الرسوم الحقيقية في بورصة تونس.</div></div>
-    <div class="info-card"><div class="ic-head"><div class="ic-icon">💰</div><div class="ic-title">الرسوم والعمولات</div></div><div class="ic-body">الرسوم المطبقة على كل عملية شراء أو بيع:<div class="fee-table"><div class="ft-row"><span class="ft-label">عمولة الوسيط</span><span class="ft-value">0.80% (حد أدنى 0.500)</span></div><div class="ft-row"><span class="ft-label">عمولة BVMT</span><span class="ft-value">0.15% (5 - 40,000)</span></div><div class="ft-row"><span class="ft-label">رسم CMF</span><span class="ft-value">23% من عمولة BVMT</span></div><div class="ft-row"><span class="ft-label">رسوم RUS</span><span class="ft-value">0.015% (حد أقصى 2,000)</span></div></div></div></div>
-    <div class="info-card legal"><div class="ic-head"><div class="ic-icon">⚠️</div><div class="ic-title">تنبيه قانوني</div></div><div class="ic-body"><b>جميع أسماء الشركات في هذا التطبيق خيالية</b>، ولا تمثّل شركات حقيقية مدرجة في بورصة تونس. الأسعار المعروضة افتراضية 100%.</div></div>
+    <div class="info-card" style="margin-top:16px"><div class="ic-head"><div class="ic-icon">🏛️</div><div class="ic-title">كيف يعمل السوق؟</div></div><div class="ic-body">في تونس، لا يمكن للمستثمر أن يتداول مباشرة في البورصة. يجب أن يمرّ عبر <b>وسيط مرخّص من هيئة السوق المالية (CMF)</b>.</div></div>
+    <div class="info-card"><div class="ic-head"><div class="ic-icon">📚</div><div class="ic-title">ملاحظة تعليمية</div></div><div class="ic-body">أزرار الشراء والبيع في هذا التطبيق تحاكي دور <b>الوسيط المالي</b>.</div></div>
+    <div class="info-card"><div class="ic-head"><div class="ic-icon">💰</div><div class="ic-title">الرسوم والعمولات</div></div><div class="ic-body">الرسوم المطبقة على كل عملية:<div class="fee-table"><div class="ft-row"><span class="ft-label">عمولة الوسيط</span><span class="ft-value">0.80% (حد أدنى 0.500)</span></div><div class="ft-row"><span class="ft-label">عمولة BVMT</span><span class="ft-value">0.15% (5 - 40,000)</span></div><div class="ft-row"><span class="ft-label">رسم CMF</span><span class="ft-value">23% من عمولة BVMT</span></div><div class="ft-row"><span class="ft-label">رسوم RUS</span><span class="ft-value">0.015% (حد أقصى 2,000)</span></div></div></div></div>
+    <div class="info-card legal"><div class="ic-head"><div class="ic-icon">⚠️</div><div class="ic-title">تنبيه قانوني</div></div><div class="ic-body"><b>جميع أسماء الشركات في هذا التطبيق خيالية</b>. الأسعار المعروضة افتراضية 100%.</div></div>
     <div class="disc">هذا القسم تعليمي بحت.</div>`;
   sheet.classList.add('on');backdrop.classList.add('on');
 }
 function openAbout(){
   sheetBody.innerHTML=`<div class="sh-head"><div><div class="sh-tk">ℹ️ حول TounsiTrade</div><div class="sh-nm">معلومات قانونية</div></div><button class="sh-close" onclick="closeSheet()">×</button></div>
-    <div style="background:#12161b;border:1px solid #1c222a;border-radius:14px;padding:16px;margin-top:16px"><h3 style="font-size:14px;font-weight:800;margin-bottom:10px;color:#f0b90b">ما هي TounsiTrade؟</h3><p style="font-size:12px;color:#c3cad4;line-height:1.75">محاكي تعليمي للتداول، يهدف إلى تعليم المستخدمين مبادئ الاستثمار وبورصة الأوراق المالية، بلغة عربية مبسّطة وبيئة افتراضية آمنة.</p></div>
-    <div style="background:#12161b;border:1px solid #1c222a;border-radius:14px;padding:16px;margin-top:12px"><h3 style="font-size:14px;font-weight:800;margin-bottom:10px;color:#f0b90b">⚠️ إخلاء المسؤولية</h3><div style="font-size:11.5px;color:#c3cad4;line-height:1.8"><b style="color:#f6465d">1. منصة غير رسمية:</b> TounsiTrade ليست منصة تداول حقيقية.<br><br><b style="color:#f6465d">2. أسعار افتراضية 100%:</b> مولّدة بمحرك رياضي تعليمي.<br><br><b style="color:#f6465d">3. أسماء الشركات خيالية:</b> أي تشابه مع شركات حقيقية هو من قبيل الصدفة.<br><br><b style="color:#f6465d">4. لا نصائح استثمارية:</b> التطبيق تعليمي بحت.<br><br><b style="color:#f6465d">5. الأرصدة وهمية:</b> كل الأرصدة افتراضية (10,000 TND).</div></div>
+    <div style="background:#12161b;border:1px solid #1c222a;border-radius:14px;padding:16px;margin-top:16px"><h3 style="font-size:14px;font-weight:800;margin-bottom:10px;color:#f0b90b">ما هي TounsiTrade؟</h3><p style="font-size:12px;color:#c3cad4;line-height:1.75">محاكي تعليمي للتداول، يهدف إلى تعليم المستخدمين مبادئ الاستثمار وبورصة الأوراق المالية، بلغة عربية مبسّطة وبيئة افتراضية آمنة.</p><div style="margin-top:12px;padding-top:12px;border-top:1px solid #1c222a"><div style="font-size:11.5px;font-weight:800;color:#f0b90b;margin-bottom:8px">🎯 فلسفتنا</div><div style="font-size:11.5px;color:#c3cad4;line-height:1.8"><b style="color:#0ecb81">المال وحده لا يصنع محترفاً.</b><br><b style="color:#0ecb81">المعرفة وحدها لا تكفي.</b><br>المحترف الكامل = <b style="color:#f0b90b">توازن</b> بين: 📚 المعرفة · 💰 الربح · 🎯 الانضباط · 🏅 الاستمرارية.</div></div></div>
+    <div class="about-slogan-card"><div class="asc-main">«المعرفة لا تُثريك بسرعة<br>لكنها تمنعك من الإفلاس»</div><div class="asc-sub">المقامر يفوز 5 مرات… ويفقد كل شيء في السادسة.<br>المتعلّم يفوز 6 ويخسر 4… <b>ويعيش للأبد</b>.</div></div>
+    <div style="background:#12161b;border:1px solid #1c222a;border-radius:14px;padding:16px;margin-top:12px"><h3 style="font-size:14px;font-weight:800;margin-bottom:10px;color:#f0b90b">⚠️ إخلاء المسؤولية</h3><div style="font-size:11.5px;color:#c3cad4;line-height:1.8"><b style="color:#f6465d">1. منصة غير رسمية:</b> TounsiTrade ليست منصة تداول حقيقية.<br><br><b style="color:#f6465d">2. أسعار افتراضية 100%.</b><br><br><b style="color:#f6465d">3. أسماء الشركات خيالية.</b><br><br><b style="color:#f6465d">4. لا نصائح استثمارية.</b><br><br><b style="color:#f6465d">5. الأرصدة وهمية (10,000 TND).</b></div></div>
     <div class="disc">🇹🇳 صُنع في تونس</div>`;
   sheet.classList.add('on');backdrop.classList.add('on');
 }
 
 /* ============================================================
-   CONTACT (Formspree)
+   CONTACT (FIX #4)
    ============================================================ */
 const SUBJECT_LABELS={suggestion:'اقتراح',bug:'مشكلة',advertising:'إعلان',partnership:'شراكة',other:'أخرى'};
 function openContact(){
@@ -1974,7 +2059,7 @@ function openContact(){
 }
 async function sendContactMessage(){
   const subject=document.getElementById('contactSubject').value;
-  const name=document.getElementById('contactName').value.trim()||(currentUser?currentUser.name:'مجهول');
+  const name=cleanText(document.getElementById('contactName').value)||(currentUser?currentUser.name:'مجهول');
   const email=document.getElementById('contactEmail').value.trim();
   const message=document.getElementById('contactMessage').value.trim();
   if(message.length<10)return toast('الرسالة قصيرة جدًا','warn');
@@ -1982,15 +2067,33 @@ async function sendContactMessage(){
   const btn=document.getElementById('sendMsgBtn');btn.disabled=true;btn.textContent='جاري الإرسال...';
   const msg={id:'msg_'+Date.now(),subject,subjectLabel:SUBJECT_LABELS[subject],name,email,message,sentAt:Date.now(),status:'pending'};
   sentMessages.unshift(msg);if(sentMessages.length>30)sentMessages.pop();
-  if(fbDb&&currentUser){fbDb.collection('messages').add({...msg,uid:currentUser.id,userEmail:currentUser.email,userName:currentUser.name}).then(()=>{msg.status='sent';}).catch(()=>{msg.status='failed';});}
   saveState();
+  // FIX #4: احفظ في Firestore أولاً
   try{
-    if(FORMSPREE_ENDPOINT.includes('YOUR_FORM_ID')){await new Promise(r=>setTimeout(r,600));if(msg.status==='failed')throw new Error('save-failed');msg.status='sent';pushNotification('contact','✅ تم إرسال رسالتك','سنراجعها ونردّ قريبًا.');toast('✅ تم الإرسال بنجاح!','good');closeSheet();return;}
+    if(fbDb&&currentUser){
+      await fbDb.collection('messages').add({...msg,uid:currentUser.id,userName:currentUser.name});
+      msg.status='sent';
+    }
+  }catch(e){msg.status='failed';}
+  // إذا Formspree غير مُفعّل، اعتمد على Firestore
+  if(FORMSPREE_ENDPOINT.includes('YOUR_FORM_ID')){
+    if(msg.status==='sent'){
+      pushNotification('contact','✅ تم استلام رسالتك','سنراجعها قريبًا.');
+      toast('✅ تم الإرسال بنجاح','good');
+    }else{
+      pushNotification('contact','⚠️ تعذّر الإرسال','حاول لاحقًا.');
+      toast('تعذّر الإرسال','warn');
+    }
+    btn.disabled=false;btn.textContent='إرسال';closeSheet();
+    return;
+  }
+  // Formspree مُفعّل
+  try{
     const res=await fetch(FORMSPREE_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({name,email:email||'غير محدد',subject:SUBJECT_LABELS[subject],message,_subject:`[TounsiTrade · ${SUBJECT_LABELS[subject]}] من ${name}`,userId:currentUser?currentUser.id:'anon'})});
-    if(res.ok){msg.status='sent';pushNotification('contact','✅ تم إرسال رسالتك','سنراجعها ونردّ قريبًا.');toast('✅ تم الإرسال بنجاح!','good');closeSheet();}
+    if(res.ok){msg.status='sent';pushNotification('contact','✅ تم إرسال رسالتك','سنراجعها ونردّ قريبًا.');toast('✅ تم الإرسال!','good');}
     else throw new Error('HTTP '+res.status);
-  }catch(err){console.error('Contact error:',err);msg.status='failed';pushNotification('contact','⚠️ تعذّر الإرسال','حاول مرة أخرى لاحقًا.');toast('تعذّر الإرسال، حاول لاحقًا','warn');closeSheet();}
-  finally{btn.disabled=false;btn.textContent='إرسال';}
+  }catch(err){console.error('Contact:',err);msg.status='failed';pushNotification('contact','⚠️ تعذّر الإرسال','حاول لاحقًا.');toast('تعذّر الإرسال','warn');}
+  finally{btn.disabled=false;btn.textContent='إرسال';closeSheet();}
 }
 
 function openNotifications(){
@@ -1998,6 +2101,8 @@ function openNotifications(){
   sheetBody.innerHTML=`<div class="sh-head"><div><div class="sh-tk">الإشعارات</div><div class="sh-nm">${notifications.filter(n=>!n.read).length} غير مقروء</div></div><button class="sh-close" onclick="closeSheet()">×</button></div>${notifications.length>0?`<button class="btn-primary" style="margin-top:12px;margin-bottom:14px;background:#1e252d;color:#f0b90b;box-shadow:none" onclick="markAllRead();openNotifications()">تعليم الكل كمقروء</button>`:''}${items}`;
   sheet.classList.add('on');backdrop.classList.add('on');
 }
+
+/* FIX #25: openProfile مع سويتش الخصوصية */
 function openProfile(){
   if(!currentUser)return;
   const mv=cash+holdingsValue(),mp=((mv-STARTING_CASH)/STARTING_CASH)*100;
@@ -2007,6 +2112,7 @@ function openProfile(){
   const cl=Object.keys(lessonProgress.completed).length,tl=LESSONS.length;
   const mode=getMarketMode(),ml=mode==='live'?'وضع السوق':'وضع التدريب',isM=manualMode!==null;
   const lv=getLevel(userXP);
+  const hidden=currentUser.privacyHidden===true;
   sheetBody.innerHTML=`<div class="sh-head"><div style="display:flex;align-items:center;gap:12px"><div class="hero-avatar" style="width:52px;height:52px;font-size:22px;background:linear-gradient(135deg,${currentUser.avatarColor||'#f0b90b'},${shade(currentUser.avatarColor||'#f0b90b',-30)})">${av}<div class="online-badge"></div></div><div><div class="sh-tk" style="font-size:17px">${currentUser.name}</div><div class="sh-nm" style="margin-top:3px">${lv.icon} ${lv.name} · ${userXP} XP</div></div></div><button class="sh-close" onclick="closeSheet()">×</button></div>
     <div class="sh-stats" style="margin-top:16px"><div class="stat"><div class="sl">قيمة المحفظة</div><div class="sv">${fmt(mv)}</div></div><div class="stat"><div class="sl">الأرباح</div><div class="sv ${cls(mp)}">${mp>=0?'+':''}${mp.toFixed(2)}%</div></div><div class="stat"><div class="sl">المراكز</div><div class="sv">${Object.keys(holdings).length}</div></div></div>
     <div style="margin-top:14px"><div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #1c222a;font-size:12px"><span style="color:#7b8494">طريقة الدخول</span><span style="font-weight:700">${pl}</span></div>
@@ -2015,11 +2121,32 @@ function openProfile(){
     <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #1c222a;font-size:12px"><span style="color:#7b8494">الدروس</span><span style="font-weight:700">${cl}/${tl}</span></div>
     <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #1c222a;font-size:12px"><span style="color:#7b8494">الشارات</span><span style="font-weight:700">${userBadges.length}/${BADGES.length}</span></div>
     <div style="display:flex;justify-content:space-between;padding:10px 0;font-size:12px"><span style="color:#7b8494">حالة السوق</span><span style="font-weight:700">${ml}${isM?' · يدوي':''}</span></div></div>
+    <div class="priv-box">
+      <div class="priv-title">🔒 الخصوصية</div>
+      <div class="priv-desc">💡 في الأسواق الحقيقية، المحافظ سرية. أنت وحدك تقرر ما تشاركه.</div>
+      <div class="priv-row">
+        <span class="priv-row-label">أظهر قيمة محفظتي في الترتيب</span>
+        <button class="priv-toggle ${hidden?'off':''}" onclick="togglePrivacy()"><span class="knob"></span></button>
+      </div>
+      <div class="priv-status">${hidden?'🔒 قيمتك ونسبتك مخفيتان في الترتيب':'👁 قيمتك ونسبتك مرئيتان للجميع'}</div>
+    </div>
     ${isM?`<button style="width:100%;padding:14px;border-radius:13px;font-size:14px;font-weight:800;font-family:inherit;cursor:pointer;border:none;margin-top:16px;background:#1c222a;color:#0ecb81" onclick="resetMarketMode();closeSheet()">العودة للوضع التلقائي</button>`:''}
     <button style="width:100%;padding:14px;border-radius:13px;font-size:14px;font-weight:800;font-family:inherit;cursor:pointer;border:none;margin-top:9px;background:#1c222a;color:#f0b90b" onclick="resetState()">إعادة تعيين اللعبة (هذا الوضع)</button>
     <button style="width:100%;padding:14px;border-radius:13px;font-size:14px;font-weight:800;font-family:inherit;cursor:pointer;border:none;margin-top:9px;background:#1c222a;color:#f6465d" onclick="logout()">تسجيل الخروج</button>
     <div class="disc">تقدمك يُحفظ على Firebase.</div>`;
   sheet.classList.add('on');backdrop.classList.add('on');
+}
+
+/* FIX #25: togglePrivacy */
+function togglePrivacy(){
+  if(!currentUser)return;
+  currentUser.privacyHidden=!currentUser.privacyHidden;
+  if(fbDb){
+    fbDb.collection('users').doc(currentUser.id).set({privacyHidden:currentUser.privacyHidden,updatedAt:Date.now()},{merge:true}).catch(e=>console.warn('privacy save failed',e));
+  }
+  toast(currentUser.privacyHidden?'🔒 تم إخفاء قيمتك':'👁 قيمتك مرئية الآن','good');
+  closeSheet();
+  setTimeout(()=>openProfile(),150);
 }
 
 /* ============================================================
@@ -2062,6 +2189,7 @@ window.openQuiz=openQuiz;window.answerQuiz=answerQuiz;window.nextQuizStep=nextQu
 window.answerMixedQuiz=answerMixedQuiz;window.nextMixedStep=nextMixedStep;
 window.openCertificate=openCertificate;window.downloadCertificate=downloadCertificate;
 window.applyLessonConcept=applyLessonConcept;window.claimWeeklyReward=claimWeeklyReward;
+window.openPhilosophy=openPhilosophy;window.togglePrivacy=togglePrivacy;
 
 setInterval(tick,700);
 setInterval(()=>{if(currentUser){const v=cash+holdingsValue();valueHistory.push({t:Date.now(),v});if(valueHistory.length>2000)valueHistory.shift();}},30000);
@@ -2072,14 +2200,11 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden)saveState()
 </script>
 </body>
 <!--
-===== قواعد Firestore (انسخها إلى Firebase Console > Firestore > Rules > Publish) =====
+===== Firestore Rules (انسخها إلى Firebase Console > Firestore > Rules > Publish) =====
 rules_version = '2';
 service cloud.firestore {
   match /databases/{db}/documents {
-
     function signedIn() { return request.auth != null; }
-
-    // الملف العام + لوحة المتصدرين (بدون بريد إلكتروني)
     match /users/{uid} {
       allow read: if signedIn();
       allow create, update: if signedIn() && request.auth.uid == uid
@@ -2092,13 +2217,9 @@ service cloud.firestore {
         && (!('email' in request.resource.data));
       allow delete: if false;
     }
-
-    // حالة اللعبة: خاصة بصاحبها فقط
     match /userStates/{uid} {
       allow read, write: if signedIn() && request.auth.uid == uid;
     }
-
-    // رسائل الاتصال: الإنشاء فقط، لا قراءة من التطبيق
     match /messages/{id} {
       allow create: if signedIn()
         && request.resource.data.uid == request.auth.uid
