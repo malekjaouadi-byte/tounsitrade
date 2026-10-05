@@ -103,12 +103,12 @@ body{font-family:-apple-system,"Segoe UI",Tahoma,system-ui,sans-serif;background
 .market-status.practice .ms-pulse{background:#0ecb81;box-shadow:0 0 8px #0ecb81}
 .market-status .ms-switch{font-size:9px;font-weight:800;background:rgba(255,255,255,.15);padding:3px 8px;border-radius:6px;margin-right:6px}
 .hero{margin:0 16px 12px;padding:16px 18px;border-radius:18px;background:linear-gradient(135deg,#1a1f26,#12161b);border:1px solid #232a31;position:relative;overflow:hidden;flex-shrink:0}
-.hero::after{content:"";position:absolute;top:-50px;left:-40px;width:150px;height:150px;background:radial-gradient(circle,rgba(240,185,11,.16),transparent 70%)}
+.hero::after{content:"";position:absolute;top:-50px;left:-40px;width:150px;height:150px;background:radial-gradient(circle,rgba(240,185,11,.16),transparent 70%);pointer-events:none}
 .hero-top{display:flex;justify-content:space-between;align-items:flex-start}
 .hero-l{font-size:11px;color:#7b8494;margin-bottom:5px}
 .hero-v{font-size:29px;font-weight:800;letter-spacing:-1px;font-variant-numeric:tabular-nums}
 .hero-v span{font-size:14px;font-weight:600;color:#7b8494;margin-right:4px}
-.hero-avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#f0b90b,#b88700);display:grid;place-items:center;font-size:16px;font-weight:900;color:#0b0e11;cursor:pointer;flex-shrink:0;border:2px solid #232a31;position:relative;overflow:hidden}
+.hero-avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#f0b90b,#b88700);display:grid;place-items:center;font-size:16px;font-weight:900;color:#0b0e11;cursor:pointer;flex-shrink:0;border:2px solid #232a31;position:relative;overflow:hidden;z-index:10}
 .hero-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
 .hero-avatar .online-badge{position:absolute;bottom:-1px;right:-1px;width:11px;height:11px;border-radius:50%;background:#0ecb81;border:2px solid #0b0e11}
 .hero-row{display:flex;gap:8px;margin-top:11px;flex-wrap:wrap}
