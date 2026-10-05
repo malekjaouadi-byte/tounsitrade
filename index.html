@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#0b0e11">
 <title>TounsiTrade — محاكي التداول التونسي</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23E70013'/><text x='50' y='68' font-size='58' font-weight='bold' fill='white' text-anchor='middle' font-family='Arial'>T</text></svg>">
@@ -464,6 +464,11 @@ main::-webkit-scrollbar{display:none}
 /* ============================================================
    FIREBASE
    ============================================================ */
+/* ===== SECURITY HELPERS (XSS) ===== */
+function cleanText(s,max){max=max||30;return String(s==null?'':s).replace(/[<>&"'`\\]/g,'').replace(/\s+/g,' ').trim().slice(0,max);}
+function cleanUrl(u){if(typeof u!=='string')return null;return /^https:\/\/[^\s"'<>`\\]{1,500}$/.test(u)?u:null;}
+function cleanColor(c){return(typeof c==='string'&&/^#[0-9a-fA-F]{6}$/.test(c))?c:'#f0b90b';}
+function cleanNum(n,min,max,def){n=Number(n);return(isFinite(n)&&n>=min&&n<=max)?n:def;}
 const firebaseConfig={apiKey:"AIzaSyAvGMTxk8YMdfMIbYcO_nZQBGJ6I6MRrJA",authDomain:"tounsitrade-1f721.firebaseapp.com",projectId:"tounsitrade-1f721",storageBucket:"tounsitrade-1f721.firebasestorage.app",messagingSenderId:"953224886571",appId:"1:953224886571:web:53b6ae41db318393aa2d6e"};
 let fbAuth=null,fbDb=null;
 try{
@@ -945,7 +950,7 @@ setTimeout(()=>{
     if(user){
       if(appStarted&&currentUser&&currentUser.id===user.uid)return;
       appStarted=true;
-      currentUser={id:user.uid,name:user.displayName||(user.email?user.email.split('@')[0]:'لاعب'),email:user.email,photo:user.photoURL,provider:(user.providerData[0]&&user.providerData[0].providerId)||'password',avatarColor:'#f0b90b',joined:user.metadata&&user.metadata.creationTime?new Date(user.metadata.creationTime).getTime():Date.now()};
+      currentUser={id:user.uid,name:cleanText(user.displayName||(user.email?user.email.split('@')[0]:''))||'لاعب',email:cleanText(user.email,120)||null,photo:cleanUrl(user.photoURL),provider:(user.providerData[0]&&user.providerData[0].providerId)||'password',avatarColor:'#f0b90b',joined:user.metadata&&user.metadata.creationTime?new Date(user.metadata.creationTime).getTime():Date.now()};
       startApp();
     }else{appStarted=false;currentUser=null;showAuthScreen();}
   });
@@ -973,7 +978,7 @@ document.getElementById('btnGoogle').addEventListener('click',async function(){
 });
 async function registerEmail(){
   if(!fbAuth)return showError('regError','Firebase غير جاهز');
-  const e=document.getElementById('regEmail').value.trim(),p=document.getElementById('regPass').value,n=document.getElementById('regName').value.trim();
+  const e=document.getElementById('regEmail').value.trim(),p=document.getElementById('regPass').value,n=cleanText(document.getElementById('regName').value);
   if(!e||!e.includes('@'))return showError('regError','بريد غير صحيح');
   if(!p||p.length<6)return showError('regError','كلمة المرور 6 أحرف على الأقل');
   if(!n||n.length<2)return showError('regError','أدخل اسمًا');
@@ -1018,7 +1023,7 @@ async function updatePresence(){
   try{
     const v=cash+holdingsValue();
     const p=((v-STARTING_CASH)/STARTING_CASH)*100;
-    await fbDb.collection('users').doc(currentUser.id).set({name:currentUser.name,email:currentUser.email||'',photo:currentUser.photo||null,provider:currentUser.provider,avatarColor:currentUser.avatarColor||'#f0b90b',joined:currentUser.joined||Date.now(),lastSeen:Date.now(),totalValue:v,profitPct:p,xp:userXP,badges:userBadges},{merge:true});
+    await fbDb.collection('users').doc(currentUser.id).set({name:currentUser.name,email:firebase.firestore.FieldValue.delete(),photo:currentUser.photo||null,provider:currentUser.provider,avatarColor:currentUser.avatarColor||'#f0b90b',joined:currentUser.joined||Date.now(),lastSeen:Date.now(),totalValue:v,profitPct:p,xp:userXP,badges:userBadges},{merge:true});
   }catch(e){}
 }
 async function fetchRealStats(){if(!fbDb)return;try{const t=await fbDb.collection('users').count().get();realStats.totalUsers=t.data().count;const f=Date.now()-5*60*1000;const o=await fbDb.collection('users').where('lastSeen','>',f).count().get();realStats.onlineNow=o.data().count;updateRealCountersUI();}catch(e){}}
@@ -1055,7 +1060,7 @@ function updateRealCountersUI(){
   }
 }
 
-async function fetchRealLeaderboard(){if(!fbDb)return[];try{const s=await fbDb.collection('users').orderBy('totalValue','desc').limit(50).get();const l=[];s.forEach(d=>{const x=d.data();l.push({uid:d.id,name:x.name||'لاعب',photo:x.photo||null,avatarColor:x.avatarColor||'#f0b90b',totalValue:x.totalValue||STARTING_CASH,profitPct:x.profitPct||0,joined:x.joined||Date.now(),lastSeen:x.lastSeen||0,isMe:d.id===(currentUser&&currentUser.id)});});return l;}catch(e){return[];}}
+async function fetchRealLeaderboard(){if(!fbDb)return[];try{const s=await fbDb.collection('users').orderBy('totalValue','desc').limit(50).get();const l=[];s.forEach(d=>{const x=d.data();l.push({uid:d.id,name:cleanText(x.name)||'لاعب',photo:cleanUrl(x.photo),avatarColor:cleanColor(x.avatarColor),totalValue:cleanNum(x.totalValue,0,5e6,STARTING_CASH),profitPct:cleanNum(x.profitPct,-100,5000,0),joined:x.joined||Date.now(),lastSeen:x.lastSeen||0,isMe:d.id===(currentUser&&currentUser.id)});});return l;}catch(e){return[];}}
 function timeAgo(ts){if(!ts)return'فترة';const d=Date.now()-ts;const m=Math.floor(d/60000),h=Math.floor(d/3600000),dy=Math.floor(d/86400000);if(m<1)return'الآن';if(m<60)return`${m} دقيقة`;if(h<24)return`${h} ساعة`;if(dy<30)return`${dy} يوم`;return`${Math.floor(dy/30)} شهر`;}
 function startPresenceSystem(){if(presenceInterval)clearInterval(presenceInterval);updatePresence();fetchRealStats();updateRealCountersUI();presenceInterval=setInterval(updatePresence,45000);setInterval(fetchRealStats,180000);let la=0;const on=()=>{const n=Date.now();if(n-la>30000){la=n;updatePresence();}};['click','touchstart','keydown'].forEach(e=>document.addEventListener(e,on,{passive:true}));}
 
@@ -1078,7 +1083,7 @@ function saveState(){
       weekly:weeklyState,adaptive:adaptiveState,
       updatedAt:Date.now()
     };
-    fbDb.doc(stateDocPath()).set(state,{merge:false}).catch(e=>{});
+    fbDb.doc(stateDocPath()).set(state,{merge:false}).catch(e=>{console.error('save',e);const n=Date.now();if(n-(window._lastSaveErr||0)>60000){window._lastSaveErr=n;toast('⚠️ تعذّر حفظ التقدم، تحقق من الاتصال','warn');}});
   },2000);
 }
 async function loadState(){
@@ -1125,7 +1130,7 @@ async function startApp(){
     toast('مرحبًا '+currentUser.name,'good');
   }catch(err){
     const v=document.getElementById('view');
-    if(v)v.innerHTML=`<div style="padding:40px 20px;text-align:center;color:#f6465d;font-size:13px">خطأ: <br><span style="font-size:11px;color:#8b95a5">${err.message||err}</span></div>`;
+    if(v)v.innerHTML=`<div style="padding:40px 20px;text-align:center;color:#f6465d;font-size:13px">خطأ: <br><span style="font-size:11px;color:#8b95a5">${cleanText(err.message||err,200)}</span></div>`;
   }
 }
 
@@ -1551,7 +1556,7 @@ function doSell(){
   const s=STOCKS.find(x=>x.id===openStockId);const h=holdings[s.id];const q=currentQty();
   if(!h||h.qty<q-0.0001)return toast('لا تملك كمية كافية','warn');
   const f=ttCalculateFees(s.price,q);const net=f.stockValue-f.totalFees;
-  const profit=(s.price-h.avg)*q;
+  const profit=net-h.avg*q;
   if(!confirm(`تأكيد البيع؟\n${displayId(s)}\nالكمية: ${fmtQty(q)}\nالمستلم: ${fmt(net)} TND`))return;
   cash+=net;h.qty-=q;
   if(h.qty<0.0001){delete holdings[s.id];pendingOrders=pendingOrders.filter(o=>!(o.type==='sl'&&o.stockId===s.id));}
@@ -1980,10 +1985,11 @@ async function sendContactMessage(){
   if(fbDb&&currentUser){fbDb.collection('messages').add({...msg,uid:currentUser.id,userEmail:currentUser.email,userName:currentUser.name}).then(()=>{msg.status='sent';}).catch(()=>{msg.status='failed';});}
   saveState();
   try{
+    if(FORMSPREE_ENDPOINT.includes('YOUR_FORM_ID')){await new Promise(r=>setTimeout(r,600));if(msg.status==='failed')throw new Error('save-failed');msg.status='sent';pushNotification('contact','✅ تم إرسال رسالتك','سنراجعها ونردّ قريبًا.');toast('✅ تم الإرسال بنجاح!','good');closeSheet();return;}
     const res=await fetch(FORMSPREE_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({name,email:email||'غير محدد',subject:SUBJECT_LABELS[subject],message,_subject:`[TounsiTrade · ${SUBJECT_LABELS[subject]}] من ${name}`,userId:currentUser?currentUser.id:'anon'})});
     if(res.ok){msg.status='sent';pushNotification('contact','✅ تم إرسال رسالتك','سنراجعها ونردّ قريبًا.');toast('✅ تم الإرسال بنجاح!','good');closeSheet();}
     else throw new Error('HTTP '+res.status);
-  }catch(err){console.error('Formspree error:',err);msg.status='failed';pushNotification('contact','⚠️ تم الحفظ محليًا','سنراجعها قريبًا.');toast('تم الحفظ — البريد لم يُرسل','warn');closeSheet();}
+  }catch(err){console.error('Contact error:',err);msg.status='failed';pushNotification('contact','⚠️ تعذّر الإرسال','حاول مرة أخرى لاحقًا.');toast('تعذّر الإرسال، حاول لاحقًا','warn');closeSheet();}
   finally{btn.disabled=false;btn.textContent='إرسال';}
 }
 
@@ -2065,4 +2071,42 @@ window.addEventListener('beforeunload',saveState);
 document.addEventListener('visibilitychange',()=>{if(document.hidden)saveState();});
 </script>
 </body>
+<!--
+===== قواعد Firestore (انسخها إلى Firebase Console > Firestore > Rules > Publish) =====
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{db}/documents {
+
+    function signedIn() { return request.auth != null; }
+
+    // الملف العام + لوحة المتصدرين (بدون بريد إلكتروني)
+    match /users/{uid} {
+      allow read: if signedIn();
+      allow create, update: if signedIn() && request.auth.uid == uid
+        && request.resource.data.name is string
+        && request.resource.data.name.size() >= 1 && request.resource.data.name.size() <= 30
+        && request.resource.data.totalValue is number
+        && request.resource.data.totalValue >= 0 && request.resource.data.totalValue <= 5000000
+        && request.resource.data.profitPct is number
+        && request.resource.data.profitPct >= -100 && request.resource.data.profitPct <= 5000
+        && (!('email' in request.resource.data));
+      allow delete: if false;
+    }
+
+    // حالة اللعبة: خاصة بصاحبها فقط
+    match /userStates/{uid} {
+      allow read, write: if signedIn() && request.auth.uid == uid;
+    }
+
+    // رسائل الاتصال: الإنشاء فقط، لا قراءة من التطبيق
+    match /messages/{id} {
+      allow create: if signedIn()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.message is string
+        && request.resource.data.message.size() <= 2000;
+      allow read, update, delete: if false;
+    }
+  }
+}
+-->
 </html>
