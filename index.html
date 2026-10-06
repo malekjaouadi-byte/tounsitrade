@@ -1004,7 +1004,8 @@ async function resetState(){
 /* ============================================================
    PRESENCE + STATS
    ============================================================ */
-async function updatePresence(force){if(!currentUser||!fbDb)return;const _n=Date.now();if(!force&&_n-(window._lastPres||0)<240000)return;window._lastPres=_n;
+const TT_SCALE={presenceMinMs:2*60*60*1000,statsCacheMs:6*60*60*1000,rankCacheMs:15*60*1000,leaderboardLimit:30};
+async function updatePresence(force){if(!currentUser||!fbDb)return;const _n=Date.now();if(!force&&_n-(window._lastPres||0)<TT_SCALE.presenceMinMs)return;window._lastPres=_n;
   if(!currentUser||!fbDb)return;
   try{
     const v=cash+holdingsValue();
@@ -1025,7 +1026,7 @@ async function updatePresence(force){if(!currentUser||!fbDb)return;const _n=Date
     },{merge:true});
   }catch(e){}
 }
-async function fetchRealStats(){if(!fbDb)return;try{const t=await fbDb.collection('users').count().get();realStats.totalUsers=t.data().count;const f=Date.now()-8*60*1000;const o=await fbDb.collection('users').where('lastSeen','>',f).count().get();realStats.onlineNow=o.data().count;updateRealCountersUI();}catch(e){}}
+async function fetchRealStats(force){if(!fbDb)return;const now=Date.now();if(!force){try{const c=JSON.parse(localStorage.getItem('tt_stats_cache')||'null');if(c&&now-c.t<TT_SCALE.statsCacheMs){realStats.totalUsers=c.total||0;realStats.onlineNow=c.online||0;updateRealCountersUI();return;}}catch(e){}}try{const t=await fbDb.collection('users').count().get();const total=t.data().count||0;const f=now-8*60*1000;const o=await fbDb.collection('users').where('lastSeen','>',f).count().get();const online=o.data().count||0;realStats.totalUsers=total;realStats.onlineNow=online;try{localStorage.setItem('tt_stats_cache',JSON.stringify({t:now,total,online}));}catch(e){}updateRealCountersUI();}catch(e){console.warn('stats',e);}}
 
 function updateRealCountersUI(){
   const t=realStats.totalUsers||0;
@@ -1045,7 +1046,7 @@ function updateRealCountersUI(){
 async function fetchRealLeaderboard(){
   if(!fbDb)return[];
   try{
-    const s=await fbDb.collection('users').orderBy('totalValue','desc').limit(50).get();
+    let s;const cacheKey='tt_rank_cache';const now=Date.now();try{const c=JSON.parse(localStorage.getItem(cacheKey)||'null');if(c&&now-c.t<TT_SCALE.rankCacheMs&&Array.isArray(c.rows)){return c.rows;}}catch(e){}s=await fbDb.collection('users').orderBy('totalValue','desc').limit(TT_SCALE.leaderboardLimit).get();
     const l=[];
     s.forEach(d=>{
       const x=d.data();
@@ -1066,11 +1067,12 @@ async function fetchRealLeaderboard(){
         isMe:isMe
       });
     });
+    try{localStorage.setItem(cacheKey,JSON.stringify({t:now,rows:l}));}catch(e){}
     return l;
   }catch(e){return[];}
 }
 function timeAgo(ts){if(!ts)return'فترة';const d=Date.now()-ts;const m=Math.floor(d/60000),h=Math.floor(d/3600000),dy=Math.floor(d/86400000);if(m<1)return'الآن';if(m<60)return`${m} دقيقة`;if(h<24)return`${h} ساعة`;if(dy<30)return`${dy} يوم`;return`${Math.floor(dy/30)} شهر`;}
-function startPresenceSystem(){if(presenceInterval)clearInterval(presenceInterval);updatePresence();fetchRealStats();updateRealCountersUI();presenceInterval=setInterval(updatePresence,240000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)updatePresence(true);});setInterval(fetchRealStats,180000);let la=0;const on=()=>{const n=Date.now();if(n-la>240000){la=n;updatePresence();}};['click','touchstart','keydown'].forEach(e=>document.addEventListener(e,on,{passive:true}));}
+function startPresenceSystem(){if(presenceInterval)clearInterval(presenceInterval);updatePresence(true);fetchRealStats(false);updateRealCountersUI();presenceInterval=setInterval(updatePresence,TT_SCALE.presenceMinMs);document.addEventListener('visibilitychange',()=>{if(!document.hidden)updatePresence(false);});let la=0;const on=()=>{const n=Date.now();if(n-la>TT_SCALE.presenceMinMs){la=n;updatePresence(false);}};['click','touchstart','keydown'].forEach(e=>document.addEventListener(e,on,{passive:true}));}
 
 /* ============================================================
    SYNC (saveState + loadState)
@@ -1297,7 +1299,7 @@ async function loadPodium(){
 /* FIX #7: renderRank مع الترتيب الشخصي + FIX #25 privacy */
 async function renderRank(){
   view.innerHTML=`<div class="pf-empty" style="padding:60px 20px"><div class="ico" style="font-size:30px">⏳</div><div>جاري التحميل...</div></div>`;
-  await fetchRealStats();
+  await fetchRealStats(false);
   const list=await fetchRealLeaderboard();
   // FIX #7: حساب الترتيب الفعلي
   let myRank=null;
@@ -1310,7 +1312,7 @@ async function renderRank(){
       totalUsers=realStats.totalUsers||myRank;
     }catch(e){console.warn('rank calc failed',e);}
   }
-  const header=`<div class="index-strip" style="margin-bottom:12px"><div><div class="nm">مستخدم مسجل</div><div class="vv">${Math.max(1,realStats.totalUsers).toLocaleString('en-US')}</div></div><div style="text-align:left"><div class="nm">نشط الآن</div><div class="vv" style="color:#0ecb81">${Math.max(1,realStats.onlineNow).toLocaleString('en-US')}</div></div></div><div class="sec"><span class="sec-t">🏆 أفضل 50 متداول</span><span class="sec-line"></span></div>`;
+  const header=`<div class="index-strip" style="margin-bottom:12px"><div><div class="nm">مستخدم مسجل</div><div class="vv">${Math.max(1,realStats.totalUsers).toLocaleString('en-US')}</div></div><div style="text-align:left"><div class="nm">نشط الآن</div><div class="vv" style="color:#0ecb81">${Math.max(1,realStats.onlineNow).toLocaleString('en-US')}</div></div></div><div class="sec"><span class="sec-t">🏆 أفضل 30 متداول</span><span class="sec-line"></span></div>`;
   if(!list.length){view.innerHTML=header+`<div class="pf-empty" style="padding:60px 20px"><div class="ico">🏆</div><div>لا يوجد لاعبون بعد</div></div><button class="btn-primary" style="margin-top:14px;background:#1e252d;color:#eaecef;box-shadow:none" onclick="backToMore()">رجوع</button>`;return;}
   const listHTML=list.map((p,i)=>{
     const on=(!p.hidden)&&(Date.now()-p.lastSeen)<8*60*1000;
@@ -1330,7 +1332,7 @@ async function renderRank(){
   }).join('');
   // FIX #7: عرض ترتيب المستخدم إذا كان خارج أفضل 50
   let myRankHTML='';
-  if(myRank&&myRank>50){
+  if(myRank&&myRank>TT_SCALE.leaderboardLimit){
     const myVal=cash+holdingsValue();
     const myPnl=((myVal-STARTING_CASH)/STARTING_CASH)*100;
     myRankHTML=`
