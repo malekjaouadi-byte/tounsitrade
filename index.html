@@ -443,6 +443,13 @@ main::-webkit-scrollbar{display:none}
 .auth-row .g{border-color:#0ecb81;box-shadow:0 0 14px rgba(14,203,129,.35)}
 .btn-social.em-outline{display:none!important}
 .pf-btn-mini.dim{opacity:.8!important}
+.btn-buy,.btn-sell,.fbtn{display:flex!important;direction:ltr;align-items:center;justify-content:space-between;gap:12px;flex:1;height:58px;padding:0 16px!important;border:none;border-radius:22px!important;color:#fff!important;font-size:21px!important;font-weight:900;font-family:inherit;cursor:pointer;box-shadow:0 8px 22px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.28)}
+.btn-buy,.fbtn.buy{background:linear-gradient(180deg,#10d77c,#049a4c)!important;--ic:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2048%2048%27%3E%3Cpath%20d%3D%27M4%2024%20L16%2013%20L24%2019%20L36%208%27%20stroke%3D%27black%27%20stroke-width%3D%274.5%27%20fill%3D%27none%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27/%3E%3Cpolygon%20points%3D%2730%2C4%2044%2C3%2042%2C17%27/%3E%3Crect%20x%3D%274%27%20y%3D%2732%27%20width%3D%278%27%20height%3D%2712%27%20rx%3D%271.5%27/%3E%3Crect%20x%3D%2716%27%20y%3D%2726%27%20width%3D%278%27%20height%3D%2718%27%20rx%3D%271.5%27/%3E%3Crect%20x%3D%2728%27%20y%3D%2720%27%20width%3D%278%27%20height%3D%2724%27%20rx%3D%271.5%27/%3E%3C/svg%3E")}
+.btn-sell,.fbtn.sell{background:linear-gradient(180deg,#ff2d3d,#c3101f)!important;--ic:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2048%2048%27%3E%3Cpath%20d%3D%27M4%208%20L16%2019%20L24%2013%20L36%2027%27%20stroke%3D%27black%27%20stroke-width%3D%274.5%27%20fill%3D%27none%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27/%3E%3Cpolygon%20points%3D%2742%2C33%2044%2C19%2030%2C25%27/%3E%3Crect%20x%3D%274%27%20y%3D%2724%27%20width%3D%278%27%20height%3D%2720%27%20rx%3D%271.5%27/%3E%3Crect%20x%3D%2716%27%20y%3D%2730%27%20width%3D%278%27%20height%3D%2714%27%20rx%3D%271.5%27/%3E%3Crect%20x%3D%2728%27%20y%3D%2736%27%20width%3D%278%27%20height%3D%278%27%20rx%3D%271.5%27/%3E%3C/svg%3E")}
+.btn-buy::before,.btn-sell::before,.fbtn::before{content:'';flex:0 0 32px;height:32px;background:#fff;-webkit-mask:var(--ic) center/contain no-repeat;mask:var(--ic) center/contain no-repeat}
+.btn-buy::after,.btn-sell::after,.fbtn::after{content:'Broker';writing-mode:vertical-rl;transform:rotate(180deg);font-size:12px;font-weight:800;line-height:1;border-right:2px solid rgba(255,255,255,.9);padding-right:10px}
+.btn-buy:disabled,.btn-sell:disabled{opacity:.45;filter:grayscale(.4)}
+.btn-buy:active,.btn-sell:active,.fbtn:active{transform:scale(.98)}
 </style>
 <script>
   // ⚠️ بدّل YOUR_FORM_ID بمعرّف Formspree
@@ -719,7 +726,9 @@ const BADGES=[
   {id:'weekly_champion',icon:'🏅',name:'بطل الأسبوع',desc:'أكملت تحديًا أسبوعيًا',xp:0}
 ];
 function getLevel(xp){if(xp>=1500)return{name:'متقدم',icon:'🟣',color:'#a855f7'};if(xp>=500)return{name:'متوسط',icon:'🔵',color:'#3b82f6'};return{name:'مبتدئ',icon:'🟢',color:'#0ecb81'};}
-function addXP(amount,reason){const oldXP=userXP;userXP+=amount;if(oldXP<500&&userXP>=500)pushNotification('rank','🎉 وصلت متوسط!','أصبحت متداولًا متوسطًا');if(oldXP<1500&&userXP>=1500)pushNotification('rank','🎉 وصلت متقدم!','أصبحت متداولًا متقدمًا');saveState();}
+function pnlPoints(profit,cost){const p=cost>0?Math.abs(profit)/cost*100:0;if(profit>0)return Math.min(40,Math.max(5,Math.round(5+p*2)));if(profit<0)return -Math.min(20,Math.max(2,Math.round(2+p)));return 0;}
+function awardPnL(profit,cost){const k=pnlPoints(profit,cost);if(!k)return;addXP(k,k>0?'profit':'loss');toast((k>0?'+':'')+k+' XP '+(k>0?'📈':'📉'),k>0?'good':'warn');}
+function addXP(amount,reason){const oldXP=userXP;userXP=Math.max(0,userXP+amount);if(oldXP<500&&userXP>=500)pushNotification('rank','🎉 وصلت متوسط!','أصبحت متداولًا متوسطًا');if(oldXP<1500&&userXP>=1500)pushNotification('rank','🎉 وصلت متقدم!','أصبحت متداولًا متقدمًا');saveState();}
 function unlockBadge(id){if(userBadges.includes(id))return;const b=BADGES.find(x=>x.id===id);if(!b)return;userBadges.push(id);addXP(b.xp,'badge');pushNotification('rank','🏆 شارة جديدة!',b.icon+' '+b.name);toast('🏆 '+b.name,'good');}
 
 /* ============================================================
@@ -1250,7 +1259,7 @@ function checkOrders(){
       const h=holdings[s.id];if(!h){pendingOrders.splice(i,1);continue;}
       if(s.price<=o.price){
         const f=ttCalculateFees(s.price,h.qty);cash+=f.stockValue-f.totalFees;
-        addTrade(s.id,'sell',h.qty,s.price);trackWeeklyEvent('trade');
+        addTrade(s.id,'sell',h.qty,s.price);trackWeeklyEvent('trade');awardPnL((s.price-h.avg)*h.qty,h.avg*h.qty);
         pushNotification('alert','وقف الخسارة',`تم بيع ${fmtQty(h.qty)} × ${displayId(s)}`);
         toast('وقف الخسارة: بيع '+fmtQty(h.qty),'warn');
         delete holdings[s.id];pendingOrders.splice(i,1);playAlertSound();
@@ -1541,7 +1550,7 @@ function renderSheet(){
     <div class="qty-row"><button class="qty-btn" onclick="stepInput(-1)">−</button><input class="qty-in" id="inputField" type="number" min="0" step="${buyMode==='qty'?'0.01':'1'}" value="${inputVal}" oninput="onInputChange(this.value)"><button class="qty-btn" onclick="stepInput(1)">+</button></div>
     <div class="unit-hint" id="unitHint">${buyMode==='qty'?`ستشتري <b>${fmtQty(q)}</b> سهم بقيمة <b>${fmt(total)}</b> TND`:`ستحصل على <b>${fmtQty(q)}</b> سهم بسعر ${fmt(s.price,dc)} TND`}</div>
     <div class="quick">${qVals.map(v=>`<button onclick="setInputTo(${v})">${v}</button>`).join('')}<button onclick="setInputMax()">الأقصى</button></div>
-    ${renderFeeBox(fees,q)}
+    ${(holdings[s.id]&&holdings[s.id].qty>0)?`<div style="background:rgba(240,185,11,.08);border:1px solid rgba(240,185,11,.3);border-radius:11px;padding:9px 12px;margin:8px 0;font-size:11.5px;color:#cfd6e0;display:flex;justify-content:space-between"><span>📦 تملك حاليًا</span><b style="color:#f0b90b">${fmtQty(holdings[s.id].qty)} سهم · متوسط ${fmt(holdings[s.id].avg,dc)}</b></div>`:''}${renderFeeBox(fees,q)}
     <div style="display:flex;justify-content:space-between;padding:10px 0;border-top:1px solid #1c222a;font-size:11.5px;color:#7b8494"><span>إجمالي الأمر</span><b id="ordTotal" style="color:#fff;font-size:13px">${fmt(total+fees.totalFees)} TND</b></div>
     <div style="display:flex;justify-content:space-between;padding:10px 0;font-size:11.5px;color:#7b8494"><span>الكاش المتاح</span><b style="color:#f0b90b;font-size:13px">${fmt(cash)} TND</b></div>
     ${isMarketFrozen()?`<div style="background:rgba(246,70,93,.1);border:1px solid rgba(246,70,93,.3);color:#f6465d;padding:9px 12px;border-radius:10px;font-size:11px;text-align:center;margin-bottom:10px;line-height:1.5">السوق مغلق — الشراء والبيع الفوري معطّلان<br><span style="font-size:10px;color:#8b95a5">يمكنك وضع أوامر معلقة تُنفّذ عند الفتح</span></div>`:''}
@@ -1581,9 +1590,9 @@ function panelHTML(type,s,h){
   if(type==='sl'){
     if(!h)return`<div style="font-size:10.5px;color:#8b95a5">لا تملك أسهمًا في ${displayId(s)}. اشتر أولاً.</div>`;
     const ex=pendingOrders.find(o=>o.type==='sl'&&o.stockId===s.id);const def=ex?ex.price:s.price*0.94;
-    return`<div class="op-title">وقف الخسارة</div><div style="font-size:10.5px;color:#8b95a5;margin-bottom:9px;line-height:1.5">سيتم بيع كل أسهمك (${fmtQty(h.qty)}) إذا وصل السعر إلى:</div><input type="number" step="0.0001" id="opPrice" value="${def.toFixed(4)}" style="width:100%;height:40px;background:#05070a;border:1px solid #262b30;border-radius:9px;color:#fff;font-size:14px;font-weight:700;text-align:center;font-family:inherit;margin-bottom:9px"><div style="display:flex;gap:7px"><button onclick="togglePanel(null)" style="flex:1;padding:10px;border-radius:9px;font-size:12px;font-weight:800;font-family:inherit;cursor:pointer;border:none;background:#262e38;color:#eaecef">إلغاء</button><button onclick="setSL()" style="flex:1;padding:10px;border-radius:9px;font-size:12px;font-weight:800;font-family:inherit;cursor:pointer;border:none;background:#f0b90b;color:#0b0e11">${ex?'تحديث':'تفعيل'}</button></div>`;
+    return`<div class="op-title">وقف الخسارة</div><div style="font-size:10.5px;color:#8b95a5;margin-bottom:9px;line-height:1.5">سيتم بيع كل أسهمك (${fmtQty(h.qty)}) إذا وصل السعر إلى:</div><input type="number" step="0.0001" id="opPrice" value="${def.toFixed(4)}" style="width:100%;height:40px;background:#05070a;border:1px solid #262b30;border-radius:9px;color:#fff;font-size:14px;font-weight:700;text-align:center;font-family:inherit;margin-bottom:9px"><div style="display:flex;gap:7px"><button onclick="togglePanel(null)" style="flex:1;padding:10px;border-radius:9px;font-size:12px;font-weight:800;font-family:inherit;cursor:pointer;border:none;background:#262e38;color:#eaecef">إلغاء</button><button class="fbtn sell" onclick="setSL()">${ex?'تحديث':'تفعيل'}</button></div>`;
   }
-  if(type==='buy'){const q=currentQty();return`<div class="op-title">شراء تلقائي</div><div style="font-size:10.5px;color:#8b95a5;margin-bottom:9px;line-height:1.5">سيتم شراء ${fmtQty(q)} سهم إذا وصل السعر إلى:</div><input type="number" step="0.0001" id="opPrice" value="${(s.price*0.97).toFixed(4)}" style="width:100%;height:40px;background:#05070a;border:1px solid #262b30;border-radius:9px;color:#fff;font-size:14px;font-weight:700;text-align:center;font-family:inherit;margin-bottom:9px"><div style="display:flex;gap:7px"><button onclick="togglePanel(null)" style="flex:1;padding:10px;border-radius:9px;font-size:12px;font-weight:800;font-family:inherit;cursor:pointer;border:none;background:#262e38;color:#eaecef">إلغاء</button><button onclick="setBuyOrder()" style="flex:1;padding:10px;border-radius:9px;font-size:12px;font-weight:800;font-family:inherit;cursor:pointer;border:none;background:#f0b90b;color:#0b0e11">تأكيد</button></div>`;}
+  if(type==='buy'){const q=currentQty();return`<div class="op-title">شراء تلقائي</div><div style="font-size:10.5px;color:#8b95a5;margin-bottom:9px;line-height:1.5">سيتم شراء ${fmtQty(q)} سهم إذا وصل السعر إلى:</div><input type="number" step="0.0001" id="opPrice" value="${(s.price*0.97).toFixed(4)}" style="width:100%;height:40px;background:#05070a;border:1px solid #262b30;border-radius:9px;color:#fff;font-size:14px;font-weight:700;text-align:center;font-family:inherit;margin-bottom:9px"><div style="display:flex;gap:7px"><button onclick="togglePanel(null)" style="flex:1;padding:10px;border-radius:9px;font-size:12px;font-weight:800;font-family:inherit;cursor:pointer;border:none;background:#262e38;color:#eaecef">إلغاء</button><button class="fbtn buy" onclick="setBuyOrder()">تأكيد</button></div>`;}
   if(type==='alert'){return`<div class="op-title">منبه سعر</div><div style="font-size:10.5px;color:#8b95a5;margin-bottom:9px;line-height:1.5">سنُنبّهك عند وصول ${displayId(s)} إلى:</div><input type="number" step="0.0001" id="opPrice" value="${(s.price*1.05).toFixed(4)}" style="width:100%;height:40px;background:#05070a;border:1px solid #262b30;border-radius:9px;color:#fff;font-size:14px;font-weight:700;text-align:center;font-family:inherit;margin-bottom:9px"><div style="display:flex;gap:7px"><button onclick="togglePanel(null)" style="flex:1;padding:10px;border-radius:9px;font-size:12px;font-weight:800;font-family:inherit;cursor:pointer;border:none;background:#262e38;color:#eaecef">إلغاء</button><button onclick="setAlert()" style="flex:1;padding:10px;border-radius:9px;font-size:12px;font-weight:800;font-family:inherit;cursor:pointer;border:none;background:#f0b90b;color:#0b0e11">تأكيد</button></div>`;}
   return'';
 }
@@ -1648,7 +1657,7 @@ async function doSell(){
   if(h.qty<0.0001){delete holdings[s.id];pendingOrders=pendingOrders.filter(o=>!(o.type==='sl'&&o.stockId===s.id));}
   addTrade(s.id,'sell',q,s.price);
   trackWeeklyEvent('trade');
-  if(profit>0){unlockBadge('first_profit');addXP(25,'profit');trackWeeklyEvent('winner');}
+  if(profit>0){unlockBadge('first_profit');awardPnL(profit,h.avg*q);trackWeeklyEvent('winner');}else if(profit<0){awardPnL(profit,h.avg*q);}
   toast(`تم بيع ${fmtQty(q)} × ${displayId(s)}`,'warn');
   inputVal=buyMode==='qty'?1:50;saveState();renderSheet();updateHero();
   if(recentTrades.length>=10)unlockBadge('ten_trades');
@@ -1784,6 +1793,7 @@ function renderLessons(){
 }
 function openLesson(id){
   const l=LESSONS.find(x=>x.id===id);if(!l)return;
+if(lessonProgress.quiz&&lessonProgress.quiz[id]){toast('✅ أنهيت هذا الدرس واختباره، ولا يمكن إعادته','warn');return;}
   const wasNew=!lessonProgress.completed[id];
   lessonProgress.completed[id]=true;
   if(wasNew){
@@ -1826,7 +1836,7 @@ function openQuiz(lessonId){
   closeSheet();
   setTimeout(()=>renderQuizModal(),50);
 }
-function renderQuizModal(){
+function renderQuizModal(){if(activeQuiz&&!activeQuiz._m){activeQuiz._m=1;if(!lessonProgress.quiz)lessonProgress.quiz={};if(!lessonProgress.quiz[activeQuiz.lessonId])lessonProgress.quiz[activeQuiz.lessonId]={score:0,total:0,pct:0,started:true,at:Date.now()};}
   const bank=getQuizFor(activeQuiz.lessonId);
   const q=bank[activeQuiz.idx];
   const correctText=q[1][q[2]];
@@ -1869,14 +1879,14 @@ function nextQuizStep(){
   if(activeQuiz.idx>=bank.length)renderQuizResult();
   else renderQuizModal();
 }
-function renderQuizResult(){
+function renderQuizResult(){const _pq=(lessonProgress.quiz||{})[activeQuiz.lessonId];const _firstDone=!_pq||_pq.started;
   const pct=Math.round((activeQuiz.score/activeQuiz.total)*100);
   const pass=pct>=60;
   if(!lessonProgress.quiz)lessonProgress.quiz={};
   lessonProgress.quiz[activeQuiz.lessonId]={score:activeQuiz.score,total:activeQuiz.total,pct,at:Date.now()};
   adaptTrackAnswer(activeQuiz.lessonId,pct);
   if(pass){
-    addXP(15,'quiz');
+    if(_firstDone)addXP(15,'quiz');
     const passedCount=Object.values(lessonProgress.quiz).filter(q=>q.pct>=60).length;
     if(passedCount>=5)unlockBadge('quiz_master');
   }
@@ -2309,6 +2319,7 @@ setInterval(divTick,60000);function _hc(){const e=document.getElementById('heroC
 try{const _uh=updateHero;updateHero=function(){const r=_uh.apply(this,arguments);_hc();return r;};}catch(e){}
 setInterval(_hc,2000);_hc();
 (function(){for(const n of ['sellAll','sellWinners','sellLosers']){const o=window[n];if(typeof o!=='function')continue;window[n]=async function(){const p=recentTrades[0];const r=await o.apply(this,arguments);if(recentTrades[0]!==p)trackWeeklyEvent('trade');return r;};}})();
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){try{closeSheet();}catch(x){}}});
 /* ===== HELPERS (fixes #11 #12 #15 #16 #28) ===== */
 function safeOpenProfile(){try{openProfile();}catch(e){console.error(e);toast('تعذّر فتح الملف: '+cleanText(e.message,60),'warn');}}
 function _rng(seed){let a=seed>>>0;return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
