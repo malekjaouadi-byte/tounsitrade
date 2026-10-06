@@ -550,6 +550,7 @@ main::-webkit-scrollbar{display:none}
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 
 <script>
 /* ============================================================
@@ -561,11 +562,12 @@ function cleanColor(c){return(typeof c==='string'&&/^#[0-9a-fA-F]{6}$/.test(c))?
 function cleanNum(n,min,max,def){n=Number(n);return(isFinite(n)&&n>=min&&n<=max)?n:def;}
 
 const firebaseConfig={apiKey:"AIzaSyAvGMTxk8YMdfMIbYcO_nZQBGJ6I6MRrJA",authDomain:"tounsitrade-1f721.firebaseapp.com",projectId:"tounsitrade-1f721",storageBucket:"tounsitrade-1f721.firebasestorage.app",messagingSenderId:"953224886571",appId:"1:953224886571:web:53b6ae41db318393aa2d6e"};
-let fbAuth=null,fbDb=null;
+let fbAuth=null,fbDb=null,fbRtdb=null;
 try{
   firebase.initializeApp(firebaseConfig);
   fbAuth=firebase.auth();
   fbDb=firebase.firestore();
+  fbRtdb=firebase.database();
   fbAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(()=>{});
 }catch(e){console.error(e);}
 
@@ -1002,13 +1004,28 @@ async function resetState(){
 }
 
 /* ============================================================
+   REALTIME DATABASE HOOK
+   ============================================================
+   RTDB is loaded and available as fbRtdb, but disabled by default.
+   Firebase Spark/Free has a low simultaneous-connection ceiling, so
+   enabling a persistent RTDB connection for every visitor would be
+   counterproductive for the 1,000-user free target.
+*/
+const USE_RTDDB_PRESENCE=false;
+function rtdbPresenceRef(){
+  if(!USE_RTDDB_PRESENCE||!fbRtdb||!currentUser)return null;
+  return fbRtdb.ref('presence/'+currentUser.id);
+}
+
+/* ============================================================
    PRESENCE + STATS
    ============================================================ */
-const TT_SCALE={presenceMinMs:2*60*60*1000,statsCacheMs:6*60*60*1000,rankCacheMs:15*60*1000,leaderboardLimit:30};
-async function updatePresence(force){if(!currentUser||!fbDb)return;const _n=Date.now();if(!force&&_n-(window._lastPres||0)<TT_SCALE.presenceMinMs)return;window._lastPres=_n;
+async function updatePresence(force){if(!currentUser||!fbDb)return;const _n=Date.now();if(!force&&_n-(window._lastPres||0)<600000)return;window._lastPres=_n;
   if(!currentUser||!fbDb)return;
   try{
     const v=cash+holdingsValue();
+    const rref=rtdbPresenceRef();
+    if(rref){await rref.set({online:true,lastSeen:Date.now(),name:cleanText(currentUser.name,30)});rref.onDisconnect().remove();}
     const p=((v-STARTING_CASH)/STARTING_CASH)*100;
     await fbDb.collection('users').doc(currentUser.id).set({
       name:currentUser.name,
@@ -1026,7 +1043,7 @@ async function updatePresence(force){if(!currentUser||!fbDb)return;const _n=Date
     },{merge:true});
   }catch(e){}
 }
-async function fetchRealStats(force){if(!fbDb)return;const now=Date.now();if(!force){try{const c=JSON.parse(localStorage.getItem('tt_stats_cache')||'null');if(c&&now-c.t<TT_SCALE.statsCacheMs){realStats.totalUsers=c.total||0;realStats.onlineNow=c.online||0;updateRealCountersUI();return;}}catch(e){}}try{const t=await fbDb.collection('users').count().get();const total=t.data().count||0;const f=now-8*60*1000;const o=await fbDb.collection('users').where('lastSeen','>',f).count().get();const online=o.data().count||0;realStats.totalUsers=total;realStats.onlineNow=online;try{localStorage.setItem('tt_stats_cache',JSON.stringify({t:now,total,online}));}catch(e){}updateRealCountersUI();}catch(e){console.warn('stats',e);}}
+async function fetchRealStats(){if(!fbDb)return;try{const t=await fbDb.collection('users').count().get();realStats.totalUsers=t.data().count;const f=Date.now()-8*60*1000;const o=await fbDb.collection('users').where('lastSeen','>',f).count().get();realStats.onlineNow=o.data().count;updateRealCountersUI();}catch(e){}}
 
 function updateRealCountersUI(){
   const t=realStats.totalUsers||0;
@@ -1046,7 +1063,7 @@ function updateRealCountersUI(){
 async function fetchRealLeaderboard(){
   if(!fbDb)return[];
   try{
-    let s;const cacheKey='tt_rank_cache';const now=Date.now();try{const c=JSON.parse(localStorage.getItem(cacheKey)||'null');if(c&&now-c.t<TT_SCALE.rankCacheMs&&Array.isArray(c.rows)){return c.rows;}}catch(e){}s=await fbDb.collection('users').orderBy('totalValue','desc').limit(TT_SCALE.leaderboardLimit).get();
+    const s=await fbDb.collection('users').orderBy('totalValue','desc').limit(50).get();
     const l=[];
     s.forEach(d=>{
       const x=d.data();
@@ -1067,20 +1084,18 @@ async function fetchRealLeaderboard(){
         isMe:isMe
       });
     });
-    try{localStorage.setItem(cacheKey,JSON.stringify({t:now,rows:l}));}catch(e){}
     return l;
   }catch(e){return[];}
 }
 function timeAgo(ts){if(!ts)return'فترة';const d=Date.now()-ts;const m=Math.floor(d/60000),h=Math.floor(d/3600000),dy=Math.floor(d/86400000);if(m<1)return'الآن';if(m<60)return`${m} دقيقة`;if(h<24)return`${h} ساعة`;if(dy<30)return`${dy} يوم`;return`${Math.floor(dy/30)} شهر`;}
-function startPresenceSystem(){if(presenceInterval)clearInterval(presenceInterval);updatePresence(true);fetchRealStats(false);updateRealCountersUI();presenceInterval=setInterval(updatePresence,TT_SCALE.presenceMinMs);document.addEventListener('visibilitychange',()=>{if(!document.hidden)updatePresence(false);});let la=0;const on=()=>{const n=Date.now();if(n-la>TT_SCALE.presenceMinMs){la=n;updatePresence(false);}};['click','touchstart','keydown'].forEach(e=>document.addEventListener(e,on,{passive:true}));}
+function startPresenceSystem(){if(presenceInterval)clearInterval(presenceInterval);updatePresence();fetchRealStats();updateRealCountersUI();presenceInterval=setInterval(updatePresence,600000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)updatePresence(true);});setInterval(fetchRealStats,600000);let la=0;const on=()=>{const n=Date.now();if(n-la>600000){la=n;updatePresence();}};['click','touchstart','keydown'].forEach(e=>document.addEventListener(e,on,{passive:true}));}
 
 /* ============================================================
    SYNC (saveState + loadState)
    ============================================================ */
 function stateDocPath(){return'userStates/'+currentUser.id;}
-function saveState(){
-  if(!stateLoaded||!currentUser||!fbDb)return;
-  updatePresence();
+async function _saveStateNow(){
+  if(!stateLoaded||!currentUser||!fbDb)return false;
   if(saveTimer)return;
   saveTimer=setTimeout(()=>{window._saveNow=false;
     saveTimer=null;saveModeState();
@@ -1094,8 +1109,38 @@ function saveState(){
       updatedAt:Date.now()
     };
     fbDb.doc(stateDocPath()).set(state,{merge:false}).catch(e=>{console.error('save',e);const n=Date.now();if(n-(window._lastSaveErr||0)>60000){window._lastSaveErr=n;toast('⚠️ تعذّر حفظ التقدم','warn');}});
-  },window._saveNow?0:2000);
+  },0);
+  return true;
 }
+
+/* ============================================================
+   SCALE SAVE LAYER — 5 minute throttle + dirty flag
+   ============================================================ */
+let _stateDirty=false;
+let _flushTimer=null;
+const SAVE_THROTTLE_MS=5*60*1000;
+
+function saveState(){
+  if(!stateLoaded||!currentUser||!fbDb)return;
+  _stateDirty=true;
+  if(_flushTimer)return;
+  _flushTimer=setTimeout(()=>{_flushTimer=null;_flushState();},SAVE_THROTTLE_MS);
+}
+
+async function _flushState(){
+  if(!stateLoaded||!currentUser||!fbDb||!_stateDirty)return false;
+  _stateDirty=false;
+  if(_flushTimer){clearTimeout(_flushTimer);_flushTimer=null;}
+  try{
+    await _saveStateNow();
+    return true;
+  }catch(e){
+    _stateDirty=true;
+    console.error('flushState',e);
+    return false;
+  }
+}
+
 async function loadState(){
   if(!currentUser||!fbDb)return false;
   try{
@@ -1146,6 +1191,7 @@ async function startApp(){
       toast('⚠️ تعذّر تحميل بياناتك — تحقق من الاتصال','warn');
     }
     stateLoaded=loadOK;
+    if(loadOK){_stateDirty=false;if(_flushTimer){clearTimeout(_flushTimer);_flushTimer=null;}}
     loadModeState(getMarketMode());
     rolloverWeeklyIfNeeded();
     computeWeeklyProgress();
@@ -1299,7 +1345,7 @@ async function loadPodium(){
 /* FIX #7: renderRank مع الترتيب الشخصي + FIX #25 privacy */
 async function renderRank(){
   view.innerHTML=`<div class="pf-empty" style="padding:60px 20px"><div class="ico" style="font-size:30px">⏳</div><div>جاري التحميل...</div></div>`;
-  await fetchRealStats(false);
+  await fetchRealStats();
   const list=await fetchRealLeaderboard();
   // FIX #7: حساب الترتيب الفعلي
   let myRank=null;
@@ -1312,7 +1358,7 @@ async function renderRank(){
       totalUsers=realStats.totalUsers||myRank;
     }catch(e){console.warn('rank calc failed',e);}
   }
-  const header=`<div class="index-strip" style="margin-bottom:12px"><div><div class="nm">مستخدم مسجل</div><div class="vv">${Math.max(1,realStats.totalUsers).toLocaleString('en-US')}</div></div><div style="text-align:left"><div class="nm">نشط الآن</div><div class="vv" style="color:#0ecb81">${Math.max(1,realStats.onlineNow).toLocaleString('en-US')}</div></div></div><div class="sec"><span class="sec-t">🏆 أفضل 30 متداول</span><span class="sec-line"></span></div>`;
+  const header=`<div class="index-strip" style="margin-bottom:12px"><div><div class="nm">مستخدم مسجل</div><div class="vv">${Math.max(1,realStats.totalUsers).toLocaleString('en-US')}</div></div><div style="text-align:left"><div class="nm">نشط الآن</div><div class="vv" style="color:#0ecb81">${Math.max(1,realStats.onlineNow).toLocaleString('en-US')}</div></div></div><div class="sec"><span class="sec-t">🏆 أفضل 50 متداول</span><span class="sec-line"></span></div>`;
   if(!list.length){view.innerHTML=header+`<div class="pf-empty" style="padding:60px 20px"><div class="ico">🏆</div><div>لا يوجد لاعبون بعد</div></div><button class="btn-primary" style="margin-top:14px;background:#1e252d;color:#eaecef;box-shadow:none" onclick="backToMore()">رجوع</button>`;return;}
   const listHTML=list.map((p,i)=>{
     const on=(!p.hidden)&&(Date.now()-p.lastSeen)<8*60*1000;
@@ -1332,7 +1378,7 @@ async function renderRank(){
   }).join('');
   // FIX #7: عرض ترتيب المستخدم إذا كان خارج أفضل 50
   let myRankHTML='';
-  if(myRank&&myRank>TT_SCALE.leaderboardLimit){
+  if(myRank&&myRank>50){
     const myVal=cash+holdingsValue();
     const myPnl=((myVal-STARTING_CASH)/STARTING_CASH)*100;
     myRankHTML=`
@@ -2066,12 +2112,21 @@ function openContact(){
   sheet.classList.add('on');backdrop.classList.add('on');
 }
 async function sendContactMessage(){
+  /* Client-side rate limit: protects Firestore/Formspree from accidental spam. */
+  const now=Date.now();
+  const lastMsg=Number(localStorage.getItem('tt_last_message_at')||0);
+  const dayKey='tt_msg_day_'+new Date().toISOString().slice(0,10);
+  const dayCount=Number(localStorage.getItem(dayKey)||0);
+  if(now-lastMsg<60000)return toast('⏳ يمكنك إرسال رسالة أخرى بعد دقيقة','warn');
+  if(dayCount>=10)return toast('⚠️ تم بلوغ الحد اليومي للرسائل','warn');
   const subject=document.getElementById('contactSubject').value;
   const name=cleanText(document.getElementById('contactName').value)||(currentUser?currentUser.name:'مجهول');
   const email=cleanText(document.getElementById('contactEmail').value,120);
   const message=document.getElementById('contactMessage').value.replace(/[<>]/g,'').trim().slice(0,2000);
   if(message.length<10)return toast('الرسالة قصيرة جدًا','warn');
   if(email&&!email.includes('@'))return toast('البريد غير صحيح','warn');
+  localStorage.setItem('tt_last_message_at',String(now));
+  localStorage.setItem(dayKey,String(dayCount+1));
   const btn=document.getElementById('sendMsgBtn');btn.disabled=true;btn.textContent='جاري الإرسال...';
   const msg={id:'msg_'+Date.now(),subject,subjectLabel:SUBJECT_LABELS[subject],name,email,message,sentAt:Date.now(),status:'pending'};
   sentMessages.unshift(msg);if(sentMessages.length>30)sentMessages.pop();
@@ -2250,7 +2305,7 @@ function calBody(){const fr=lsG('lang','ar')==='fr',now=Date.now(),pend=lsG('dvp
   const st=now<e.ex?(fr?'Date : ':(isD?'قطع الكوبون: ':'تاريخ التنفيذ: '))+fd(e.ex):(isD&&now<e.pay)?(fr?'Détaché · paiement : ':'قُطع الكوبون · الدفع: ')+fd(e.pay):(fr?'✓ Effectué':'✓ تم');
   const mine=isD?(p?p.amt:q*e.dps):0;
   return`<div style="padding:11px 0;border-bottom:1px solid #1c222a"><div style="display:flex;justify-content:space-between;align-items:center"><b>${ttl}</b>${(q>0||p)?`<span style="font-size:10px;background:#1c222a;border-radius:8px;padding:3px 7px;color:#f0b90b">${fr?'Vous détenez':'تملكه'}</span>`:''}</div><div style="font-size:12px;color:${col};margin-top:4px">${st}</div>${(isD&&(q>0||p))?`<div style="font-size:11px;color:#8b95a5;margin-top:2px">${fr?'Montant estimé':'المبلغ المتوقع'}: ${mine.toFixed(2)} TND</div>`:''}</div>`;}).join('');}
-setInterval(divTick,15000);function _hc(){const e=document.getElementById('heroCash');if(e&&typeof cash==='number'&&currentUser)e.innerHTML='💧 السيولة: '+fmt(cash)+' TND · 📈 الأسهم: '+fmt(holdingsValue())+' TND';}
+setInterval(divTick,60000);function _hc(){const e=document.getElementById('heroCash');if(e&&typeof cash==='number'&&currentUser)e.innerHTML='💧 السيولة: '+fmt(cash)+' TND · 📈 الأسهم: '+fmt(holdingsValue())+' TND';}
 try{const _uh=updateHero;updateHero=function(){const r=_uh.apply(this,arguments);_hc();return r;};}catch(e){}
 setInterval(_hc,2000);_hc();
 (function(){for(const n of ['sellAll','sellWinners','sellLosers']){const o=window[n];if(typeof o!=='function')continue;window[n]=async function(){const p=recentTrades[0];const r=await o.apply(this,arguments);if(recentTrades[0]!==p)trackWeeklyEvent('trade');return r;};}})();
@@ -2258,7 +2313,7 @@ setInterval(_hc,2000);_hc();
 function safeOpenProfile(){try{openProfile();}catch(e){console.error(e);toast('تعذّر فتح الملف: '+cleanText(e.message,60),'warn');}}
 function _rng(seed){let a=seed>>>0;return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
 function _gauss(r){let u=0,v=0;while(!u)u=r();while(!v)v=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
-const TF_MS={'1m':6e4,'5m':3e5,'1h':36e5,'1D':864e5},TICK_MS=700;
+const TF_MS={'1m':6e4,'5m':3e5,'1h':36e5,'1D':864e5},TICK_MS=1500;
 function _applyTick(s,p,ts,r){const v=20+80*Math.min(3,Math.abs(r)/0.003);for(const tf in TF_MS){const ms=TF_MS[tf],b=Math.floor(ts/ms)*ms,a=s.candles[tf],l=a[a.length-1];if(l&&l.t===b){if(p>l.high)l.high=p;if(p<l.low)l.low=p;l.close=p;l.volume+=v;}else{const o=l?l.close:p;a.push({t:b,open:o,high:Math.max(o,p),low:Math.min(o,p),close:p,volume:v});if(a.length>150)a.shift();}}}
 function seedCandles(s){if(s.candles)return;s.candles={};for(const tf in TF_MS)s.candles[tf]=[];const n=s.spark.length,now=Date.now();for(let i=0;i<n;i++)_applyTick(s,s.spark[i],now-(n-1-i)*TICK_MS,i?Math.log(s.spark[i]/s.spark[i-1]):0);
  for(const tf in TF_MS){const a=s.candles[tf],ms=TF_MS[tf],tk=ms/TICK_MS,need=100-a.length;if(need<=0)continue;let h=0;for(const ch of s.id+tf)h=(h*31+ch.charCodeAt(0))|0;const rnd=_rng(h),kap=s.kappa||0.06,sdS=s.vol/Math.sqrt(2*kap),kc=1-Math.exp(-kap*tk),sdc=(sdS*Math.sqrt(1-(1-kc)*(1-kc)))||0.003,lf=Math.log(s.fair||s.price);let close=a.length?a[0].open:s.price,t=a.length?a[0].t:Math.floor(now/ms)*ms;const pre=[];
@@ -2288,15 +2343,27 @@ window.openCertificate=openCertificate;window.downloadCertificate=downloadCertif
 window.applyLessonConcept=applyLessonConcept;window.claimWeeklyReward=claimWeeklyReward;
 window.openPhilosophy=openPhilosophy;window.togglePrivacy=togglePrivacy;
 
-setInterval(tick,700);
+setInterval(tick,1500);
 setInterval(()=>{if(currentUser){const v=cash+holdingsValue();valueHistory.push({t:Date.now(),v});if(valueHistory.length>2000)valueHistory.shift();}},30000);
 updateMarketStatus();
 setInterval(updateMarketStatus,1000);
-window.addEventListener('beforeunload',saveState);document.addEventListener('visibilitychange',()=>{if(document.hidden){if(saveTimer){clearTimeout(saveTimer);saveTimer=null;}window._saveNow=true;saveState();}});
-document.addEventListener('visibilitychange',()=>{if(document.hidden)saveState();});
+window.addEventListener('beforeunload',()=>{_flushState();});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){_flushState();}});
 </script>
 </body>
 <!--
+===== Optional Realtime Database Rules (only if USE_RTDDB_PRESENCE=true) =====
+{
+  "rules": {
+    "presence": {
+      "$uid": {
+        ".read": false,
+        ".write": "auth != null && auth.uid === $uid"
+      }
+    }
+  }
+}
+
 ===== Firestore Rules (انسخها إلى Firebase Console > Firestore > Rules > Publish) =====
 rules_version = '2';
 service cloud.firestore {
