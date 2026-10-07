@@ -1008,7 +1008,7 @@ async function loginEmail(){
   btn.disabled=false;btn.textContent='تسجيل الدخول';
 }
 
-async function logout(){if(!(await askConfirm('تسجيل الخروج؟ سيتم حفظ تقدمك.')))return;saveState();closeSheet();try{await fbAuth.signOut();}catch(e){}appStarted=false;clearLocalState();toast('تم تسجيل الخروج','good');}
+async function logout(){if(!(await askConfirm('تسجيل الخروج؟ سيتم حفظ تقدمك.')))return;saveState();try{await _flushState();}catch(e){}closeSheet();try{await fbAuth.signOut();}catch(e){}appStarted=false;clearLocalState();toast('تم تسجيل الخروج','good');}
 
 function clearLocalState(){
   ['practice','live'].forEach(m=>{STATE[m]={cash:STARTING_CASH,holdings:{},pendingOrders:[],alerts:[],recentTrades:[],orderSeq:1,valueHistory:[{t:Date.now(),v:STARTING_CASH}],stocks:buildStocksFor(m),market:{value:9850,open:9850,drift:0.0000008,vol:0.0012,ret:0}};});
@@ -1125,7 +1125,7 @@ function _buildState(){saveModeState();return {
       rankPeriod,notifications:notifications.slice(0,50),lessonProgress,
       sentMessages:sentMessages.slice(0,30),userXP,userBadges,
       weekly:weeklyState,adaptive:adaptiveState,
-      updatedAt:Date.now()
+      updatedAt:Date.now(),unsynced:(window._cloudOK===false)
     };}
 async function _saveStateNow(){
   if(!stateLoaded||!currentUser||!fbDb)return false;
@@ -1133,7 +1133,7 @@ async function _saveStateNow(){
   saveTimer=setTimeout(()=>{window._saveNow=false;
     saveTimer=null;saveModeState();
     const state=_buildState();
-    fbDb.doc(stateDocPath()).set(state,{merge:false}).catch(e=>{console.error('save',e);const n=Date.now();if(n-(window._lastSaveErr||0)>60000){window._lastSaveErr=n;toast('⚠️ تعذّر حفظ التقدم','warn');}});
+    fbDb.doc(stateDocPath()).set(state,{merge:false}).catch(e=>{console.error('save',e);const n=Date.now();if(n-(window._lastSaveErr||0)>60000){window._lastSaveErr=n;toast('⚠️ تعذّر الحفظ السحابي ('+cleanText((e&&e.code)||'',30)+') — راجع قواعد Firestore','warn');}});
   },0);
   return true;
 }
@@ -1154,7 +1154,8 @@ function saveState(){
 
 async function _flushState(){
   if(!stateLoaded||!currentUser||!fbDb||!_stateDirty)return false;
-  _stateDirty=false;
+  if(window._cloudOK===false){try{const _d=await fbDb.doc(stateDocPath()).get();if(_d.exists)return false;window._cloudOK=true;}catch(e){return false;}}
+_stateDirty=false;
   if(_flushTimer){clearTimeout(_flushTimer);_flushTimer=null;}
   try{
     await _saveStateNow();
@@ -1172,8 +1173,9 @@ async function loadState(){
     let rs=null,lerr=null;
 try{const doc=await fbDb.doc(stateDocPath()).get();if(doc.exists)rs=doc.data();}catch(e){lerr=e;}
 let ls=null;try{ls=JSON.parse(localStorage.getItem('tt_bk_'+currentUser.id)||'null');}catch(e){}
-let s=rs;window._usedLocal=false;
-if(ls&&(!rs||(ls.updatedAt||0)>(rs.updatedAt||0))){s=ls;window._usedLocal=!lerr;}
+window._cloudOK=!lerr;let s=rs;window._usedLocal=false;
+if(ls&&(!rs||((ls.updatedAt||0)>(rs.updatedAt||0)&&!ls.unsynced))){s=ls;window._usedLocal=!lerr;}
+if(window._loadAborted)return false;
 if(!s){if(lerr)throw lerr;return false;}
     ['practice','live'].forEach(m=>{
       const d=s[m];if(!d)return;
@@ -1216,10 +1218,8 @@ let loadOK=false;
       await Promise.race([loadState(),new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),20000))]);
       loadOK=true;
     }catch(e){
-      console.warn('loadState failed:',e);
-      toast('⚠️ تعذّر تحميل بياناتك — تحقق من الاتصال','warn');
-    }
-    stateLoaded=loadOK;
+      console.warn('loadState failed:',e); window._loadAborted=true; window._cloudOK=false; loadOK=true; toast('⚠️ تعذّر الاتصال بالسحابة ('+cleanText((e&&e.code)||(e&&e.message)||'',30)+'). يُحفظ تقدمك على جهازك مؤقتًا.','warn'); }
+stateLoaded=loadOK;
     if(loadOK){_stateDirty=false;if(_flushTimer){clearTimeout(_flushTimer);_flushTimer=null;}}
 if(loadOK&&window._usedLocal){_stateDirty=true;setTimeout(()=>{try{_flushState();}catch(e){}},3000);}
     loadModeState(getMarketMode());
