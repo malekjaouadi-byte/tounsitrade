@@ -582,10 +582,10 @@ button[aria-label="More"]{display:none!important}
   <div class="users-strip" id="usersStripWrap"><span class="dot"></span><span>🇹🇳</span><span id="usersStrip">انضم إلى مجتمع TounsiTrade</span></div>
   <div class="market-status practice" id="marketStatus" onclick="toggleMarketMode()"><div class="ms-label"><span class="ms-pulse"></span><span id="marketStatusText">وضع التدريب</span></div><div style="display:flex;align-items:center;gap:6px"><span class="ms-timer" id="marketStatusTimer">—</span><span class="ms-switch">تبديل</span></div></div>
   <div class="hero">
-    <div class="hero-top"><div><div class="hero-l">إجمالي قيمة المحفظة</div><div class="hero-v" id="heroVal">10,000.00 <span>TND</span></div><div id="heroCash" style="font-size:12px;color:#8b95a5;margin-top:5px;font-weight:700"></div><button onclick="hubTab='cal';renderHub()" style="margin-top:8px;padding:7px 12px;border:none;border-radius:10px;background:#1c222a;color:#f0b90b;font-weight:800;font-size:11.5px;font-family:inherit;cursor:pointer">📅 تقويم الأرباح والأحداث</button> <button onclick="hubTab='jr';renderHub()" style="margin-top:8px;padding:7px 12px;border:none;border-radius:10px;background:#1c222a;color:#f0b90b;font-weight:800;font-size:11.5px;font-family:inherit;cursor:pointer">📓 دفتر صفقاتي</button></div><div class="hero-avatar" id="heroAvatar" onclick="safeOpenProfile()" style="cursor:pointer;-webkit-tap-highlight-color:transparent"><span id="avatarLetter" style="pointer-events:none">؟</span><div class="online-badge" style="pointer-events:none"></div></div></div>
+    <div class="hero-top"><div><div class="hero-l">إجمالي قيمة المحفظة</div><div class="hero-v" id="heroVal">10,000.00 <span>TND</span></div><div id="heroCash" style="font-size:12px;color:#8b95a5;margin-top:5px;font-weight:700"></div><button onclick="hubTab='cal';renderHub()" style="margin-top:8px;padding:7px 12px;border:none;border-radius:10px;background:#1c222a;color:#f0b90b;font-weight:800;font-size:11.5px;font-family:inherit;cursor:pointer">📅 تقويم الأرباح والأحداث</button> <button onclick="hubTab='jr';renderHub()" style="margin-top:8px;padding:7px 12px;border:none;border-radius:10px;background:#1c222a;color:#f0b90b;font-weight:800;font-size:11.5px;font-family:inherit;cursor:pointer">📓 دفتر صفقاتي</button> <button onclick="runDiag()" style="margin-top:8px;padding:7px 12px;border:none;border-radius:10px;background:#1c222a;color:#8b95a5;font-weight:800;font-size:11.5px;font-family:inherit;cursor:pointer">🩺 فحص الاتصال</button><div id="heroRank" onclick="switchToRank()" style="margin-top:8px;font-size:12.5px;color:#f0b90b;font-weight:800;cursor:pointer">🏆 ترتيبك: جارٍ الحساب…</div></div><div class="hero-avatar" id="heroAvatar" onclick="safeOpenProfile()" style="cursor:pointer;-webkit-tap-highlight-color:transparent"><span id="avatarLetter" style="pointer-events:none">؟</span><div class="online-badge" style="pointer-events:none"></div></div></div>
     <div class="hero-row"><div class="pill nu" id="heroPnl">+0.00 (0.00%)</div><div class="pill nu" id="heroHold">0 مركز</div><div class="pill warn" id="heroOrders" style="display:none">0/10 أمر</div></div>
   </div>
-  <div class="tabs"><div class="tab on" data-tab="market"><span class="ticon">📈</span>السوق</div><div class="tab" data-tab="lessons"><span class="ticon">📚</span>الدروس</div><div class="tab" data-tab="portfolio"><span class="ticon">💼</span>محفظتي</div><div class="tab" data-tab="more"><span class="ticon">☰</span>المزيد</div></div>
+  <div id="worldClocks" class="wclk" style="margin:0 0 10px"></div><div class="tabs"><div class="tab on" data-tab="market"><span class="ticon">📈</span>السوق</div><div class="tab" data-tab="lessons"><span class="ticon">📚</span>الدروس</div><div class="tab" data-tab="portfolio"><span class="ticon">💼</span>محفظتي</div><div class="tab" data-tab="more"><span class="ticon">☰</span>المزيد</div></div>
   <main id="view"></main>
   <div class="backdrop" id="backdrop"></div>
   <div class="sheet" id="sheet"><div class="grab"></div><div class="sheet-body" id="sheetBody"></div></div>
@@ -994,22 +994,66 @@ function showLogin(){hideAllAuth();const el=document.getElementById('loginScreen
 function backToAuth(){showAuthScreen();}
 function setNameMode(m){nameMode=m;const p=document.getElementById('choicePseudo'),r=document.getElementById('choiceReal');if(p)p.classList.toggle('on',m==='pseudo');if(r)r.classList.toggle('on',m==='real');const rn=document.getElementById('regName');if(rn)rn.placeholder=m==='pseudo'?'Trader_Tounsi':'محمد بن علي';}
 
-document.getElementById('btnGoogle').addEventListener('click',async function(){
-  if(!fbAuth)return showError('authError','Firebase غير جاهز');
-  if(/FBAN|FBAV|Instagram|Messenger|MicroMessenger|Line\//i.test(navigator.userAgent))return showError('authError','متصفح فيسبوك لا يدعم دخول Google. افتح الرابط في Safari أو Chrome، أو سجّل بالبريد الإلكتروني.');
-  this.classList.add('loading');
-  const p=new firebase.auth.GoogleAuthProvider();p.setCustomParameters({prompt:'select_account'});
-  try{try{await fbAuth.signInWithPopup(p);}catch(e0){if(e0&&(e0.code==='auth/popup-blocked'||e0.code==='auth/operation-not-supported-in-this-environment')){await fbAuth.signInWithRedirect(p);return;}throw e0;}}catch(err){
-    let msg='';
-    if(err.code==='auth/popup-blocked')msg='المتصفح منع النافذة.';
-    else if(err.code==='auth/popup-closed-by-user')msg='أغلقت نافذة الدخول.';
-    else if(err.code==='auth/unauthorized-domain')msg='النطاق غير مصرّح.';
-    else if(err.code==='auth/cancelled-popup-request'){this.classList.remove('loading');return;}
-    else msg=err.message||err.code;
-    showError('authError',msg);
+/* Google OAuth: inside Facebook/Messenger WebView, Google OAuth is restricted.
+   Keep the app usable, explain the situation clearly, and offer a one-tap external-browser action. */
+(function(){
+  const ua=navigator.userAgent||'';
+  const inApp=/FBAN|FBAV|Messenger|Instagram|MicroMessenger|Line\//i.test(ua);
+  const android=/Android/i.test(ua);
+
+  function openExternalBrowser(){
+    const url=location.href;
+    try{
+      if(android){
+        const u=new URL(url);
+        const intent='intent://'+u.host+u.pathname+u.search+u.hash+'#Intent;scheme='+u.protocol.replace(':','')+';action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;package=com.android.chrome;end';
+        location.href=intent;
+        setTimeout(()=>{try{window.open(url,'_blank','noopener,noreferrer')}catch(e){}},900);
+      }else{
+        window.open(url,'_blank','noopener,noreferrer');
+      }
+    }catch(e){window.open(url,'_blank','noopener,noreferrer');}
   }
-  this.classList.remove('loading');
-});
+
+  function showGoogleBrowserChoice(){
+    const box=document.getElementById('authError');
+    if(!box)return;
+    box.innerHTML='';
+    box.style.display='block';
+    const text=document.createElement('div');
+    text.textContent='لتسجيل الدخول بحساب Google، افتح TounsiTrade في Chrome أو Safari. يمكنك متابعة استخدام البريد الإلكتروني داخل هذا المتصفح.';
+    text.style.cssText='line-height:1.7;margin-bottom:10px';
+    const btn=document.createElement('button');
+    btn.type='button';
+    btn.textContent='🌐 فتح TounsiTrade في المتصفح';
+    btn.style.cssText='width:100%;padding:12px;border:0;border-radius:10px;background:#f0b90b;color:#0b0e11;font-family:inherit;font-weight:800;cursor:pointer';
+    btn.onclick=openExternalBrowser;
+    box.appendChild(text);box.appendChild(btn);
+  }
+
+  document.getElementById('btnGoogle').addEventListener('click',async function(){
+    if(!fbAuth)return showError('authError','Firebase غير جاهز');
+    if(inApp){showGoogleBrowserChoice();return;}
+    this.classList.add('loading');
+    const provider=new firebase.auth.GoogleAuthProvider();
+    provider.setCustomParameters({prompt:'select_account'});
+    try{
+      await fbAuth.signInWithPopup(provider);
+    }catch(err){
+      if(err&&(err.code==='auth/popup-blocked'||err.code==='auth/operation-not-supported-in-this-environment')){
+        try{await fbAuth.signInWithRedirect(provider);return;}catch(e){err=e;}
+      }
+      let msg='';
+      if(err.code==='auth/popup-blocked')msg='المتصفح منع نافذة Google. افتح الموقع في Chrome أو Safari.';
+      else if(err.code==='auth/popup-closed-by-user')msg='تم إغلاق نافذة Google.';
+      else if(err.code==='auth/unauthorized-domain')msg='هذا النطاق غير مصرّح به في Firebase.';
+      else if(err.code==='auth/cancelled-popup-request'){this.classList.remove('loading');return;}
+      else msg=err.message||err.code||'تعذر تسجيل الدخول عبر Google.';
+      showError('authError',msg);
+    }
+    this.classList.remove('loading');
+  });
+})();
 
 async function registerEmail(){
   if(!fbAuth)return showError('regError','Firebase غير جاهز');
@@ -1197,7 +1241,7 @@ async function loadState(){
     let rs=null,lerr=null;
 try{const doc=await fbDb.doc(stateDocPath()).get();if(doc.exists)rs=doc.data();}catch(e){lerr=e;}
 let ls=null;try{ls=JSON.parse(localStorage.getItem('tt_bk_'+currentUser.id)||'null');}catch(e){}
-window._cloudOK=!lerr;let s=rs;window._usedLocal=false;
+window._cloudOK=!lerr;window._loadErr=lerr?cleanText((lerr.code)||(lerr.message)||'',30):null;let s=rs;window._usedLocal=false;
 if(ls&&(!rs||((ls.updatedAt||0)>(rs.updatedAt||0)&&!ls.unsynced))){s=ls;window._usedLocal=!lerr;}
 if(window._loadAborted)return false;
 if(!s){if(lerr)throw lerr;return false;}
@@ -1242,7 +1286,7 @@ let loadOK=false;
       await Promise.race([loadState(),new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),20000))]);
       loadOK=true;
     }catch(e){
-      console.warn('loadState failed:',e); window._loadAborted=true; window._cloudOK=false; loadOK=true; toast('⚠️ تعذّر الاتصال بالسحابة ('+cleanText((e&&e.code)||(e&&e.message)||'',30)+'). يُحفظ تقدمك على جهازك مؤقتًا.','warn'); }
+      console.warn('loadState failed:',e); window._loadAborted=true; window._cloudOK=false; window._loadErr=cleanText((e&&e.code)||(e&&e.message)||'',30); loadOK=true; toast('⚠️ تعذّر الاتصال بالسحابة ('+cleanText((e&&e.code)||(e&&e.message)||'',30)+'). يُحفظ تقدمك على جهازك مؤقتًا.','warn'); }
 stateLoaded=loadOK;
     if(loadOK){_stateDirty=false;if(_flushTimer){clearTimeout(_flushTimer);_flushTimer=null;}}
 if(loadOK&&window._usedLocal){_stateDirty=true;setTimeout(()=>{try{_flushState();}catch(e){}},3000);}
@@ -1338,7 +1382,7 @@ function renderMarket(){
   const counts={};filters.forEach(f=>{counts[f]=f==='الكل'?STOCKS.length:STOCKS.filter(s=>s.sector===f).length;});
   const mode=getMarketMode();
   view.innerHTML=`
-    <div id="worldClocks" class="wclk">${clocksHTML()}</div><div class="index-strip"><div><div class="nm">مؤشر السوق الافتراضي</div><div class="vv">${fmt(MARKET.value)}</div></div><div style="text-align:left"><div class="nm">التغير</div><div class="vv ${cls(mChg)}" id="idxChg">${fmtPct(mChg)}</div></div></div>
+    <div class="index-strip"><div><div class="nm">مؤشر السوق الافتراضي</div><div class="vv">${fmt(MARKET.value)}</div></div><div style="text-align:left"><div class="nm">التغير</div><div class="vv ${cls(mChg)}" id="idxChg">${fmtPct(mChg)}</div></div></div>
     ${renderWeeklyCard()}
     <div class="chips">${filters.map(f=>`<div class="chip ${f===currentFilter?'on':''}" data-f="${f}">${f} <span style="font-size:9px;opacity:.7">(${counts[f]})</span></div>`).join('')}</div>
     ${listed.length?`<div class="sec"><span class="sec-t">${mode==='live'?'شركات مدرجة':'شركات التدريب'}</span><span class="badge-real">${mode==='live'?'سوق حقيقي':'تدريب'}</span><span class="sec-line"></span></div><div class="stock-list">${listed.map(stockRow).join('')}</div>`:''}
@@ -1404,14 +1448,11 @@ async function renderRank(){
   await fetchRealStats();
   const list=await fetchRealLeaderboard();
   // FIX #7: حساب الترتيب الفعلي
-  let myRank=null;
-  let totalUsers=0;
+  const M=getMarketMode()==='live'?'live':'practice';let myRank=null;let totalUsers=0;
   if(currentUser&&fbDb){
     try{
       const myValue=cash+holdingsValue();
-      const higher=await fbDb.collection('users').where('totalValue','>',myValue).count().get();
-      myRank=higher.data().count+1;
-      totalUsers=realStats.totalUsers||myRank;
+      const higher=await fbDb.collection('users').where(M+'Value','>',myValue).count().get(); myRank=higher.data().count+1; try{const tt=await fbDb.collection('users').where(M+'Value','>=',0).count().get();totalUsers=Math.max(tt.data().count,myRank);}catch(e){totalUsers=myRank;} window._myRank=myRank;window._rankTotal=totalUsers;
     }catch(e){console.warn('rank calc failed',e);}
   }
   const header=`<div class="index-strip" style="margin-bottom:12px"><div><div class="nm">مستخدم مسجل</div><div class="vv">${Math.max(1,realStats.totalUsers).toLocaleString('en-US')}</div></div><div style="text-align:left"><div class="nm">نشط الآن</div><div class="vv" style="color:#0ecb81">${Math.max(1,realStats.onlineNow).toLocaleString('en-US')}</div></div></div><div class="sec"><span class="sec-t">🏆 أفضل 50 متداول</span><span class="sec-line"></span></div>`;
@@ -2363,10 +2404,10 @@ function calBody(){const fr=lsG('lang','ar')==='fr',now=Date.now(),pend=lsG('dvp
   const st=now<e.ex?(fr?'Date : ':(isD?'قطع الكوبون: ':'تاريخ التنفيذ: '))+fd(e.ex):(isD&&now<e.pay)?(fr?'Détaché · paiement : ':'قُطع الكوبون · الدفع: ')+fd(e.pay):(fr?'✓ Effectué':'✓ تم');
   const mine=isD?(p?p.amt:q*e.dps):0;
   return`<div style="padding:11px 0;border-bottom:1px solid #1c222a"><div style="display:flex;justify-content:space-between;align-items:center"><b>${ttl}</b>${(q>0||p)?`<span style="font-size:10px;background:#1c222a;border-radius:8px;padding:3px 7px;color:#f0b90b">${fr?'Vous détenez':'تملكه'}</span>`:''}</div><div style="font-size:12px;color:${col};margin-top:4px">${st}</div>${(isD&&(q>0||p))?`<div style="font-size:11px;color:#8b95a5;margin-top:2px">${fr?'Montant estimé':'المبلغ المتوقع'}: ${mine.toFixed(2)} TND</div>`:''}</div>`;}).join('');}
-setInterval(divTick,60000);async function forceSave(){try{_stateDirty=true;const r=await _flushState();toast(r?'جارٍ الحفظ…':'تعذّر الحفظ الآن','warn');}catch(e){toast('تعذّر الحفظ','warn');}}
+setInterval(divTick,60000);async function forceSave(){try{if(window._cloudOK===false||window._cloudErr){runDiag();return;}_stateDirty=true;const r=await _flushState();toast(r?'جارٍ الحفظ…':'تعذّر الحفظ الآن','warn');}catch(e){toast('تعذّر الحفظ','warn');}}
 window.forceSave=forceSave;
 const APP_BUILD='نسخة 07-10-r12';
-function _hc(){const e=document.getElementById('heroCash');if(e&&typeof cash==='number'&&currentUser){const _er=window._cloudErr,_ok=window._lastCloud;const _st=_er?'⚠️ لم يُحفظ سحابيًا ('+_er+') — اضغط للحفظ':_ok?'☁️ حُفظ '+new Date(_ok).toLocaleTimeString('fr-TN',{hour:'2-digit',minute:'2-digit'}):(window._cloudOK===false?'⚠️ دون اتصال بالسحابة — اضغط للحفظ':'☁️ بانتظار أول حفظ');e.innerHTML='💧 السيولة: '+fmt(cash)+' TND · 📈 الأسهم: '+fmt(holdingsValue())+' TND<br><span onclick="forceSave()" style="cursor:pointer;font-size:11px;color:'+(_er||window._cloudOK===false?'#f6465d':'#0ecb81')+'">'+_st+'</span> <span style="font-size:9px;color:#5e6673">· '+APP_BUILD+'</span>';}}
+function _hc(){const e=document.getElementById('heroCash');if(e&&typeof cash==='number'&&currentUser){const _er=window._cloudErr,_ok=window._lastCloud;const _st=_er?'⚠️ لم يُحفظ سحابيًا ('+_er+') — اضغط للفحص':_ok?'☁️ حُفظ '+new Date(_ok).toLocaleTimeString('fr-TN',{hour:'2-digit',minute:'2-digit'}):(window._cloudOK===false?'⚠️ دون اتصال بالسحابة ('+(window._loadErr||'?')+') — اضغط للفحص':'☁️ بانتظار أول حفظ');e.innerHTML='💧 السيولة: '+fmt(cash)+' TND · 📈 الأسهم: '+fmt(holdingsValue())+' TND<br><span onclick="forceSave()" style="cursor:pointer;font-size:11px;color:'+(_er||window._cloudOK===false?'#f6465d':'#0ecb81')+'">'+_st+'</span> <span style="font-size:9px;color:#5e6673">· '+APP_BUILD+'</span>';}}
 try{const _uh=updateHero;updateHero=function(){const r=_uh.apply(this,arguments);_hc();return r;};}catch(e){}
 setInterval(_hc,2000);_hc();
 (function(){for(const n of ['sellAll','sellWinners','sellLosers']){const o=window[n];if(typeof o!=='function')continue;window[n]=async function(){const p=recentTrades[0];const r=await o.apply(this,arguments);if(recentTrades[0]!==p)trackWeeklyEvent('trade');return r;};}})();
@@ -2424,6 +2465,31 @@ function jrBody(){const L=lsG('jr_'+getMarketMode(),[]);if(!L.length)return'<div
  let h=`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:8px;text-align:center"><div style="background:#12161b;border-radius:10px;padding:8px 2px"><div style="font-size:15px;font-weight:900">${L.length}</div><div style="font-size:9.5px;color:#8b95a5">صفقات</div></div><div style="background:#12161b;border-radius:10px;padding:8px 2px"><div style="font-size:15px;font-weight:900;color:#0ecb81">${Math.round(w.length/L.length*100)}%</div><div style="font-size:9.5px;color:#8b95a5">نسبة النجاح</div></div><div style="background:#12161b;border-radius:10px;padding:8px 2px"><div style="font-size:15px;font-weight:900;color:#0ecb81">+${avg(w).toFixed(1)}%</div><div style="font-size:9.5px;color:#8b95a5">متوسط الربح</div></div><div style="background:#12161b;border-radius:10px;padding:8px 2px"><div style="font-size:15px;font-weight:900;color:#f6465d">${avg(ls).toFixed(1)}%</div><div style="font-size:9.5px;color:#8b95a5">متوسط الخسارة</div></div></div>`;
  if(top)h+=`<div style="background:rgba(246,70,93,.1);border:1px solid rgba(246,70,93,.35);border-radius:11px;padding:9px 12px;font-size:12px;margin-bottom:8px;line-height:1.7">🎯 نقطة ضعفك الأكثر تكرارًا: <b>${JR_L[top[0]]}</b> (${top[1]} مرة في صفقاتك الخاسرة)</div>`;
  return h+L.slice(0,30).map(x=>`<div style="border-bottom:1px solid #1c222a;padding:11px 0"><div style="display:flex;justify-content:space-between;align-items:center"><b>${x.win?'✅':'❌'} ${cleanText(x.sym,12)} <span style="color:#8b95a5;font-size:10.5px">${x.qty} × ${x.price}</span></b><b style="color:${x.win?'#0ecb81':'#f6465d'}">${x.pnl>=0?'+':''}${x.pnl} TND · ${x.pct>=0?'+':''}${x.pct}%</b></div><div style="font-size:10px;color:#5e6673;margin:2px 0 5px">${new Date(x.t).toLocaleString('fr-TN',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})} · مدة الاحتفاظ ${x.mins} د</div>${x.r.map(r=>`<div style="font-size:11.5px;color:#cfd6e0;line-height:1.7">• ${cleanText(r[1],200)}</div>`).join('')}</div>`).join('');}
+
+/* ===== ترتيبي + رجوع + تشخيص الاتصال ===== */
+const _rr0=renderRank;
+renderRank=async function(){await _rr0();try{const m=getMarketMode()==='live'?'السوق':'التدريب';
+ view.insertAdjacentHTML('afterbegin','<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><button onclick="document.querySelector(\'.tab[data-tab=market]\').click()" style="padding:9px 14px;border:none;border-radius:11px;background:#1c222a;color:#eaecef;font-weight:800;font-family:inherit;cursor:pointer">← رجوع</button><span style="font-size:12px;color:#f0b90b;font-weight:800">ترتيب وضع '+m+'</span></div>');
+ if(window._myRank){const mine=document.querySelector('.rank-card.me');view.insertAdjacentHTML('beforeend',(mine?'':'<div style="text-align:center;color:#8b95a5;margin:8px 0">• • •</div>')+'<div style="background:rgba(240,185,11,.1);border:1px solid rgba(240,185,11,.4);border-radius:13px;padding:11px 14px;margin-top:8px;display:flex;justify-content:space-between;align-items:center"><b style="color:#f0b90b">ترتيبك: #'+window._myRank+' من '+(window._rankTotal||window._myRank)+'</b><span style="font-size:11px;color:#cfd6e0">'+fmt(cash+holdingsValue())+' TND</span></div>');}
+ if(window._lbErr)view.insertAdjacentHTML('beforeend','<div style="text-align:center;color:#f6465d;font-size:11px;margin-top:8px">تعذّرت قراءة الترتيب ('+window._lbErr+')</div>');}catch(e){}};
+window.renderRank=renderRank;
+async function refreshMyRank(){const e=document.getElementById('heroRank');if(!e||!fbDb||!currentUser)return;const M=getMarketMode()==='live'?'live':'practice',nm=M==='live'?'السوق':'التدريب';
+ try{const v=cash+holdingsValue();const a=await fbDb.collection('users').where(M+'Value','>',v).count().get();const r=a.data().count+1;let t=r;try{const b=await fbDb.collection('users').where(M+'Value','>=',0).count().get();t=Math.max(b.data().count,r);}catch(x){}
+  window._myRank=r;window._rankTotal=t;e.innerHTML='🏆 ترتيبك في وضع '+nm+': <b>#'+r+'</b> من '+t+' متداول';}catch(x){e.innerHTML='🏆 ترتيبك غير متاح ('+cleanText((x&&x.code)||'',24)+')';}}
+window.refreshMyRank=refreshMyRank;
+setInterval(()=>{try{if(currentUser&&!document.hidden)refreshMyRank();}catch(e){}},180000);
+setTimeout(()=>{try{refreshMyRank();}catch(e){}},6000);
+async function runDiag(){const rows=[];const T=async(n,f)=>{try{const r=await f();rows.push([n,true,r||'']);}catch(e){rows.push([n,false,cleanText((e&&e.code)||(e&&e.message)||'?',40)]);}};
+ openStockId=null;sheetBody.innerHTML='<div style="text-align:center;padding:30px;color:#8b95a5">🩺 جاري فحص الاتصال…</div>';sheet.classList.add('on');backdrop.classList.add('on');
+ if(!fbDb||!currentUser){sheetBody.innerHTML='<div style="padding:24px;text-align:center">لا يوجد اتصال أو حساب.</div>';return;}
+ await T('قراءة حالتك (userStates)',async()=>{const d=await fbDb.doc(stateDocPath()).get();return d.exists?'موجودة':'لا توجد بعد';});
+ await T('قراءة ملفك العام (users)',async()=>{const d=await fbDb.collection('users').doc(currentUser.id).get();return d.exists?'موجود':'غير موجود';});
+ await T('كتابة ملفك العام (users)',async()=>{await fbDb.collection('users').doc(currentUser.id).set({diagAt:Date.now()},{merge:true});});
+ await T('كتابة بيانات الترتيب',async()=>{await updatePresence(true);if(window._presErr)throw new Error(window._presErr);});
+ await T('قراءة الترتيب',async()=>{const q=await fbDb.collection('users').orderBy((getMarketMode()==='live'?'live':'practice')+'Value','desc').limit(5).get();let n=0;q.forEach(()=>n++);return n+' سجل';});
+ sheetBody.innerHTML='<div style="font-weight:900;font-size:16px;margin-bottom:10px">🩺 فحص الاتصال بالسحابة</div>'+rows.map(r=>'<div style="display:flex;justify-content:space-between;gap:8px;padding:10px 0;border-bottom:1px solid #1c222a;font-size:12.5px"><span>'+(r[1]?'✅':'❌')+' '+r[0]+'</span><b style="color:'+(r[1]?'#0ecb81':'#f6465d')+'">'+r[2]+'</b></div>').join('')+'<div style="margin-top:12px;font-size:11.5px;color:#8b95a5;line-height:1.8">إن ظهر <b>permission-denied</b> في أي بند فقواعد Firestore في مشروعك لا تسمح به: انشر ملف firestore.rules المرفق من Firebase ← Firestore ← Rules ← Publish.</div>';}
+window.runDiag=runDiag;
+updateClocks();
 /* ===== HELPERS (fixes #11 #12 #15 #16 #28) ===== */
 function safeOpenProfile(){try{openProfile();}catch(e){console.error(e);toast('تعذّر فتح الملف: '+cleanText(e.message,60),'warn');}}
 function _rng(seed){let a=seed>>>0;return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
