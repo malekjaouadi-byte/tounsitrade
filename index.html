@@ -2531,4 +2531,60 @@ service cloud.firestore {
   }
 }
 -->
+  <!-- =================================================================== -->
+<!-- كود الإصلاح السحري: ضعه في ملف index.html مباشرة قبل وسم </body> -->
+<!-- =================================================================== -->
+<script>
+// 1. الفتح التلقائي والسلس من فيسبوك / مسنجر إلى متصفح خارجي
+(function autoRedirectFromMessenger() {
+    const ua = navigator.userAgent || '';
+    // التحقق مما إذا كان التطبيق مفتوحاً داخل متصفح التطبيقات (فيسبوك، مسنجر، انستغرام...)
+    const inApp = /FBAN|FBAV|Messenger|Instagram|MicroMessenger|Line\//i.test(ua);
+    const android = /Android/i.test(ua);
+
+    if (inApp) {
+        const url = location.href;
+        if (android) {
+            // التحويل التلقائي المباشر لمتصفح كروم على الأندرويد باستخدام Intent
+            const u = new URL(url);
+            const intent = 'intent://' + u.host + u.pathname + u.search + u.hash + '#Intent;scheme=' + u.protocol.replace(':', '') + ';action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;package=com.android.chrome;end';
+            location.replace(intent);
+        } else {
+            // التحويل لمتصفح Safari على أجهزة الآيفون (iOS)
+            setTimeout(function() {
+                window.open(url, '_blank', 'noopener,noreferrer');
+            }, 100);
+        }
+    }
+})();
+
+// 2. إصلاح تصميم الشاشات: جعل السوق وترتيب اللاعبين يفتح في شاشة كاملة
+function adjustLayoutForTabs() {
+    // التأكد من التبويبة المفتوحة حالياً
+    const isPortfolio = (typeof currentTab !== 'undefined' && currentTab === 'portfolio');
+    
+    // جلب العناصر العلوية (المحفظة، الشريط، الساعة)
+    const hero = document.querySelector('.hero');
+    const mStatus = document.getElementById('marketStatus');
+    const uStrip = document.getElementById('usersStripWrap');
+    const wClocks = document.getElementById('worldClocks');
+    
+    // إظهار العناصر العلوية فقط في صفحة المحفظة (portfolio) وإخفائها في باقي الصفحات (السوق، الترتيب، إلخ)
+    if (hero) hero.style.display = isPortfolio ? '' : 'none';
+    if (mStatus) mStatus.style.display = isPortfolio ? 'flex' : 'none';
+    if (uStrip) uStrip.style.display = isPortfolio ? 'flex' : 'none';
+    if (wClocks) wClocks.style.display = isPortfolio ? 'flex' : 'none';
+}
+
+// مراقبة النقر لتحديث التصميم بشكل فوري وتلقائي عند التنقل بين الصفحات
+document.addEventListener('click', function() {
+    setTimeout(adjustLayoutForTabs, 50); // تأخير 50 ملي ثانية لضمان تبديل المتغير currentTab أولاً
+});
+
+// تطبيق التصميم تلقائياً عند بدء فتح المنصة
+window.addEventListener('DOMContentLoaded', function() {
+    setTimeout(adjustLayoutForTabs, 500);
+});
+</script>
+
 </html>
