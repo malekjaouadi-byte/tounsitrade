@@ -477,7 +477,6 @@ main::-webkit-scrollbar{display:none}
 .splash-logo{position:relative;box-shadow:0 0 0 1px rgba(255,120,120,.4),0 0 48px rgba(255,20,20,.7)!important}
 .splash-logo::before{content:'';position:absolute;top:-30px;left:50%;transform:translateX(-50%);width:64px;height:64px;background:url("data:image/svg+xml,%3Csvg%20viewBox%3D%270%200%2064%2064%27%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%3E%3Cdefs%3E%3ClinearGradient%20id%3D%27g%27%20x1%3D%270%27%20y1%3D%270%27%20x2%3D%271%27%20y2%3D%271%27%3E%3Cstop%20offset%3D%270%27%20stop-color%3D%27%23fff1b8%27/%3E%3Cstop%20offset%3D%271%27%20stop-color%3D%27%23c8942a%27/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath%20fill%3D%27url%28%23g%29%27%20d%3D%27M44%2010a24%2024%200%201%200%206%2036a19%2019%200%201%201-6-36z%27/%3E%3Cpolygon%20fill%3D%27url%28%23g%29%27%20points%3D%2746%2C22%2048.5%2C28%2055%2C28.5%2050%2C32.5%2051.8%2C39%2046%2C35.5%2040.2%2C39%2042%2C32.5%2037%2C28.5%2043.5%2C28%27/%3E%3C/svg%3E") center/contain no-repeat;filter:drop-shadow(0 0 8px rgba(224,181,82,.8));z-index:3}
 .hero-art{width:100%;max-width:520px;aspect-ratio:1/1;margin:5vh auto 0;-webkit-mask-image:linear-gradient(180deg,#000 80%,transparent);mask-image:linear-gradient(180deg,#000 80%,transparent)}
-.tt-disclaimer{font-size:10.5px;line-height:1.65;color:#aeb7c4;text-align:center;margin:5px 12px 10px;padding:7px 10px;border:1px solid #2a313b;border-radius:9px;background:#11161c;font-weight:700}.tt-disclaimer b{color:#f0b90b}
 #splash{background:#050a14!important;display:flex;align-items:center;justify-content:center}
 #authScreen{background:#050a14!important}
 #authScreen::before,#authScreen .zellige-bg{display:none!important}
@@ -649,8 +648,7 @@ button[aria-label="More"]{display:none!important}
       <div class="top-actions"><button class="icon-btn" id="bellBtn" onclick="openNotifications()">🔔<span class="bell-badge" id="bellBadge" style="display:none">0</span></button></div>
     </div>
 
-    <div class="tt-disclaimer"><b>TounsiTrade</b> محاكي تعليمي بحت — ليس منصة تداول حقيقية، الأسعار والأرباح وهمية 100%، ولا نقدّم نصائح استثمارية</div>
-      <div class="users-strip" id="usersStripWrap"><span class="dot"></span><span>🇹🇳</span><span id="usersStrip">انضم إلى مجتمع TounsiTrade</span></div>
+    <div class="users-strip" id="usersStripWrap"><span class="dot"></span><span>🇹🇳</span><span id="usersStrip">انضم إلى مجتمع TounsiTrade</span></div>
     
     <div id="worldClocks" class="wclk" style="margin:0 16px 10px"></div>
 
@@ -1117,18 +1115,15 @@ document.getElementById('btnGoogle').addEventListener('click',async function(){
 });
 
 async function registerEmail(){
-  if(!fbAuth)return showError('regError','Firebase غير جاهز — أعد تحميل الصفحة.');
-  const e=document.getElementById('regEmail').value.trim().toLowerCase(),p=document.getElementById('regPass').value,n=cleanText(document.getElementById('regName').value);
-  if(!e||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e))return showError('regError','أدخل بريدًا إلكترونيًا صحيحًا.');
-  if(!p||p.length<6)return showError('regError','كلمة المرور يجب أن تكون 6 أحرف على الأقل.');
-  if(!n||n.length<2)return showError('regError','أدخل اسمًا من حرفين على الأقل.');
-  const btn=document.getElementById('regBtn');btn.disabled=true;btn.textContent='جاري إنشاء الحساب...';
-  try{const cred=await fbAuth.createUserWithEmailAndPassword(e,p),user=cred.user;
-    try{await Promise.race([user.updateProfile({displayName:n}),new Promise((_,r)=>setTimeout(()=>r(new Error('profile-timeout')),8000))]);}catch(profileErr){console.warn('profile update:',profileErr);} try{await user.reload();}catch(e2){}
-    if(fbDb){try{await fbDb.collection('users').doc(user.uid).set({name:n,email:e,provider:'password',avatarColor:'#f0b90b',joined:Date.now(),lastSeen:Date.now(),practiceValue:STARTING_CASH,practicePct:0,liveValue:STARTING_CASH,livePct:0,totalValue:STARTING_CASH,xp:0,badges:[],privacyHidden:false,updatedAt:Date.now()},{merge:true});}catch(dbErr){console.warn('initial user profile:',dbErr);}}
-    document.getElementById('regEmail').value='';document.getElementById('regPass').value='';document.getElementById('regName').value='';toast('✅ تم إنشاء الحساب بنجاح','good');
-  }catch(err){console.error('registerEmail:',err);let msg='تعذّر إنشاء الحساب.';if(err.code==='auth/email-already-in-use')msg='هذا البريد مستعمل من قبل. جرّب تسجيل الدخول.';else if(err.code==='auth/weak-password')msg='كلمة المرور ضعيفة. استخدم 6 أحرف على الأقل.';else if(err.code==='auth/invalid-email')msg='البريد الإلكتروني غير صحيح.';else if(err.code==='auth/operation-not-allowed')msg='إنشاء الحساب بالبريد غير مفعّل في Firebase. فعّل Email/Password من Firebase Authentication.';else if(err.code==='auth/network-request-failed')msg='تعذّر الاتصال بـ Firebase. تحقق من الإنترنت ثم حاول مرة أخرى.';else msg=cleanText(err.message||err.code||msg,180);showError('regError',msg);
-  }finally{btn.disabled=false;btn.textContent='إنشاء الحساب والدخول';}
+  if(!fbAuth)return showError('regError','Firebase غير جاهز');
+  const e=document.getElementById('regEmail').value.trim(),p=document.getElementById('regPass').value,n=cleanText(document.getElementById('regName').value);
+  if(!e||!e.includes('@'))return showError('regError','بريد غير صحيح');
+  if(!p||p.length<6)return showError('regError','كلمة المرور 6 أحرف على الأقل');
+  if(!n||n.length<2)return showError('regError','أدخل اسمًا');
+  const btn=document.getElementById('regBtn');btn.disabled=true;btn.textContent='جاري الإنشاء...';
+  try{const c=await fbAuth.createUserWithEmailAndPassword(e,p);await c.user.updateProfile({displayName:n});await c.user.reload();document.getElementById('regEmail').value='';document.getElementById('regPass').value='';document.getElementById('regName').value='';}
+  catch(err){let msg='';if(err.code==='auth/email-already-in-use')msg='البريد مستعمل.';else if(err.code==='auth/weak-password')msg='كلمة المرور ضعيفة.';else msg=err.message||err.code;showError('regError',msg);}
+  btn.disabled=false;btn.textContent='إنشاء الحساب والدخول';
 }
 
 async function loginEmail(){
@@ -2640,10 +2635,9 @@ renderRank=async function(){await _rr0();try{const m=getMarketMode()==='live'?'�
  if(window._myRank&&!document.querySelector('.rank-card.me')){view.insertAdjacentHTML('beforeend','<div style="background:rgba(240,185,11,.1);border:1px solid rgba(240,185,11,.4);border-radius:13px;padding:11px 14px;margin-top:8px;display:flex;justify-content:space-between;align-items:center"><b style="color:#f0b90b">ترتيبك: #'+window._myRank+' من '+(window._rankTotal||window._myRank)+'</b><span style="font-size:11px;color:#cfd6e0">'+fmt(cash+holdingsValue())+' TND</span></div>');}
  if(window._lbErr)view.insertAdjacentHTML('beforeend','<div style="text-align:center;color:#f6465d;font-size:11px;margin-top:8px">تعذّرت قراءة الترتيب ('+window._lbErr+')</div>');}catch(e){}};
 window.renderRank=renderRank;
-async function refreshMyRank(){
-  const e=document.getElementById('heroRank');if(!e||!fbDb||!currentUser)return;const M=getMarketMode()==='live'?'live':'practice',nm=M==='live'?'السوق':'التدريب';
-  try{const v=cash+holdingsValue(),list=await fetchRealLeaderboard(true),mine=list.findIndex(x=>x.isMe);if(mine>=0){window._myRank=mine+1;window._rankTotal=Math.max(list.length,mine+1);e.innerHTML='🏆 ترتيبك في وضع '+nm+': <b>#'+window._myRank+'</b> من '+window._rankTotal+' متداول';return;}const a=await fbDb.collection('users').where(M+'Value','>',v).count().get(),r=a.data().count+1;let t=r;try{const b=await fbDb.collection('users').where(M+'Value','>=',0).count().get();t=Math.max(b.data().count,r);}catch(x){}window._myRank=r;window._rankTotal=t;e.innerHTML='🏆 ترتيبك في وضع '+nm+': <b>#'+r+'</b> من '+t+' متداول';}catch(x){console.warn('refreshMyRank:',x);if(window._myRank)e.innerHTML='🏆 ترتيبك في وضع '+nm+': <b>#'+window._myRank+'</b> من '+(window._rankTotal||window._myRank)+' متداول';else e.innerHTML='🏆 جارٍ حساب ترتيبك…';}
-}
+async function refreshMyRank(){const e=document.getElementById('heroRank');if(!e||!fbDb||!currentUser)return;const M=getMarketMode()==='live'?'live':'practice',nm=M==='live'?'السوق':'التدريب';
+ try{const v=cash+holdingsValue();const a=await fbDb.collection('users').where(M+'Value','>',v).count().get();const r=a.data().count+1;let t=r;try{const b=await fbDb.collection('users').where(M+'Value','>=',0).count().get();t=Math.max(b.data().count,r);}catch(x){}
+  window._myRank=r;window._rankTotal=t;e.innerHTML='🏆 ترتيبك في وضع '+nm+': <b>#'+r+'</b> من '+t+' متداول';}catch(x){e.innerHTML='🏆 ترتيبك غير متاح ('+cleanText((x&&x.code)||'',24)+')';}}
 window.refreshMyRank=refreshMyRank;
 setInterval(()=>{try{if(currentUser&&!document.hidden)refreshMyRank();}catch(e){}},180000);
 (function _rankBoot(){let n=0;const t=setInterval(()=>{n++;try{if(currentUser&&fbDb&&stateLoaded){clearInterval(t);refreshMyRank();}else if(n>20)clearInterval(t);}catch(e){clearInterval(t);}},500);})();
