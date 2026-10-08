@@ -592,7 +592,7 @@ button[aria-label="More"]{display:none!important}
     
     <div id="worldClocks" class="wclk" style="margin:0 16px 10px"></div>
 
-    <div class="tabs"><div class="tab on" data-tab="market"><span class="ticon">📈</span>السوق</div><div class="tab" data-tab="lessons"><span class="ticon">📚</span>الدروس</div><div class="tab" data-tab="portfolio"><span class="ticon">💼</span>محفظتي</div><div class="tab" data-tab="more"><span class="ticon">☰</span>المزيد</div></div>
+    <div class="tabs"><div class="tab on" data-tab="home"><span class="ticon">🏠</span>الرئيسية</div><div class="tab" data-tab="market"><span class="ticon">📈</span>السوق</div><div class="tab" data-tab="lessons"><span class="ticon">📚</span>الدروس</div><div class="tab" data-tab="portfolio"><span class="ticon">💼</span>محفظتي</div><div class="tab" data-tab="more"><span class="ticon">☰</span>المزيد</div></div>
   </div>
 
   <!-- ========================================== -->
@@ -1089,8 +1089,8 @@ async function resetState(){
   if(!(await askConfirm('إعادة تعيين المنصة التعليمية؟ سيتم حذف تقدمك في هذا الوضع والعودة إلى 10,000 TND.')))return;
   const m=getMarketMode();
   STATE[m]={cash:STARTING_CASH,holdings:{},pendingOrders:[],alerts:[],recentTrades:[],orderSeq:1,valueHistory:[{t:Date.now(),v:STARTING_CASH}],stocks:buildStocksFor(m),market:{value:9850,open:9850,drift:0.0000008,vol:0.0012,ret:0}};
-  loadModeState(m);closeSheet();currentTab='market';
-  document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x.dataset.tab==='market'));
+  loadModeState(m);closeSheet();currentTab='home';
+  document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x.dataset.tab==='home'));
   render();updateHero();updateBellBadge();saveState();toast('تم إعادة التعيين','good');
 }
 
@@ -1276,13 +1276,13 @@ async function startApp(){
     const av=document.getElementById('heroAvatar');
     if(av){if(currentUser.photo){av.innerHTML=`<img src="${currentUser.photo}" alt=""><div class="online-badge"></div>`;}else{av.innerHTML=`<span>${l}</span><div class="online-badge"></div>`;av.style.background=`linear-gradient(135deg,${currentUser.avatarColor},${shade(currentUser.avatarColor,-30)})`;}}
     clearLocalState();
-    try{loadModeState(getMarketMode());currentTab='market';document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x.dataset.tab==='market'));render();updateHero();}catch(e){}
+    try{loadModeState(getMarketMode());currentTab='home';document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x.dataset.tab==='home'));render();updateHero();}catch(e){}
 let loadOK=false;
     try{
       await Promise.race([loadState(),new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),20000))]);
       loadOK=true;
     }catch(e){
-      console.warn('loadState failed:',e); window._loadAborted=true; window._cloudOK=false; window._loadErr=cleanText((e&&e.code)||(e&&e.message)||'',30); loadOK=true; toast('⚠️ تعذّر الاتصال بالسحابة ('+cleanText((e&&e.code)||(e&&e.message)||'',30)+'). يُحفظ تقدمك على جهازك مؤقتًا.','warn'); }
+      console.warn('loadState failed:',e); window._loadAborted=true; window._cloudOK=false; window._loadErr=cleanText((e&&e.code)||(e&&e.message)||'',30); loadOK=true; toast('⚠️ '+ttCloudErrMsg((e&&e.code)||(e&&e.message)||''),'warn'); }
 stateLoaded=loadOK;
     if(loadOK){_stateDirty=false;if(_flushTimer){clearTimeout(_flushTimer);_flushTimer=null;}}
 if(loadOK&&window._usedLocal){_stateDirty=true;setTimeout(()=>{try{_flushState();}catch(e){}},3000);}
@@ -1291,8 +1291,8 @@ if(loadOK&&window._usedLocal){_stateDirty=true;setTimeout(()=>{try{_flushState()
  if((lm==='live'||lm==='practice')&&lm!==getAutoMode()&&hh(lm)&&!hh(getAutoMode())){manualMode=lm;try{localStorage.setItem('tt_manual_mode',lm);}catch(e){}loadModeState(getMarketMode());toast('فتحنا وضع '+(lm==='live'?'السوق':'التدريب')+' حيث توجد مراكزك. اضغط «تبديل» للتغيير.','good');}}}catch(e){}
 rolloverWeeklyIfNeeded();
     computeWeeklyProgress();
-    currentTab='market';
-    document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x.dataset.tab==='market'));
+    currentTab='home';
+    document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x.dataset.tab==='home'));
     render();updateHero();updateBellBadge();startPresenceSystem();updateMarketStatus();updateRealCountersUI();
     toast('مرحبًا '+currentUser.name,'good');
   }catch(err){
@@ -1304,7 +1304,7 @@ rolloverWeeklyIfNeeded();
 /* ============================================================
    UI HELPERS
    ============================================================ */
-let currentTab='market',currentFilter='الكل',openStockId=null;
+let currentTab='home',currentFilter='الكل',openStockId=null;
 let buyMode='qty',inputVal=1,activePanel=null;
 let sheetIndicator='candle';
 let sheetInterval=null;
@@ -1314,7 +1314,7 @@ const sheetBody=document.getElementById('sheetBody');
 const backdrop=document.getElementById('backdrop');
 
 function sparkPoints(data,w,h){if(data.length<2)return'';const mi=Math.min(...data),ma=Math.max(...data),r=(ma-mi)||1;return data.map((v,i)=>`${((i/(data.length-1))*w).toFixed(1)},${(h-((v-mi)/r)*h).toFixed(1)}`).join(' ');}
-function render(){if(currentTab==='market')renderMarket();else if(currentTab==='portfolio')renderPortfolio();else if(currentTab==='lessons')renderLessons();else if(currentTab==='rank')renderRank();else renderMore();}
+function render(){if(currentTab==='home')renderHome();else if(currentTab==='market')renderMarket();else if(currentTab==='portfolio')renderPortfolio();else if(currentTab==='lessons')renderLessons();else if(currentTab==='rank')renderRank();else renderMore();}
 function displayId(s){return ttGetCompanyDisplay(s.id,getMarketMode()).id;}
 function holdingsValue(){return Object.entries(holdings).reduce((sum,[id,h])=>{const s=STOCKS.find(x=>x.id===id);return sum+(s?s.price*h.qty:0);},0);}
 function totalActiveOrders(){return pendingOrders.length+alerts.length;}
@@ -1379,14 +1379,19 @@ function renderMarket(){
   const mode=getMarketMode();
   view.innerHTML=`
     <div class="index-strip"><div><div class="nm">مؤشر السوق الافتراضي</div><div class="vv">${fmt(MARKET.value)}</div></div><div style="text-align:left"><div class="nm">التغير</div><div class="vv ${cls(mChg)}" id="idxChg">${fmtPct(mChg)}</div></div></div>
-    ${renderWeeklyCard()}
     <div class="chips">${filters.map(f=>`<div class="chip ${f===currentFilter?'on':''}" data-f="${f}">${f} <span style="font-size:9px;opacity:.7">(${counts[f]})</span></div>`).join('')}</div>
     ${listed.length?`<div class="sec"><span class="sec-t">${mode==='live'?'شركات مدرجة':'شركات التدريب'}</span><span class="badge-real">${mode==='live'?'سوق حقيقي':'تدريب'}</span><span class="sec-line"></span></div><div class="stock-list">${listed.map(stockRow).join('')}</div>`:''}
     ${spon.length?`<div class="sec"><span class="sec-t">شركات مدعومة</span><span class="badge-spon">★ ترويج</span><span class="sec-line"></span></div><div class="stock-list">${spon.map(stockRow).join('')}</div>`:''}
-    <div class="podium-wrap"><div class="podium-head"><div class="podium-title">🏆 أفضل 10 متداولين <span style="font-size:10px;color:#7b8494;font-weight:600;margin-right:4px">— الترتيب التونسي</span></div><button class="podium-view-all" onclick="switchToRank()">عرض الكل ←</button></div><div id="podiumList"><div class="podium-empty">جاري التحميل...</div></div></div>
     <div class="disc">جميع أسماء الشركات خيالية. الأسعار افتراضية 100%.</div>`;
   view.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{currentFilter=c.dataset.f;renderMarket();});
   view.querySelectorAll('.stock-row').forEach(el=>el.onclick=()=>openTrade(el.dataset.id));
+}
+/* ===== الرئيسية: تحدي الأسبوع + أفضل 10 متداولين ===== */
+function renderHome(){
+  view.innerHTML=`
+    ${renderWeeklyCard()}
+    <div class="podium-wrap"><div class="podium-head"><div class="podium-title">🏆 أفضل 10 متداولين <span style="font-size:10px;color:#7b8494;font-weight:600;margin-right:4px">— الترتيب التونسي</span></div><button class="podium-view-all" onclick="switchToRank()">عرض الكل ←</button></div><div id="podiumList"><div class="podium-empty">جاري التحميل...</div></div></div>
+    <div class="disc">جميع أسماء الشركات خيالية. الأسعار افتراضية 100%.</div>`;
   loadPodium();
 }
 function stockRow(s){
@@ -1910,8 +1915,8 @@ function applyLessonConcept(lessonId){
   const stockId=LESSON_STOCK_MAP[lessonId]||'TN1';
   closeSheet();
   setTimeout(()=>{
-    currentTab='market';
-    document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x.dataset.tab==='market'));
+    currentTab='home';
+    document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x.dataset.tab==='home'));
     render();
     setTimeout(()=>{openTrade(stockId);},200);
   },200);
@@ -2417,7 +2422,13 @@ function calBody(){const fr=lsG('lang','ar')==='fr',now=Date.now(),pend=lsG('dvp
 setInterval(divTick,60000);async function forceSave(){try{if(window._cloudOK===false||window._cloudErr){runDiag();return;}_stateDirty=true;const r=await _flushState();toast(r?'جارٍ الحفظ…':'تعذّر الحفظ الآن','warn');}catch(e){toast('تعذّر الحفظ','warn');}}
 window.forceSave=forceSave;
 const APP_BUILD='نسخة 07-10-r12';
-function _hc(){const e=document.getElementById('heroCash');if(e&&typeof cash==='number'&&currentUser){const _er=window._cloudErr,_ok=window._lastCloud;const _st=_er?'⚠️ لم يُحفظ سحابيًا ('+_er+') — اضغط للفحص':_ok?'☁️ حُفظ '+new Date(_ok).toLocaleTimeString('fr-TN',{hour:'2-digit',minute:'2-digit'}):(window._cloudOK===false?'⚠️ دون اتصال بالسحابة ('+(window._loadErr||'?')+') — اضغط للفحص':'☁️ بانتظار أول حفظ');e.innerHTML='💧 السيولة: '+fmt(cash)+' TND · 📈 الأسهم: '+fmt(holdingsValue())+' TND<br><span onclick="forceSave()" style="cursor:pointer;font-size:11px;color:'+(_er||window._cloudOK===false?'#f6465d':'#0ecb81')+'">'+_st+'</span> <span style="font-size:9px;color:#5e6673">· '+APP_BUILD+'</span>';}}
+function ttCloudErrMsg(c){c=String(c||'').toLowerCase();
+  if(c.indexOf('permission')>-1)return'المزامنة السحابية متوقفة (صلاحيات الخادم) — تقدّمك محفوظ على جهازك';
+  if(c.indexOf('unavailable')>-1||c.indexOf('network')>-1||c.indexOf('offline')>-1||c.indexOf('deadline')>-1)return'لا يوجد اتصال بالإنترنت — سيُحفظ تقدّمك عند عودته';
+  if(c.indexOf('unauthenticated')>-1||c.indexOf('auth/')>-1)return'انتهت الجلسة — سجّل الدخول من جديد';
+  if(c.indexOf('quota')>-1||c.indexOf('resource-exhausted')>-1)return'تجاوز الخادم حدّه المؤقت — حاول بعد قليل';
+  return'تعذّر الاتصال بالسحابة مؤقتًا — تقدّمك محفوظ على جهازك';}
+function _hc(){const e=document.getElementById('heroCash');if(e&&typeof cash==='number'&&currentUser){const _er=window._cloudErr,_ok=window._lastCloud;const _st=_er?'⚠️ '+ttCloudErrMsg(_er)+' · اضغط للتفاصيل':_ok?'☁️ حُفظ '+new Date(_ok).toLocaleTimeString('fr-TN',{hour:'2-digit',minute:'2-digit'}):(window._cloudOK===false?'⚠️ '+ttCloudErrMsg(window._loadErr)+' · اضغط للتفاصيل':'☁️ بانتظار أول حفظ');e.innerHTML='💧 السيولة: '+fmt(cash)+' TND · 📈 الأسهم: '+fmt(holdingsValue())+' TND<br><span onclick="forceSave()" style="cursor:pointer;font-size:11px;color:'+(_er||window._cloudOK===false?'#f6465d':'#0ecb81')+'">'+_st+'</span> <span style="font-size:9px;color:#5e6673">· '+APP_BUILD+'</span>';}}
 try{const _uh=updateHero;updateHero=function(){const r=_uh.apply(this,arguments);_hc();return r;};}catch(e){}
 setInterval(_hc,2000);_hc();
 (function(){for(const n of ['sellAll','sellWinners','sellLosers']){const o=window[n];if(typeof o!=='function')continue;window[n]=async function(){const p=recentTrades[0];const r=await o.apply(this,arguments);if(recentTrades[0]!==p)trackWeeklyEvent('trade');return r;};}})();
@@ -2489,7 +2500,7 @@ async function refreshMyRank(){const e=document.getElementById('heroRank');if(!e
 window.refreshMyRank=refreshMyRank;
 setInterval(()=>{try{if(currentUser&&!document.hidden)refreshMyRank();}catch(e){}},180000);
 setTimeout(()=>{try{refreshMyRank();}catch(e){}},6000);
-async function runDiag(){const rows=[];const T=async(n,f)=>{try{const r=await f();rows.push([n,true,r||'']);}catch(e){rows.push([n,false,cleanText((e&&e.code)||(e&&e.message)||'?',40)]);}};
+async function runDiag(){const rows=[];const T=async(n,f)=>{try{const r=await f();rows.push([n,true,r||'']);}catch(e){rows.push([n,false,/permission/i.test((e&&e.code)||(e&&e.message)||'')?'مرفوض (صلاحيات)':cleanText((e&&e.code)||(e&&e.message)||'?',40)]);}};
  openStockId=null;sheetBody.innerHTML='<div style="text-align:center;padding:30px;color:#8b95a5">🩺 جاري فحص الاتصال…</div>';sheet.classList.add('on');backdrop.classList.add('on');
  if(!fbDb||!currentUser){sheetBody.innerHTML='<div style="padding:24px;text-align:center">لا يوجد اتصال أو حساب.</div>';return;}
  await T('قراءة حالتك (userStates)',async()=>{const d=await fbDb.doc(stateDocPath()).get();return d.exists?'موجودة':'لا توجد بعد';});
@@ -2497,7 +2508,7 @@ async function runDiag(){const rows=[];const T=async(n,f)=>{try{const r=await f(
  await T('كتابة ملفك العام (users)',async()=>{await fbDb.collection('users').doc(currentUser.id).set({diagAt:Date.now()},{merge:true});});
  await T('كتابة بيانات الترتيب',async()=>{await updatePresence(true);if(window._presErr)throw new Error(window._presErr);});
  await T('قراءة الترتيب',async()=>{const q=await fbDb.collection('users').orderBy((getMarketMode()==='live'?'live':'practice')+'Value','desc').limit(5).get();let n=0;q.forEach(()=>n++);return n+' سجل';});
- sheetBody.innerHTML='<div style="font-weight:900;font-size:16px;margin-bottom:10px">🩺 فحص الاتصال بالسحابة</div>'+rows.map(r=>'<div style="display:flex;justify-content:space-between;gap:8px;padding:10px 0;border-bottom:1px solid #1c222a;font-size:12.5px"><span>'+(r[1]?'✅':'❌')+' '+r[0]+'</span><b style="color:'+(r[1]?'#0ecb81':'#f6465d')+'">'+r[2]+'</b></div>').join('')+'<div style="margin-top:12px;font-size:11.5px;color:#8b95a5;line-height:1.8">إن ظهر <b>permission-denied</b> في أي بند فقواعد Firestore في مشروعك لا تسمح به: انشر ملف firestore.rules المرفق من Firebase ← Firestore ← Rules ← Publish.</div>';}
+ sheetBody.innerHTML='<div style="font-weight:900;font-size:16px;margin-bottom:10px">🩺 فحص الاتصال بالسحابة</div>'+rows.map(r=>'<div style="display:flex;justify-content:space-between;gap:8px;padding:10px 0;border-bottom:1px solid #1c222a;font-size:12.5px"><span>'+(r[1]?'✅':'❌')+' '+r[0]+'</span><b style="color:'+(r[1]?'#0ecb81':'#f6465d')+'">'+r[2]+'</b></div>').join('')+'<div style="margin-top:12px;font-size:11.5px;color:#8b95a5;line-height:1.8">إن ظهر <b>مرفوض (صلاحيات)</b> في أي بند فهذا يعني أن قواعد Firestore في مشروعك لا تسمح بالعملية. التطبيق يعمل عادي ويحفظ تقدّمك على جهازك، ولإصلاح المزامنة انسخ محتوى ملف <b>firestore.rules</b> إلى Firebase ← Firestore Database ← Rules ← Publish.</div>';}
 window.runDiag=runDiag;
 updateClocks();
 /* ===== HELPERS (fixes #11 #12 #15 #16 #28) ===== */
