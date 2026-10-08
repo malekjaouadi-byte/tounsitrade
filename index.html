@@ -672,15 +672,27 @@ function ttGetCompanyDisplay(b,m){const c=TT_COMPANIES[b];if(!c)return{id:b,name
    FEES
    ============================================================ */
 const TT_FEES={broker:0.0060,tva:0.19,brokerMin:0,bvmt:0.0015,bvmtMin:0,bvmtMax:40000,cmfRate:0.23,rus:0.00015,rusMax:1e9};
+/* ===== نظام العمولات الذكي: المعرفة (XP) تخفّض عمولة الوسيط ===== */
+const TT_TIERS=[
+  {min:1500,rate:0.0015,icon:'👑',name:'نخبة',level:'متقدم',color:'#f0b90b'},
+  {min:500,rate:0.0040,icon:'🔵',name:'متوسط',level:'متوسط',color:'#3b82f6'},
+  {min:0,rate:0.0060,icon:'🟢',name:'مبتدئ',level:'مبتدئ',color:'#0ecb81'}
+];
+function ttTierForXP(xp){xp=Number(xp)||0;return TT_TIERS.find(t=>xp>=t.min)||TT_TIERS[TT_TIERS.length-1];}
+function ttBrokerRate(xp){return ttTierForXP(xp).rate;}
+function ttPct(r){return(r*100).toFixed(2)+'%';}
+function ttTierBadge(xp,compact){const t=ttTierForXP(xp);return`<span style="display:inline-flex;align-items:center;gap:3px;padding:1px 7px;border-radius:20px;font-size:9.5px;font-weight:800;color:${t.color};background:${t.color}1f;border:1px solid ${t.color}55;white-space:nowrap;vertical-align:middle">${t.icon} ${t.name}${compact?'':' (عمولة '+ttPct(t.rate)+')'}</span>`;}
 function ttCalculateFees(p,q){
   const sv=p*q;
-  let bf=Math.max(sv*TT_FEES.broker,TT_FEES.brokerMin)*(1+TT_FEES.tva);
+  const rate=ttBrokerRate(typeof userXP==='number'?userXP:0);
+  let bf=Math.max(sv*rate,TT_FEES.brokerMin)*(1+TT_FEES.tva);
+  const baseBf=Math.max(sv*TT_FEES.broker,TT_FEES.brokerMin)*(1+TT_FEES.tva);
   let bv=sv*TT_FEES.bvmt;
   if(bv<TT_FEES.bvmtMin)bv=TT_FEES.bvmtMin;
   if(bv>TT_FEES.bvmtMax)bv=TT_FEES.bvmtMax;
   const cf=bv*TT_FEES.cmfRate;
   let rf=Math.min(sv*TT_FEES.rus,TT_FEES.rusMax);
-  return{stockValue:sv,brokerFee:bf,bvmtFee:bv,cmfFee:cf,rusFee:rf,totalFees:bf+bv+cf+rf};
+  return{stockValue:sv,brokerFee:bf,brokerRate:rate,saved:Math.max(0,baseBf-bf),bvmtFee:bv,cmfFee:cf,rusFee:rf,totalFees:bf+bv+cf+rf};
 }
 
 /* ============================================================
@@ -796,7 +808,7 @@ const BADGES=[
 function getLevel(xp){if(xp>=1500)return{name:'متقدم',icon:'🟣',color:'#a855f7'};if(xp>=500)return{name:'متوسط',icon:'🔵',color:'#3b82f6'};return{name:'مبتدئ',icon:'🟢',color:'#0ecb81'};}
 function pnlPoints(profit,cost){const p=cost>0?Math.abs(profit)/cost*100:0;if(profit>0)return Math.min(40,Math.max(5,Math.round(5+p*2)));if(profit<0)return -Math.min(20,Math.max(2,Math.round(2+p)));return 0;}
 function awardPnL(profit,cost){const k=pnlPoints(profit,cost);if(!k)return;addXP(k,k>0?'profit':'loss');toast((k>0?'+':'')+k+' XP '+(k>0?'📈':'📉'),k>0?'good':'warn');}
-function addXP(amount,reason){const oldXP=userXP;userXP=Math.max(0,userXP+amount);if(oldXP<500&&userXP>=500)pushNotification('rank','🎉 وصلت متوسط!','أصبحت متداولًا متوسطًا');if(oldXP<1500&&userXP>=1500)pushNotification('rank','🎉 وصلت متقدم!','أصبحت متداولًا متقدمًا');saveState();}
+function addXP(amount,reason){const oldXP=userXP;userXP=Math.max(0,userXP+amount);if(oldXP<500&&userXP>=500)pushNotification('rank','🎉 وصلت متوسط!','انخفضت عمولة الوسيط لديك إلى 0.40% 🔵');try{toast('🔵 عمولتك الآن 0.40%','good');}catch(e){};if(oldXP<1500&&userXP>=1500)pushNotification('rank','👑 وصلت النخبة!','انخفضت عمولة الوسيط لديك إلى 0.15% 👑');try{toast('👑 عمولتك الآن 0.15%','good');}catch(e){};saveState();}
 function unlockBadge(id){if(userBadges.includes(id))return;const b=BADGES.find(x=>x.id===id);if(!b)return;userBadges.push(id);addXP(b.xp,'badge');pushNotification('rank','🏆 شارة جديدة!',b.icon+' '+b.name);toast('🏆 '+b.name,'good');}
 
 /* ============================================================
@@ -852,7 +864,7 @@ l5:[["P/E تعني؟",["السعر ÷ الربح","السعر × الربح","ا
 r1:[["وقف الخسارة يحمي من؟",["الخسائر الكبيرة","الربح","الضرائب"],0],["النسبة الموصى بها للمخاطرة/صفقة؟",["1-2% من رأس المال","10%","20%"],0],["أين يوضع وقف الخسارة؟",["تحت سعر الشراء","فوق سعر الشراء","عند سعر الشراء"],0]],
 r2:[["نسبة المخاطرة/المكافأة المثالية؟",["1:2 على الأقل","1:1","2:1 معكوسة"],0],["مع 1:2، كم نسبة نجاح للتعادل؟",["33%","50%","66%"],0],["إذا خاطرت 100، كم الهدف؟",["200","100","50"],0]],
 r3:[["التنويع يعني؟",["عدم وضع كل رأس المال في سهم واحد","شراء سهم واحد قوي","بيع كل شيء"],0],["عدد الأسهم المثالي للمبتدئ؟",["3-7","10-15","1"],0],["التنويع يكون بين؟",["قطاعات مختلفة","شركات من نفس القطاع","أسهم صغيرة فقط"],0]],
-r4:[["عمولة الوسيط المطبقة؟",["0.60%","0.15%","1.50%"],0],["ما هو الحد الأدنى لعمولة الوسيط؟",["1.000 TND","5.000 TND","لا يوجد"],2],["التداول المكثف يؤثر على؟",["الأرباح سلباً بسبب الرسوم","لا يؤثر","يزيدها دائماً"],0]],
+r4:[["عمولة الوسيط القياسية للمبتدئ؟",["0.60%","0.15%","1.50%"],0],["ما هو الحد الأدنى لعمولة الوسيط؟",["1.000 TND","5.000 TND","لا يوجد"],2],["التداول المكثف يؤثر على؟",["الأرباح سلباً بسبب الرسوم","لا يؤثر","يزيدها دائماً"],0]],
 t1:[["RSI يقيس؟",["سرعة وحجم التحركات","حجم التداول","القيمة السوقية"],0],["RSI فوق 70 يعني؟",["تشبع شرائي","تشبع بيعي","توازن"],0],["RSI تحت 30 يعني؟",["تشبع بيعي","تشبع شرائي","توازن"],0]],
 t2:[["الدعم هو؟",["سعر يصعب النزول تحته","سعر يصعب الصعود فوقه","الربح"],0],["كسر الدعم إشارة؟",["سلبية","إيجابية","محايدة"],0],["عند الدعم القوي، القرار؟",["فرصة شراء","فرصة بيع","الانتظار فقط"],0]],
 t3:[["الشمعة اليابانية تعرض؟",["4 أسعار","سعر واحد","حجم فقط"],0],["اللون الأخضر يعني؟",["Close > Open","Close < Open","Open = Close"],0],["Doji يعبر عن؟",["تردد","قوة صعودية","قوة هبوطية"],0]],
@@ -884,7 +896,7 @@ const LESSONS=[
 {cat:'risk',catName:'إدارة المخاطر',catIcon:'⚠️',id:'r1',icon:'🛑',title:'وقف الخسارة',time:'7 د',content:`<p><b>وقف الخسارة</b> أمر تلقائي يُنفَّذ عند وصول السعر لحد معيّن.</p><p><b>📚 لماذا؟</b> يمنع الخسائر الكبيرة، يُلغي العامل النفسي.</p><p><b>🔢 مثال:</b> اشتريت 100 سهم × 92.50 = 9,250 TND. وقف الخسارة عند 90.00 (-2.7%).</p><p><b>⚠️ بدون وقف:</b> السهم ينهار إلى 70 → خسارة 2,250 TND!</p><p><b>⚖️ القاعدة:</b> لا تخسر أكثر من <b>1-2%</b> من رأس المال في صفقة واحدة.</p><p><b>✅ الخلاصة:</b> وقف الخسارة علامة احتراف، ليس ضعفًا.</p>`},
 {cat:'risk',catName:'إدارة المخاطر',catIcon:'⚠️',id:'r2',icon:'⚖️',title:'المخاطرة / المكافأة',time:'6 د',content:`<p>قبل كل صفقة، حدد: كم تخاطر؟ وكم تتوقع أن تربح؟</p><p><b>🎯 القاعدة:</b> نسبة <b>1:2 على الأقل</b>.</p><p><b>🔢 مثال:</b> شراء 50 TND، وقف 48 (-4%)، هدف 54 (+8%). النسبة 1:2 ✅</p><p><b>📊 المعنى:</b> 1:2 → 33% ربح كافٍ للتعادل.</p><p><b>✅ الخلاصة:</b> الجودة ليست بعدد الصفقات الرابحة.</p>`},
 {cat:'risk',catName:'إدارة المخاطر',catIcon:'⚠️',id:'r3',icon:'🧺',title:'التنويع',time:'5 د',content:`<p><b>لا تضع كل بيضك في سلة واحدة</b>.</p><p><b>❌ مثال سيء:</b> 10,000 TND كلها في سهم واحد.</p><p><b>✅ مثال جيد:</b> 3,000 بنوك + 2,500 صناعة + 2,000 أغذية + 1,500 طاقة + 1,000 كاش.</p><p><b>⚠️ لا تفرط:</b> 3-7 أسهم مثالي.</p><p><b>✅ الخلاصة:</b> وزّع على 3-5 قطاعات.</p>`},
-{cat:'risk',catName:'إدارة المخاطر',catIcon:'⚠️',id:'r4',icon:'💰',title:'الرسوم والعمولات',time:'7 د',content:`<p>الرسوم <b>تكلفة خفية</b> تأكل أرباحك.</p><p><b>📊 مكونات في بورصة تونس:</b></p><ul><li>عمولة الوسيط: 0.60% + TVA 19%</li><li>عمولة BVMT: 0.15%</li><li>رسم CMF: 23% من عمولة BVMT</li><li>رسوم RUS: 0.015%</li></ul><p><b>✅ الخلاصة:</b> احسب الرسوم قبل الدخول.</p>`},
+{cat:'risk',catName:'إدارة المخاطر',catIcon:'⚠️',id:'r4',icon:'💰',title:'الرسوم والعمولات',time:'7 د',content:`<p>الرسوم <b>تكلفة خفية</b> تأكل أرباحك.</p><p><b>📊 مكونات في بورصة تونس:</b></p><ul><li>عمولة الوسيط: 0.60% للمبتدئ، 0.40% للمتوسط (500 XP)، 0.15% للنخبة (1500 XP) + TVA 19% — العلم يخفّض تكاليفك!</li><li>عمولة BVMT: 0.15%</li><li>رسم CMF: 23% من عمولة BVMT</li><li>رسوم RUS: 0.015%</li></ul><p><b>✅ الخلاصة:</b> احسب الرسوم قبل الدخول.</p>`},
 {cat:'tech',catName:'التحليل التقني',catIcon:'📊',id:'t1',icon:'📉',title:'مؤشر RSI',time:'7 د',content:`<p><b>RSI</b> يقيس سرعة وحجم التحركات (0-100).</p><p><b>🎯 التفسير:</b></p><ul><li>RSI > 70 → تشبع شرائي</li><li>RSI < 30 → تشبع بيعي</li><li>30-70 → متوازن</li></ul><p><b>✅ الخلاصة:</b> يساعدك في تحديد "غالي" أو "رخيص".</p>`},
 {cat:'tech',catName:'التحليل التقني',catIcon:'📊',id:'t2',icon:'🎯',title:'الدعم والمقاومة',time:'7 د',content:`<p><b>الدعم:</b> سعر يصعب النزول تحته. <b>المقاومة:</b> سعر يصعب الصعود فوقه.</p><p><b>🔢 مثال:</b> QRN نزل لـ 85 TND 3 مرات = دعم. صعد لـ 105 مرتين = مقاومة.</p><p><b>✅ الخلاصة:</b> اشتر قرب الدعم، بِع قرب المقاومة.</p>`},
 {cat:'tech',catName:'التحليل التقني',catIcon:'📊',id:'t3',icon:'🕯️',title:'الشموع اليابانية',time:'8 د',content:`<p><b>الشموع</b> طريقة لتصوير حركة السعر خلال فترة.</p><p><b>🎯 4 أسعار:</b> Open، Close، High، Low.</p><p><b>🎨 الألوان:</b> أخضر (Close > Open)، أحمر (Close < Open).</p><p><b>🎯 أشكال:</b> Doji، Hammer، Shooting Star، Marubozu.</p><p><b>✅ الخلاصة:</b> الشمعة = ملخص معركة.</p>`},
@@ -1421,7 +1433,7 @@ async function loadPodium(){
       }
       const col=p.profitPct>=0?'#0ecb81':'#f6465d';
       const sg=p.profitPct>=0?'+':'';
-      return`<div class="podium-row" onclick="switchToRank()"><div class="podium-medal">${m}</div><div class="podium-name">${p.name}${me}</div><div class="podium-pct" style="color:${col}">${sg}${p.profitPct.toFixed(2)}%</div></div>`;
+      return`<div class="podium-row" onclick="switchToRank()"><div class="podium-medal">${m}</div><div class="podium-name">${p.name}${me} ${ttTierBadge(p.isMe?userXP:p.xp,true)}</div><div class="podium-pct" style="color:${col}">${sg}${p.profitPct.toFixed(2)}%</div></div>`;
     }).join('');
   }catch(e){el.innerHTML='<div class="podium-empty">تعذّر التحميل</div>';}
 }
@@ -1439,7 +1451,13 @@ async function renderRank(){
       const higher=await fbDb.collection('users').where(M+'Value','>',myValue).count().get(); myRank=higher.data().count+1; try{const tt=await fbDb.collection('users').where(M+'Value','>=',0).count().get();totalUsers=Math.max(tt.data().count,myRank);}catch(e){totalUsers=myRank;} window._myRank=myRank;window._rankTotal=totalUsers;
     }catch(e){console.warn('rank calc failed',e);}
   }
-  const header=`<div class="index-strip" style="margin-bottom:12px"><div><div class="nm">مستخدم مسجل</div><div class="vv">${Math.max(1,realStats.totalUsers).toLocaleString('en-US')}</div></div><div style="text-align:left"><div class="nm">نشط الآن</div><div class="vv" style="color:#0ecb81">${Math.max(1,realStats.onlineNow).toLocaleString('en-US')}</div></div></div><div class="sec"><span class="sec-t">🏆 أفضل 10 متداولين</span><span class="sec-line"></span></div>`;
+  const header=`<div class="index-strip" style="margin-bottom:12px"><div><div class="nm">مستخدم مسجل</div><div class="vv">${Math.max(1,realStats.totalUsers).toLocaleString('en-US')}</div></div><div style="text-align:left"><div class="nm">نشط الآن</div><div class="vv" style="color:#0ecb81">${Math.max(1,realStats.onlineNow).toLocaleString('en-US')}</div></div></div><div class="sec"><span class="sec-t">🏆 أفضل 10 متداولين</span><span class="sec-line"></span></div>
+  <div style="background:#0e1216;border:1px solid #1c222a;border-radius:12px;padding:10px 12px;margin-bottom:12px;font-size:10.5px;color:#8b95a5;line-height:1.9">
+    <div style="font-weight:800;color:#f0b90b;margin-bottom:3px">🎓 العلم يخفّض عمولتك — اجتز الدروس والاختبارات لترتقي</div>
+    <div style="display:flex;justify-content:space-between"><span>${ttTierBadge(0,true)} 0 XP</span><b style="color:#eaecef">عمولة 0.60%</b></div>
+    <div style="display:flex;justify-content:space-between"><span>${ttTierBadge(500,true)} 500 XP</span><b style="color:#eaecef">عمولة 0.40%</b></div>
+    <div style="display:flex;justify-content:space-between"><span>${ttTierBadge(1500,true)} 1500 XP</span><b style="color:#eaecef">عمولة 0.15%</b></div>
+  </div>`;
   if(!list.length){view.innerHTML=header+`<div class="pf-empty" style="padding:60px 20px"><div class="ico">🏆</div><div>لا يوجد لاعبون بعد</div></div><button class="btn-primary" style="margin-top:14px;background:#1e252d;color:#eaecef;box-shadow:none" onclick="backToMore()">رجوع</button>`;return;}
   const rowsArr=list.map((p,i)=>{
     const on=(!p.hidden)&&(Date.now()-p.lastSeen)<8*60*1000;
@@ -1455,7 +1473,7 @@ async function renderRank(){
     const mc=i===0?'gold':i===1?'silver':i===2?'bronze':'';
     const valueDisplay=p.hidden?'<span style="color:#5e6673">🔒 مخفي</span>':fmt(p.totalValue)+' TND';
     const pctDisplay=p.hidden?'<span style="color:#5e6673;font-size:10px">🔒</span>':`<span style="color:${p.profitPct>=0?'#0ecb81':'#f6465d'}">${p.profitPct>=0?'+':''}${p.profitPct.toFixed(2)}%</span>`;
-    return`<div class="rank-card ${p.isMe?'me':''}"><div class="rank-num ${mc}">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</div><div class="rank-avatar" style="${ab}">${ac}<div class="status-dot ${on?'online':''}"></div></div><div class="rank-info">${p.name} ${p.isMe?'<span style="color:#f0b90b">· أنت</span>':''}<div class="meta">${st} · عضو منذ ${jn}${p.xp>0?` · ${p.xp} XP`:''}</div></div><div class="rank-value"><div class="v">${valueDisplay}</div><div class="pct">${pctDisplay}</div></div></div>`;
+    return`<div class="rank-card ${p.isMe?'me':''}"><div class="rank-num ${mc}">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</div><div class="rank-avatar" style="${ab}">${ac}<div class="status-dot ${on?'online':''}"></div></div><div class="rank-info">${p.name} ${p.isMe?'<span style="color:#f0b90b">· أنت</span>':''} ${(p.hidden&&!p.isMe)?'':ttTierBadge(p.isMe?userXP:p.xp)}<div class="meta">${st} · عضو منذ ${jn}${p.xp>0?` · ${p.xp} XP`:''}</div></div><div class="rank-value"><div class="v">${valueDisplay}</div><div class="pct">${pctDisplay}</div></div></div>`;
   });
   const listHTML=rowsArr.slice(0,10).join('')+(rowsArr.length>10?'<div class="sec" style="margin-top:14px"><span class="sec-t">المراكز 11 – '+rowsArr.length+'</span><span class="sec-line"></span></div>'+rowsArr.slice(10).join(''):'');
   // عرض ترتيب المستخدم الحقيقي إذا كان خارج القائمة (مهما كان رقمه)
@@ -1469,7 +1487,7 @@ async function renderRank(){
       <div class="rank-card me" style="border-color:#f0b90b">
         <div class="rank-num gold" style="font-size:12.5px;width:auto;min-width:38px">#${myRank.toLocaleString('en-US')}</div>
         <div class="rank-avatar" style="background:linear-gradient(135deg,#f0b90b,#b88700)">${currentUser.name.charAt(0).toUpperCase()}<div class="status-dot online"></div></div>
-        <div class="rank-info">${currentUser.name} <span style="color:#f0b90b">· أنت</span><div class="meta">الترتيب <b>#${myRank.toLocaleString('en-US')}</b> من ${totalUsers.toLocaleString('en-US')}</div></div>
+        <div class="rank-info">${currentUser.name} <span style="color:#f0b90b">· أنت</span> ${ttTierBadge(userXP)}<div class="meta">الترتيب <b>#${myRank.toLocaleString('en-US')}</b> من ${totalUsers.toLocaleString('en-US')}</div></div>
         <div class="rank-value"><div class="v">${fmt(myVal)} TND</div><div class="pct" style="color:${myPnl>=0?'#0ecb81':'#f6465d'}">${myPnl>=0?'+':''}${myPnl.toFixed(2)}%</div></div>
       </div>
       ${(()=>{const last=list[list.length-1];const need=last&&last.totalValue!=null?last.totalValue-myVal:0;return need>0?`<div style="text-align:center;font-size:11px;color:#7b8494;margin-top:10px;line-height:1.6">🎯 لتدخل أفضل ${list.length}، تحتاج <b style="color:#f0b90b">+${fmt(need)} TND</b></div>`:'';})()}
@@ -1562,11 +1580,12 @@ function renderOrderBook(s){const ob=generateOrderBook(s);const mQ=Math.max(...o
 function renderFeeBox(fees,q){
   return`<div style="background:rgba(240,185,11,.05);border:1px solid rgba(240,185,11,.2);border-radius:10px;padding:10px 12px;margin:10px 0;font-size:10.5px;color:#8b95a5;line-height:1.6">
     <div style="font-weight:800;color:#f0b90b;margin-bottom:4px">الرسوم المقدّرة (<span id="feeQty">${fmtQty(q)}</span> سهم)</div>
-    <div style="display:flex;justify-content:space-between;padding:3px 0"><span>عمولة الوسيط</span><span style="color:#eaecef;font-weight:700" id="feeBroker">${fmt(fees.brokerFee)} TND</span></div>
+    <div style="display:flex;justify-content:space-between;padding:3px 0"><span>عمولة الوسيط (${ttPct(fees.brokerRate)}) ${ttTierBadge(userXP,true)}</span><span style="color:#eaecef;font-weight:700" id="feeBroker">${fmt(fees.brokerFee)} TND</span></div>
     <div style="display:flex;justify-content:space-between;padding:3px 0"><span>عمولة BVMT</span><span style="color:#eaecef;font-weight:700" id="feeBvmt">${fmt(fees.bvmtFee)} TND</span></div>
     <div style="display:flex;justify-content:space-between;padding:3px 0"><span>رسم CMF</span><span style="color:#eaecef;font-weight:700" id="feeCmf">${fmt(fees.cmfFee)} TND</span></div>
     <div style="display:flex;justify-content:space-between;padding:3px 0"><span>رسوم RUS</span><span style="color:#eaecef;font-weight:700" id="feeRus">${fmt(fees.rusFee)} TND</span></div>
     <div style="display:flex;justify-content:space-between;padding:5px 0;border-top:1px solid rgba(240,185,11,.2);margin-top:4px;font-weight:800;color:#f0b90b"><span>إجمالي الرسوم</span><span id="feeTotal">${fmt(fees.totalFees)} TND</span></div>
+    ${fees.saved>0.0005?`<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:10.5px;color:#0ecb81"><span>🎓 وفّرت بفضل مستواك</span><b id="feeSaved">${fmt(fees.saved)} TND</b></div>`:''}
   </div>`;
 }
 
@@ -1704,6 +1723,7 @@ function updateSheetPrice(){
   if(feeCmf)feeCmf.textContent=fmt(f.cmfFee)+' TND';
   if(feeRus)feeRus.textContent=fmt(f.rusFee)+' TND';
   if(feeTotal)feeTotal.textContent=fmt(f.totalFees)+' TND';
+  const feeSaved=document.getElementById('feeSaved');if(feeSaved)feeSaved.textContent=fmt(f.saved)+' TND';
 }
 
 async function doBuy(){
@@ -1857,7 +1877,7 @@ function renderLessons(){
   const cc=Object.keys(lessonProgress.completed).length;
   const cats=[...new Set(LESSONS.map(l=>l.cat))];
   view.innerHTML=`
-    <div class="xp-wrap"><div class="xp-head"><div class="xp-level">${getLevel(userXP).icon} ${getLevel(userXP).name}</div><div class="xp-val">${userXP} XP</div></div><div class="xp-bar"><div class="xp-bar-fill" style="width:${Math.min(100,(userXP%500)/5)}%"></div></div><div class="xp-msg">${userXP<500?'تحتاج '+(500-userXP)+' XP للمستوى التالي':userXP<1500?'تحتاج '+(1500-userXP)+' XP للمتقدّم':'وصلت أعلى مستوى!'}</div></div>
+    <div class="xp-wrap"><div class="xp-head"><div class="xp-level">${getLevel(userXP).icon} ${getLevel(userXP).name}</div><div class="xp-val">${userXP} XP</div></div><div class="xp-bar"><div class="xp-bar-fill" style="width:${Math.min(100,(userXP%500)/5)}%"></div></div><div class="xp-msg" style="color:#f0b90b;font-weight:800;margin-top:7px">💼 عمولتك الحالية: ${ttPct(ttBrokerRate(userXP))}</div><div class="xp-msg">${userXP<500?'تحتاج '+(500-userXP)+' XP لتنخفض عمولتك إلى 0.40%':userXP<1500?'تحتاج '+(1500-userXP)+' XP لتنخفض عمولتك إلى 0.15% 👑':'وصلت النخبة 👑 — أقل عمولة ممكنة!'}</div></div>
     <div class="index-strip" style="margin-bottom:14px"><div><div class="nm">مكتبة الدروس</div><div class="vv">${LESSONS.length} درس</div></div><div style="text-align:left"><div class="nm">أكملت</div><div class="vv" style="color:#f0b90b">${cc}/${LESSONS.length}</div></div></div>
     <div style="background:linear-gradient(135deg,#12161b,#0e1216);border:1px solid #232a31;border-radius:14px;padding:13px 15px;margin-bottom:10px" onclick="openAdaptive()"><div style="display:flex;align-items:center;gap:10px"><div style="font-size:20px">🎯</div><div style="flex:1"><div style="font-size:12.5px;font-weight:800">التدريب الذكي <span class="adapt-tag">جديد</span></div><div style="font-size:10px;color:#7b8494;margin-top:2px">أسئلة تكيّفية حسب مستواك</div></div><div style="color:#5e6673;font-size:14px">›</div></div></div>
     <div style="background:linear-gradient(135deg,#12161b,#0e1216);border:1px solid #232a31;border-radius:14px;padding:13px 15px;margin-bottom:10px" onclick="openTermsGlossary()"><div style="display:flex;align-items:center;gap:10px"><div style="font-size:20px">📖</div><div style="flex:1"><div style="font-size:12.5px;font-weight:800">قاموس المصطلحات (${TERMS.length})</div><div style="font-size:10px;color:#7b8494;margin-top:2px">جميع مصطلحات البورصة</div></div><div style="color:#5e6673;font-size:14px">›</div></div></div>
@@ -2126,7 +2146,7 @@ function renderMore(){
   const mv=cash+holdingsValue(),mp=((mv-STARTING_CASH)/STARTING_CASH)*100;
   const lv=getLevel(userXP);
   view.innerHTML=`
-    <div class="xp-wrap"><div class="xp-head"><div class="xp-level">${lv.icon} ${lv.name}</div><div class="xp-val">${userXP} XP · ${userBadges.length}/${BADGES.length} 🏆</div></div><div class="xp-bar"><div class="xp-bar-fill" style="width:${userXP>=1500?100:(userXP>=500?(userXP-500)/10:userXP/5)}%"></div></div><div style="font-size:10px;color:#7b8494;margin-top:6px">${userXP>=1500?'وصلت أعلى مستوى 🎉':'المتبقي للمستوى التالي: '+(userXP>=500?1500-userXP:500-userXP)+' XP'}</div></div>
+    <div class="xp-wrap"><div class="xp-head"><div class="xp-level">${lv.icon} ${lv.name}</div><div class="xp-val">${userXP} XP · ${userBadges.length}/${BADGES.length} 🏆</div></div><div class="xp-bar"><div class="xp-bar-fill" style="width:${userXP>=1500?100:(userXP>=500?(userXP-500)/10:userXP/5)}%"></div></div><div style="font-size:10px;color:#7b8494;margin-top:6px">${userXP>=1500?'وصلت النخبة 👑 🎉':'المتبقي لخفض عمولتك: '+(userXP>=500?1500-userXP:500-userXP)+' XP'}</div><div style="font-size:11px;color:#f0b90b;font-weight:800;margin-top:5px">💼 عمولتك الحالية: ${ttPct(ttBrokerRate(userXP))} ${ttTierBadge(userXP,true)}</div></div>
     <div class="index-strip" style="margin-bottom:14px"><div><div class="nm">محفظتي</div><div class="vv">${fmt(mv)} TND</div></div><div style="text-align:left"><div class="nm">الأداء</div><div class="vv ${cls(mp)}">${mp>=0?'+':''}${mp.toFixed(2)}%</div></div></div>
     <div class="more-group">📚 التعلّم</div>
     ${moreItem('🎯','التدريب الذكي','أسئلة تتكيّف مع مستواك','openAdaptive()')}
@@ -2166,7 +2186,7 @@ function openTunisianMarket(){
   sheetBody.innerHTML=`<div class="sh-head"><div><div class="sh-tk">🇹🇳 السوق التونسي</div><div class="sh-nm">كيف يعمل · الرسوم · القوانين</div></div><button class="sh-close" onclick="closeSheet()">×</button></div>
     <div class="info-card" style="margin-top:16px"><div class="ic-head"><div class="ic-icon">🏛️</div><div class="ic-title">كيف يعمل السوق؟</div></div><div class="ic-body">في تونس، لا يمكن للمستثمر أن يتداول مباشرة في البورصة. يجب أن يمرّ عبر <b>وسيط مرخّص من هيئة السوق المالية (CMF)</b>.</div></div>
     <div class="info-card"><div class="ic-head"><div class="ic-icon">📚</div><div class="ic-title">ملاحظة تعليمية</div></div><div class="ic-body">أزرار الشراء والبيع في هذا التطبيق تحاكي دور <b>الوسيط المالي</b>.</div></div>
-    <div class="info-card"><div class="ic-head"><div class="ic-icon">💰</div><div class="ic-title">الرسوم والعمولات</div></div><div class="ic-body">الرسوم المطبقة على كل عملية:<div class="fee-table"><div class="ft-row"><span class="ft-label">عمولة الوسيط</span><span class="ft-value">${(TT_FEES.broker*100).toFixed(2)}% + TVA ${Math.round(TT_FEES.tva*100)}%</span></div><div class="ft-row"><span class="ft-label">عمولة BVMT</span><span class="ft-value">${(TT_FEES.bvmt*100).toFixed(2)}% (حد أقصى ${fmt(TT_FEES.bvmtMax,0)} TND)</span></div><div class="ft-row"><span class="ft-label">رسم CMF</span><span class="ft-value">${Math.round(TT_FEES.cmfRate*100)}% من عمولة BVMT</span></div><div class="ft-row"><span class="ft-label">رسوم RUS</span><span class="ft-value">${(TT_FEES.rus*100).toFixed(3)}%</span></div></div></div></div>
+    <div class="info-card"><div class="ic-head"><div class="ic-icon">💰</div><div class="ic-title">الرسوم والعمولات</div></div><div class="ic-body">الرسوم المطبقة على كل عملية:<div class="fee-table"><div class="ft-row"><span class="ft-label">عمولة الوسيط (مستواك)</span><span class="ft-value">${ttPct(ttBrokerRate(userXP))} + TVA ${Math.round(TT_FEES.tva*100)}%</span></div><div class="ft-row"><span class="ft-label">🟢 مبتدئ (0 XP)</span><span class="ft-value">0.60%</span></div><div class="ft-row"><span class="ft-label">🔵 متوسط (500 XP)</span><span class="ft-value">0.40%</span></div><div class="ft-row"><span class="ft-label">👑 نخبة (1500 XP)</span><span class="ft-value">0.15%</span></div><div class="ft-row"><span class="ft-label">عمولة BVMT</span><span class="ft-value">${(TT_FEES.bvmt*100).toFixed(2)}% (حد أقصى ${fmt(TT_FEES.bvmtMax,0)} TND)</span></div><div class="ft-row"><span class="ft-label">رسم CMF</span><span class="ft-value">${Math.round(TT_FEES.cmfRate*100)}% من عمولة BVMT</span></div><div class="ft-row"><span class="ft-label">رسوم RUS</span><span class="ft-value">${(TT_FEES.rus*100).toFixed(3)}%</span></div></div></div></div>
     <div class="info-card legal"><div class="ic-head"><div class="ic-icon">⚠️</div><div class="ic-title">تنبيه قانوني</div></div><div class="ic-body"><b>جميع أسماء الشركات في هذا التطبيق خيالية</b>. الأسعار المعروضة افتراضية 100%.</div></div>
     <div class="disc">هذا القسم تعليمي بحت.</div>`;
   sheet.classList.add('on');backdrop.classList.add('on');
