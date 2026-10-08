@@ -125,6 +125,11 @@ body{font-family:-apple-system,"Segoe UI",Tahoma,system-ui,sans-serif;background
 .tab{flex:1;text-align:center;padding:9px 2px;border-radius:9px;font-size:10.5px;font-weight:700;color:#7b8494;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;transition:.15s}
 .tab .ticon{font-size:16px;line-height:1}
 .tab.on{background:#1e252d;color:#fff}
+.sk-row{display:flex;align-items:center;gap:10px;padding:11px 4px}
+.sk-c,.sk-l{background:linear-gradient(90deg,#161b21 25%,#1f262e 37%,#161b21 63%);background-size:400% 100%;animation:skShim 1.3s ease infinite}
+.sk-c{width:34px;height:34px;border-radius:50%;flex-shrink:0}
+.sk-l{height:11px;border-radius:6px}
+@keyframes skShim{0%{background-position:100% 50%}100%{background-position:0 50%}}
 main{flex:1;overflow-y:auto;padding:0 16px 28px;scrollbar-width:none}
 main::-webkit-scrollbar{display:none}
 .index-strip{display:flex;align-items:center;justify-content:space-between;background:linear-gradient(135deg,#12161b,#0e1216);border:1px solid #1e242b;border-radius:13px;padding:12px 14px;margin-bottom:12px}
@@ -1148,7 +1153,19 @@ function updateRealCountersUI(){
 }
 
 /* FIX #25: fetchRealLeaderboard مع privacy */
-async function fetchRealLeaderboard(){const M=getMarketMode()==='live'?'live':'practice';
+function ttSkeleton(n){let h='';for(let i=0;i<n;i++)h+='<div class="sk-row"><div class="sk-c"></div><div style="flex:1"><div class="sk-l" style="width:'+(45+(i*13)%35)+'%"></div></div><div class="sk-l" style="width:46px"></div></div>';return h;}
+const _lbCache={};
+function ttLbInvalidate(){for(const k in _lbCache)delete _lbCache[k];}
+function fetchRealLeaderboard(force){
+  const M=getMarketMode()==='live'?'live':'practice';
+  const key=M+'|'+((currentUser&&currentUser.id)||'');
+  const c=_lbCache[key];
+  if(!force&&c&&Date.now()-c.t<60000)return c.p;
+  const p=_fetchRealLeaderboardRaw().then(l=>{if(!l||!l.length)delete _lbCache[key];return l;});
+  _lbCache[key]={t:Date.now(),p};
+  return p;
+}
+async function _fetchRealLeaderboardRaw(){const M=getMarketMode()==='live'?'live':'practice';
   if(!fbDb)return[];
   try{
     const s=await fbDb.collection('users').orderBy(M+'Value','desc').limit(33).get();
@@ -1191,15 +1208,25 @@ function _buildState(){saveModeState();return {
       weekly:weeklyState,adaptive:adaptiveState,
       updatedAt:Date.now(),unsynced:(window._cloudOK===false)
     };}
+let _savingP=null;
+/* يعيد true فقط بعد اكتمال الكتابة فعلًا في Firestore، وfalse عند الفشل */
 async function _saveStateNow(){
   if(!stateLoaded||!currentUser||!fbDb)return false;
-  if(saveTimer)return;
-  saveTimer=setTimeout(()=>{window._saveNow=false;
-    saveTimer=null;saveModeState();
-    const state=_buildState();
-    fbDb.doc(stateDocPath()).set(state,{merge:false}).then(()=>{window._lastCloud=Date.now();window._cloudErr=null;try{_hc();}catch(x){}}).catch(e=>{window._cloudErr=cleanText((e&&e.code)||(e&&e.message)||'error',30);try{_hc();}catch(x){}console.error('save',e);const n=Date.now();if(n-(window._lastSaveErr||0)>60000){window._lastSaveErr=n;toast('⚠️ تعذّر الحفظ السحابي ('+cleanText((e&&e.code)||'',30)+') — راجع قواعد Firestore','warn');}});
-  },0);
-  return true;
+  if(_savingP)return _savingP;
+  _savingP=(async()=>{
+    try{
+      saveModeState();
+      await fbDb.doc(stateDocPath()).set(_buildState(),{merge:false});
+      window._lastCloud=Date.now();window._cloudErr=null;try{_hc();}catch(x){}
+      return true;
+    }catch(e){
+      window._cloudErr=cleanText((e&&e.code)||(e&&e.message)||'error',30);try{_hc();}catch(x){}
+      console.error('save',e);
+      const n=Date.now();if(n-(window._lastSaveErr||0)>60000){window._lastSaveErr=n;try{toast('⚠️ '+ttCloudErrMsg(window._cloudErr),'warn');}catch(x){}}
+      return false;
+    }finally{_savingP=null;}
+  })();
+  return _savingP;
 }
 
 /* ============================================================
@@ -1222,8 +1249,9 @@ async function _flushState(){
 _stateDirty=false;
   if(_flushTimer){clearTimeout(_flushTimer);_flushTimer=null;}
   try{
-    await _saveStateNow();
-    return true;
+    const ok=await _saveStateNow();
+    if(!ok){_stateDirty=true;if(!_flushTimer)_flushTimer=setTimeout(()=>{_flushTimer=null;_flushState();},60000);}
+    return ok;
   }catch(e){
     _stateDirty=true;
     console.error('flushState',e);
@@ -1390,7 +1418,7 @@ function renderMarket(){
 function renderHome(){
   view.innerHTML=`
     ${renderWeeklyCard()}
-    <div class="podium-wrap"><div class="podium-head"><div class="podium-title">🏆 أفضل 10 متداولين <span style="font-size:10px;color:#7b8494;font-weight:600;margin-right:4px">— الترتيب التونسي</span></div><button class="podium-view-all" onclick="switchToRank()">عرض الكل ←</button></div><div id="podiumList"><div class="podium-empty">جاري التحميل...</div></div></div>
+    <div class="podium-wrap"><div class="podium-head"><div class="podium-title">🏆 أفضل 10 متداولين <span style="font-size:10px;color:#7b8494;font-weight:600;margin-right:4px">— الترتيب التونسي</span></div><button class="podium-view-all" onclick="switchToRank()">عرض الكل ←</button></div><div id="podiumList">${ttSkeleton(3)}</div></div>
     <div class="disc">جميع أسماء الشركات خيالية. الأسعار افتراضية 100%.</div>`;
   loadPodium();
 }
@@ -1445,17 +1473,23 @@ async function loadPodium(){
 
 /* FIX #7: renderRank مع الترتيب الشخصي + FIX #25 privacy */
 async function renderRank(){
-  view.innerHTML=`<div class="pf-empty" style="padding:60px 20px"><div class="ico" style="font-size:30px">⏳</div><div>جاري التحميل...</div></div>`;
-  await fetchRealStats();
-  const list=await fetchRealLeaderboard();
-  // FIX #7: حساب الترتيب الفعلي
+  view.innerHTML=`<div class="sec"><span class="sec-t">🏆 أفضل 10 متداولين</span><span class="sec-line"></span></div>${ttSkeleton(8)}`;
+  // الاستعلامات الثلاثة (الإحصاءات + القائمة + ترتيبي) تعمل بالتوازي بدل التتابع
   const M=getMarketMode()==='live'?'live':'practice';let myRank=null;let totalUsers=0;
-  if(currentUser&&fbDb){
+  const _rkP=(async()=>{
+    if(!(currentUser&&fbDb))return;
     try{
       const myValue=cash+holdingsValue();
-      const higher=await fbDb.collection('users').where(M+'Value','>',myValue).count().get(); myRank=higher.data().count+1; try{const tt=await fbDb.collection('users').where(M+'Value','>=',0).count().get();totalUsers=Math.max(tt.data().count,myRank);}catch(e){totalUsers=myRank;} window._myRank=myRank;window._rankTotal=totalUsers;
+      const [higher,tt]=await Promise.all([
+        fbDb.collection('users').where(M+'Value','>',myValue).count().get(),
+        fbDb.collection('users').where(M+'Value','>=',0).count().get().catch(()=>null)
+      ]);
+      myRank=higher.data().count+1;
+      totalUsers=tt?Math.max(tt.data().count,myRank):myRank;
+      window._myRank=myRank;window._rankTotal=totalUsers;
     }catch(e){console.warn('rank calc failed',e);}
-  }
+  })();
+  const [,list]=await Promise.all([fetchRealStats(),fetchRealLeaderboard(),_rkP]);
   const header=`<div class="index-strip" style="margin-bottom:12px"><div><div class="nm">مستخدم مسجل</div><div class="vv">${Math.max(1,realStats.totalUsers).toLocaleString('en-US')}</div></div><div style="text-align:left"><div class="nm">نشط الآن</div><div class="vv" style="color:#0ecb81">${Math.max(1,realStats.onlineNow).toLocaleString('en-US')}</div></div></div><div class="sec"><span class="sec-t">🏆 أفضل 10 متداولين</span><span class="sec-line"></span></div>
   <div style="background:#0e1216;border:1px solid #1c222a;border-radius:12px;padding:10px 12px;margin-bottom:12px;font-size:10.5px;color:#8b95a5;line-height:1.9">
     <div style="font-weight:800;color:#f0b90b;margin-bottom:3px">🎓 العلم يخفّض عمولتك — اجتز الدروس والاختبارات لترتقي</div>
@@ -1652,7 +1686,7 @@ function renderSheet(){
     <div style="display:flex;justify-content:space-between;padding:10px 0;border-top:1px solid #1c222a;font-size:11.5px;color:#7b8494"><span>إجمالي الأمر</span><b id="ordTotal" style="color:#fff;font-size:13px">${fmt(total+fees.totalFees)} TND</b></div>
     <div style="display:flex;justify-content:space-between;padding:10px 0;font-size:11.5px;color:#7b8494"><span>الكاش المتاح</span><b style="color:#f0b90b;font-size:13px">${fmt(cash)} TND</b></div>
     ${isMarketFrozen()?`<div style="background:rgba(246,70,93,.1);border:1px solid rgba(246,70,93,.3);color:#f6465d;padding:9px 12px;border-radius:10px;font-size:11px;text-align:center;margin-bottom:10px;line-height:1.5">السوق مغلق — الشراء والبيع الفوري معطّلان<br><span style="font-size:10px;color:#8b95a5">يمكنك وضع أوامر معلقة تُنفّذ عند الفتح</span></div>`:''}
-    <div class="actions"><button class="btn btn-buy" ${canBuy?'':'disabled'} onclick="doBuy()">شراء</button><button class="btn btn-sell" ${canSell?'':'disabled'} onclick="doSell()">بيع</button></div>
+    <div class="actions"><button id="btnBuy" class="btn btn-buy" ${canBuy?'':'disabled'} onclick="doBuy()">شراء</button><button id="btnSell" class="btn btn-sell" ${canSell?'':'disabled'} onclick="doSell()">بيع</button></div>
     <div class="disc" style="margin-top:14px">سعر افتراضي. جميع الأسماء خيالية.</div>`;
 }
 
@@ -1678,9 +1712,9 @@ function updateSheetLive(){
   const h=holdings[s.id];
   const canBuy=(total<=cash&&q>0)&&tOk;
   const canSell=(h&&h.qty>=q-0.0001)&&tOk;
-  const btns=document.querySelectorAll('.actions .btn');
-  if(btns[0])btns[0].disabled=!canBuy;
-  if(btns[1])btns[1].disabled=!canSell;
+  const bb=document.getElementById('btnBuy'),bs=document.getElementById('btnSell');
+  if(bb)bb.disabled=!canBuy;
+  if(bs)bs.disabled=!canSell;
 }
 
 function setMode(m){buyMode=m;inputVal=m==='qty'?1:50;renderSheet();}
@@ -1834,6 +1868,18 @@ function updatePortfolioLive(){
 }
 
 /* FIX E5: sellAll يحذف buy orders */
+function _bulkSellExec(ids){
+  const pos=[];
+  ids.forEach(id=>{const s=STOCKS.find(x=>x.id===id),h=holdings[id];if(!h)return;if(!s){delete holdings[id];return;}
+    const f=ttCalculateFees(s.price,h.qty),cost=h.avg*h.qty;
+    pos.push({id,s,qty:h.qty,cost,profit:f.stockValue-f.totalFees-cost});});
+  pos.forEach(p=>{addTrade(p.id,'sell',p.qty,p.s.price);delete holdings[p.id];trackWeeklyEvent('trade');});
+  return pos;
+}
+function _bulkSellRewards(pos){
+  pos.forEach(p=>{if(p.profit>0){unlockBadge('first_profit');trackWeeklyEvent('winner');}if(p.profit!==0)awardPnL(p.profit,p.cost);});
+  if(recentTrades.length>=10)unlockBadge('ten_trades');
+}
 async function sellAll(){
   if(!isTradingAllowed())return toast('السوق مغلق','warn');
   const entries=Object.entries(holdings);
@@ -1842,13 +1888,13 @@ async function sellAll(){
   const net=ts-tf,exit=cash+net,pnl=exit-STARTING_CASH;
   if(!(await askConfirm(`بيع الكل؟\nستستلم: ${fmt(net)} TND\nرصيدك الجديد: ${fmt(exit)} TND`)))return;
   const ids=entries.map(([id])=>id);
-  entries.forEach(([id,h])=>{const s=STOCKS.find(x=>x.id===id);if(s)addTrade(id,'sell',h.qty,s.price);delete holdings[id];});
+  const _pos=_bulkSellExec(ids);
   pendingOrders=pendingOrders.filter(o=>{
     if(o.type==='sl')return false;
     if(o.type==='buy'&&ids.includes(o.stockId))return false;
     return true;
   });
-  cash+=net;saveState();renderPortfolio();updateHero();toast(`تم البيع. رصيدك: ${fmt(cash)} TND`,'good');
+  cash+=net;_bulkSellRewards(_pos);saveState();renderPortfolio();updateHero();toast(`تم البيع. رصيدك: ${fmt(cash)} TND`,'good');
 }
 async function sellWinners(){if(!Object.entries(holdings).some(([id,h])=>{const z=STOCKS.find(x=>x.id===id);return z&&z.price>h.avg;}))return toast('لا توجد مراكز رابحة حاليًا');
   if(!isTradingAllowed())return toast('السوق مغلق','warn');
@@ -1858,9 +1904,9 @@ async function sellWinners(){if(!Object.entries(holdings).some(([id,h])=>{const 
   const net=ts-tf,cost=ids.reduce((sm,id)=>sm+holdings[id].avg*holdings[id].qty,0);
   const profit=net-cost;
   if(!(await askConfirm(`بيع الرابحة؟\nستستلم: ${fmt(net)} TND\nالربح: +${fmt(profit)} TND`)))return;
-  ids.forEach(id=>{const s=STOCKS.find(x=>x.id===id);if(s)addTrade(id,'sell',holdings[id].qty,s.price);delete holdings[id];});
+  const _pos=_bulkSellExec(ids);
   pendingOrders=pendingOrders.filter(o=>o.type!=='sl'||!ids.includes(o.stockId));
-  cash+=net;saveState();renderPortfolio();updateHero();toast(`بعت الرابحين. +${fmt(profit)} TND`,'good');
+  cash+=net;_bulkSellRewards(_pos);saveState();renderPortfolio();updateHero();toast(`بعت الرابحين. +${fmt(profit)} TND`,'good');
 }
 async function sellLosers(){
   if(!isTradingAllowed())return toast('السوق مغلق','warn');
@@ -1870,9 +1916,9 @@ async function sellLosers(){
   const net=ts-tf,cost=ids.reduce((sm,id)=>sm+holdings[id].avg*holdings[id].qty,0);
   const loss=net-cost;
   if(!(await askConfirm(`بيع الخاسرة؟\nستستلم: ${fmt(net)} TND\nالخسارة: ${fmt(loss)} TND`)))return;
-  ids.forEach(id=>{const s=STOCKS.find(x=>x.id===id);if(s)addTrade(id,'sell',holdings[id].qty,s.price);delete holdings[id];});
+  const _pos=_bulkSellExec(ids);
   pendingOrders=pendingOrders.filter(o=>o.type!=='sl'||!ids.includes(o.stockId));
-  cash+=net;saveState();renderPortfolio();updateHero();toast(`تم بيع الخاسرة. ${fmt(loss)} TND`,'warn');
+  cash+=net;_bulkSellRewards(_pos);saveState();renderPortfolio();updateHero();toast(`تم بيع الخاسرة. ${fmt(loss)} TND`,'warn');
 }
 
 /* ============================================================
@@ -2319,7 +2365,7 @@ function togglePrivacy(){
   if(!currentUser)return;
   currentUser.privacyHidden=!currentUser.privacyHidden;
   if(fbDb){
-    fbDb.collection('users').doc(currentUser.id).set({privacyHidden:currentUser.privacyHidden,updatedAt:Date.now()},{merge:true}).catch(e=>console.warn('privacy save failed',e));
+    fbDb.collection('users').doc(currentUser.id).set({privacyHidden:currentUser.privacyHidden,updatedAt:Date.now()},{merge:true}).then(()=>{try{ttLbInvalidate();}catch(x){}}).catch(e=>console.warn('privacy save failed',e));
   }
   toast(currentUser.privacyHidden?'🔒 تم إخفاء قيمتك':'👁 قيمتك مرئية الآن','good');
   closeSheet();
@@ -2401,7 +2447,7 @@ function _hs(t){let h=0;for(const c of t)h=(h*31+c.charCodeAt(0))|0;return Math.
 function divEvents(wk){const w=wk||weekId(),b=new Date(w+'T00:00:00').getTime(),o=[];STOCKS.forEach(z=>{let h=_hs(z.id+w);if(h%10<3){const dps=Math.round(z.initial*(0.02+((h>>3)%30)/1000)*1000)/1000,ex=b+(1+h%4)*864e5+10*36e5;o.push({type:'div',id:'dv_'+z.id+'_'+w,sym:z.id,dps,ex,pay:ex+864e5});}
  h=_hs(z.id+'S'+w);if(h%25===0){const sp=(h>>4)%3===0,ex=b+(1+(h>>2)%3)*864e5+14*36e5;o.push({type:sp?'split':'bonus',id:'sp_'+z.id+'_'+w,sym:z.id,ratio:sp?2:1.1,ex,pay:ex});}});return o.sort((x,y)=>x.ex-y.ex);}
 function _adjHist(z,r){if(z.open)z.open/=r;z.spark=z.spark.map(v=>v/r);if(z.candles)for(const tf in z.candles)z.candles[tf].forEach(c=>{c.open/=r;c.high/=r;c.low/=r;c.close/=r;c.volume*=r;});}
-function divTick(){try{if(!currentUser)return;const u=currentUser.id,now=Date.now();let done=lsG('dvd_'+u,{}),pend=lsG('dvp_'+u,[]),ch=false;
+function divTick(){try{if(!currentUser)return;const u=currentUser.id,now=Date.now();let done=lsG('dvd_'+u,{}),pend=lsG('dvp_'+u,[]),ch=false;for(const k in done){const m=k.match(/(\d{4}-\d{2}-\d{2})/);if(m&&now-new Date(m[1]+'T00:00:00').getTime()>21*864e5){delete done[k];ch=true;}}
  divEvents().forEach(e=>{const z=STOCKS.find(q=>q.id===e.sym);if(!z)return;
   if(e.ex<=now&&!done[e.id]){done[e.id]=1;ch=true;
    if(e.type==='div'){z.price=Math.max(0.01,z.price-e.dps);z.fair=Math.max(0.01,z.fair-e.dps);const q=(holdings[e.sym]||{}).qty||0;if(q>0){pend.push({id:e.id,sym:e.sym,amt:q*e.dps,pay:e.pay});pushNotification('dividend','✂️ قطع كوبون '+displayId(z),'انخفض السعر بقيمة '+e.dps.toFixed(3)+' د. ستستلم '+(q*e.dps).toFixed(2)+' د بعد 24 ساعة.');}}
@@ -2419,7 +2465,7 @@ function calBody(){const fr=lsG('lang','ar')==='fr',now=Date.now(),pend=lsG('dvp
   const st=now<e.ex?(fr?'Date : ':(isD?'قطع الكوبون: ':'تاريخ التنفيذ: '))+fd(e.ex):(isD&&now<e.pay)?(fr?'Détaché · paiement : ':'قُطع الكوبون · الدفع: ')+fd(e.pay):(fr?'✓ Effectué':'✓ تم');
   const mine=isD?(p?p.amt:q*e.dps):0;
   return`<div style="padding:11px 0;border-bottom:1px solid #1c222a"><div style="display:flex;justify-content:space-between;align-items:center"><b>${ttl}</b>${(q>0||p)?`<span style="font-size:10px;background:#1c222a;border-radius:8px;padding:3px 7px;color:#f0b90b">${fr?'Vous détenez':'تملكه'}</span>`:''}</div><div style="font-size:12px;color:${col};margin-top:4px">${st}</div>${(isD&&(q>0||p))?`<div style="font-size:11px;color:#8b95a5;margin-top:2px">${fr?'Montant estimé':'المبلغ المتوقع'}: ${mine.toFixed(2)} TND</div>`:''}</div>`;}).join('');}
-setInterval(divTick,60000);async function forceSave(){try{if(window._cloudOK===false||window._cloudErr){runDiag();return;}_stateDirty=true;const r=await _flushState();toast(r?'جارٍ الحفظ…':'تعذّر الحفظ الآن','warn');}catch(e){toast('تعذّر الحفظ','warn');}}
+setInterval(divTick,60000);async function forceSave(){try{if(window._cloudOK===false||window._cloudErr){runDiag();return;}_stateDirty=true;const r=await _flushState();toast(r?'تم الحفظ ☁️':'تعذّر الحفظ الآن',r?'good':'warn');}catch(e){toast('تعذّر الحفظ','warn');}}
 window.forceSave=forceSave;
 const APP_BUILD='نسخة 07-10-r12';
 function ttCloudErrMsg(c){c=String(c||'').toLowerCase();
@@ -2431,7 +2477,7 @@ function ttCloudErrMsg(c){c=String(c||'').toLowerCase();
 function _hc(){const e=document.getElementById('heroCash');if(e&&typeof cash==='number'&&currentUser){const _er=window._cloudErr,_ok=window._lastCloud;const _st=_er?'⚠️ '+ttCloudErrMsg(_er)+' · اضغط للتفاصيل':_ok?'☁️ حُفظ '+new Date(_ok).toLocaleTimeString('fr-TN',{hour:'2-digit',minute:'2-digit'}):(window._cloudOK===false?'⚠️ '+ttCloudErrMsg(window._loadErr)+' · اضغط للتفاصيل':'☁️ بانتظار أول حفظ');e.innerHTML='💧 السيولة: '+fmt(cash)+' TND · 📈 الأسهم: '+fmt(holdingsValue())+' TND<br><span onclick="forceSave()" style="cursor:pointer;font-size:11px;color:'+(_er||window._cloudOK===false?'#f6465d':'#0ecb81')+'">'+_st+'</span> <span style="font-size:9px;color:#5e6673">· '+APP_BUILD+'</span>';}}
 try{const _uh=updateHero;updateHero=function(){const r=_uh.apply(this,arguments);_hc();return r;};}catch(e){}
 setInterval(_hc,2000);_hc();
-(function(){for(const n of ['sellAll','sellWinners','sellLosers']){const o=window[n];if(typeof o!=='function')continue;window[n]=async function(){const p=recentTrades[0];const r=await o.apply(this,arguments);if(recentTrades[0]!==p)trackWeeklyEvent('trade');return r;};}})();
+
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){try{closeSheet();}catch(x){}}});
 function chartRedraw(){const b=document.getElementById('candleBox');if(b)b.innerHTML=renderIndicatorChart();}
 function chartZoom(f){chZoom=Math.max(0.35,Math.min(5,chZoom*f));chartRedraw();}
@@ -2650,6 +2696,25 @@ document.addEventListener('click', function() {
 window.addEventListener('DOMContentLoaded', function() {
     setTimeout(adjustLayoutForTabs, 500);
 });
+/* زر احتياطي: إن بقي التطبيق مفتوحًا داخل متصفح فيسبوك/ماسنجر بعد فشل التحويل التلقائي */
+(function(){
+  const ua=navigator.userAgent||'';
+  if(!/FBAN|FBAV|Messenger|Instagram|MicroMessenger|Line\//i.test(ua))return;
+  const android=/Android/i.test(ua);
+  setTimeout(function(){
+    if(document.visibilityState!=='visible'||document.getElementById('openExtBanner'))return;
+    const b=document.createElement('div');b.id='openExtBanner';
+    b.style.cssText='position:fixed;left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:99999;background:#12161b;border:1px solid #f0b90b;border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:10px;font-size:12.5px;color:#eaecef;box-shadow:0 8px 30px rgba(0,0,0,.5);direction:rtl';
+    b.innerHTML='<div style="flex:1;line-height:1.6">للحصول على أفضل أداء وتسجيل دخول مستقر، افتح التطبيق في المتصفح.</div><button id="openExtBtn" style="border:none;border-radius:10px;padding:10px 14px;background:#f0b90b;color:#0b0e11;font-weight:900;font-family:inherit;cursor:pointer">'+(android?'افتح في Chrome':'انسخ الرابط')+'</button><button id="openExtX" aria-label="إغلاق" style="border:none;background:none;color:#7b8494;font-size:18px;cursor:pointer">✕</button>';
+    document.body.appendChild(b);
+    document.getElementById('openExtX').onclick=function(){b.remove();};
+    document.getElementById('openExtBtn').onclick=function(){
+      const u=new URL(location.href);
+      if(android){location.href='intent://'+u.host+u.pathname+u.search+u.hash+'#Intent;scheme='+u.protocol.replace(':','')+';action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;package=com.android.chrome;end';}
+      else{try{navigator.clipboard.writeText(location.href).then(function(){document.getElementById('openExtBtn').textContent='تم النسخ — الصقه في Safari';});}catch(e){prompt('انسخ الرابط وافتحه في Safari',location.href);}}
+    };
+  },2500);
+})();
 </script>
 
 </html>
