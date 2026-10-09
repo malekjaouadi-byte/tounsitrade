@@ -1514,7 +1514,10 @@ function updateHero(){
   if(oEl){const n=totalActiveOrders();if(n>0){oEl.style.display='';oEl.textContent=`${n}/${MAX_ORDERS} أمر`;}else oEl.style.display='none';}
 }
 
-function toggleBalanceVisibility(ev){if(ev){ev.preventDefault();ev.stopPropagation();}let hidden=false;try{hidden=localStorage.getItem('tt_hide_balance')==='1';localStorage.setItem('tt_hide_balance',hidden?'0':'1');}catch(e){}updateHero();try{if(currentTab==='portfolio')renderPortfolio();}catch(e){}}
+function isBalanceHidden(){try{return localStorage.getItem('tt_hide_balance')==='1';}catch(e){return !!window._ttHideBalance;}}
+function applyBalanceVisibility(){const hidden=isBalanceHidden(),mask='••••••';const ids=['pfTotalAssets','pfTotalPnl','pfTotalPct','pfSellAllAmount','pfSellAllSub','pfWinMain','pfWinSub','pfLoseMain','pfLoseSub'];ids.forEach(id=>{const el=document.getElementById(id);if(!el)return;if(hidden){if(!el.dataset.ttVisibleText)el.dataset.ttVisibleText=el.textContent;el.textContent=mask;}else if(el.dataset.ttVisibleText){el.textContent=el.dataset.ttVisibleText;delete el.dataset.ttVisibleText;}});const btn=document.getElementById('balanceVisibilityBtn');if(btn){btn.textContent=hidden?'🙈':'👁';btn.title=hidden?'إظهار الرصيد':'إخفاء الرصيد';}const cashEl=document.getElementById('heroCash');if(cashEl){if(hidden){if(!cashEl.dataset.ttMasked){cashEl.dataset.ttOriginal=cashEl.innerHTML;cashEl.dataset.ttMasked='1';}cashEl.innerHTML='💧 السيولة: '+mask+' TND · 📈 الأسهم: '+mask+' TND · 🔒 محجوز: '+mask+' TND';}else if(cashEl.dataset.ttMasked==='1'){cashEl.innerHTML=cashEl.dataset.ttOriginal||'';cashEl.dataset.ttMasked='';}}}
+function toggleBalanceVisibility(ev){if(ev){ev.preventDefault();ev.stopPropagation();}const next=!isBalanceHidden();window._ttHideBalance=next;try{localStorage.setItem('tt_hide_balance',next?'1':'0');}catch(e){}['pfTotalAssets','pfTotalPnl','pfTotalPct','pfSellAllAmount','pfSellAllSub','pfWinMain','pfWinSub','pfLoseMain','pfLoseSub'].forEach(id=>{const el=document.getElementById(id);if(el)delete el.dataset.ttVisibleText;});updateHero();if(currentTab==='portfolio')renderPortfolio();applyBalanceVisibility();}
+window.toggleBalanceVisibility=toggleBalanceVisibility;
 window.toggleBalanceVisibility=toggleBalanceVisibility;
 
 /* ============================================================
@@ -1926,6 +1929,7 @@ function renderPortfolio(){
     ${recentTrades.length>0?`<div class="sec" style="margin-top:16px"><span class="sec-t">آخر العمليات</span><span class="sec-line"></span></div>${recentTrades.slice(0,6).map(t=>{const dt=new Date(t.t);const hh=String(dt.getHours()).padStart(2,'0'),mm=String(dt.getMinutes()).padStart(2,'0');const s=STOCKS.find(x=>x.id===t.sym);const dId=s?displayId(s):t.sym;return`<div style="display:flex;justify-content:space-between;background:#0e121b;border:1px solid #1c222a;border-radius:12px;padding:10px 12px;margin-bottom:6px;align-items:center"><div><div style="font-size:11.5px;font-weight:700"><span class="${t.side==='buy'?'buy':'sell'}">${t.side==='buy'?'شراء':'بيع'}</span> — ${dId} ${fmtQty(t.qty)}</div><div style="font-size:9px;color:#6b7480;margin-top:2px">${hh}:${mm}</div></div><div style="font-size:12px;font-weight:800">${fmt(t.qty*t.price)} TND</div></div>`;}).join('')}`:''}
     <div class="disc">يتم حفظ تقدمك على Firebase.</div>`;
   updateHero();
+  applyBalanceVisibility();
 }
 
 /* FIX #1: updatePortfolioLive كامل */
@@ -1967,6 +1971,7 @@ function updatePortfolioLive(){
   const lt=document.getElementById('pfLoseTitle');if(lt){lt.textContent=`بيع الخاسرة (${lc})`;lt.parentElement.classList.toggle('dim',lc===0);}
   const lm=document.getElementById('pfLoseMain');if(lm)lm.textContent=`${fmt(lp)} TND`;
   const ls=document.getElementById('pfLoseSub');if(ls){const lpct=lcst>0?(lp/lcst)*100:0;ls.textContent=`${lpct.toFixed(2)}% · ${fmt(lp+lcst)}`;}
+  applyBalanceVisibility();
 }
 
 /* FIX E5: sellAll يحذف buy orders */
@@ -2644,8 +2649,7 @@ renderRank=async function(){await _rr0();try{const m=getMarketMode()==='live'?'�
  if(window._lbErr)view.insertAdjacentHTML('beforeend','<div style="text-align:center;color:#f6465d;font-size:11px;margin-top:8px">تعذّرت قراءة الترتيب ('+window._lbErr+')</div>');}catch(e){}};
 window.renderRank=renderRank;
 async function refreshMyRank(){const e=document.getElementById('heroRank');if(!e||!fbDb||!currentUser)return;const M=getMarketMode()==='live'?'live':'practice',nm=M==='live'?'السوق':'التدريب';
- try{await updatePresence(true);const v=portfolioTotalValue();const a=await fbDb.collection('users').where(M+'Value','>',v).count().get();const r=a.data().count+1;let t=r;try{const b=await fbDb.collection('users').where(M+'Value','>=',0).count().get();t=Math.max(b.data().count,r);}catch(x){}
-  window._myRank=r;window._rankTotal=t;e.innerHTML='🏆 ترتيبك في وضع '+nm+': <b>#'+r+'</b> من '+t+' متداول';}catch(x){e.innerHTML='🏆 ترتيبك غير متاح ('+cleanText((x&&x.code)||'',24)+')';}}
+ try{await updatePresence(true);const col=M+'Value';const snap=await fbDb.collection('users').orderBy(col,'desc').get();let rank=0,total=0,found=false;snap.forEach(d=>{total++;if(d.id==currentUser.id){rank=total;found=true;}});if(!found){const mine=await fbDb.collection('users').doc(currentUser.id).get();if(mine.exists){const val=Number(mine.data()[col]);rank=1;snap.forEach(d=>{if(d.id!==currentUser.id&&Number(d.data()[col]||0)>val)rank++;});total=Math.max(total,rank);found=true;}}if(!found)throw new Error('rank-user-missing');window._myRank=rank;window._rankTotal=total;e.innerHTML='🏆 ترتيبك في وضع '+nm+': <b>#'+rank+'</b> من '+total+' متداول';}catch(x){console.warn('personal rank failed',x);e.innerHTML='🏆 الترتيب قيد التحديث';setTimeout(()=>{if(currentUser&&document.getElementById('heroRank'))refreshMyRank();},10000);}}
 window.refreshMyRank=refreshMyRank;
 setInterval(()=>{try{if(currentUser&&!document.hidden)refreshMyRank();}catch(e){}},180000);
 (function _rankBoot(){let n=0;const t=setInterval(()=>{n++;try{if(currentUser&&fbDb&&stateLoaded){clearInterval(t);refreshMyRank();}else if(n>20)clearInterval(t);}catch(e){clearInterval(t);}},500);})();
