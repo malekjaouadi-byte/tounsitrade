@@ -472,6 +472,7 @@ main::-webkit-scrollbar{display:none}
 #authScreen .auth-form{position:absolute;left:18px;right:18px;bottom:108px;z-index:5}
 #authScreen .btn-social.gg{background:rgba(255,255,255,.08)!important;color:#cfd6e0!important;border:1px solid #232a31!important;box-shadow:none!important;height:44px;font-size:12.5px}
 #authScreen .auth-row{direction:rtl}
+#authScreen .auth-disclaimer{display:block;direction:rtl;text-align:center;width:100%;max-width:340px;margin:10px auto 0;padding:12px 14px;box-sizing:border-box;font-size:14px;line-height:1.8;font-weight:700;color:#fff;background:rgba(11,14,17,.72);border:1px solid rgba(240,185,11,.55);border-radius:14px;position:relative;z-index:4;text-shadow:0 1px 2px rgba(0,0,0,.6)}
 #authScreen .auth-form{width:auto!important;max-width:none!important;margin:0!important;padding:0!important;box-sizing:border-box}
 #authScreen .auth-footer{display:none!important}
 .splash-logo{position:relative;box-shadow:0 0 0 1px rgba(255,120,120,.4),0 0 48px rgba(255,20,20,.7)!important}
@@ -589,6 +590,7 @@ button[aria-label="More"]{display:none!important}
   <div class="zellige-bg"><svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><rect width="200" height="200" fill="url(#zellige)"/></svg></div>
   <div class="auth-content">
     <div class="hero-art"></div>
+    <div class="auth-disclaimer">TounsiTrade محاكي تعليمي بحت — ليس منصة تداول حقيقية، الأسعار والأرباح وهمية 100%، ولا نقدّم نصائح استثمارية</div>
     <div class="stats-card">
       <div class="stat-item"><span class="stat-num">15</span><span class="stat-lbl">شركة</span></div>
       <div class="divider"></div>
@@ -1077,7 +1079,7 @@ setTimeout(()=>{
       appStarted=true;
       currentUser={
         id:user.uid,
-        name:cleanText(user.displayName||(user.email?user.email.split('@')[0]:''))||'لاعب',
+        name:cleanText(user.displayName||(window._regBusy&&window._regName)||(user.email?user.email.split('@')[0]:''))||'لاعب',
         email:cleanText(user.email,120)||null,
         photo:cleanUrl(user.photoURL),
         provider:(user.providerData[0]&&user.providerData[0].providerId)||'password',
@@ -1121,8 +1123,15 @@ async function registerEmail(){
   if(!p||p.length<6)return showError('regError','كلمة المرور 6 أحرف على الأقل');
   if(!n||n.length<2)return showError('regError','أدخل اسمًا');
   const btn=document.getElementById('regBtn');btn.disabled=true;btn.textContent='جاري الإنشاء...';
-  try{const c=await fbAuth.createUserWithEmailAndPassword(e,p);await c.user.updateProfile({displayName:n});await c.user.reload();document.getElementById('regEmail').value='';document.getElementById('regPass').value='';document.getElementById('regName').value='';}
-  catch(err){let msg='';if(err.code==='auth/email-already-in-use')msg='البريد مستعمل.';else if(err.code==='auth/weak-password')msg='كلمة المرور ضعيفة.';else msg=err.message||err.code;showError('regError',msg);}
+  window._regBusy=true;window._regName=n;
+  try{const c=await fbAuth.createUserWithEmailAndPassword(e,p);
+    try{await c.user.updateProfile({displayName:n});}catch(x){}
+    try{await c.user.reload();}catch(x){}
+    if(currentUser&&currentUser.id===c.user.uid){currentUser.name=n;try{const l=n.charAt(0).toUpperCase(),av=document.getElementById('heroAvatar'),al=document.getElementById('avatarLetter');if(al)al.textContent=l;if(av&&!currentUser.photo)av.innerHTML='<span>'+l+'</span><div class="online-badge"></div>';}catch(x){}try{updatePresence(true);}catch(x){}}
+    window._regName=n;
+    document.getElementById('regEmail').value='';document.getElementById('regPass').value='';document.getElementById('regName').value='';}
+  catch(err){let msg='';const c0=err&&err.code;if(c0==='auth/email-already-in-use')msg='البريد مستعمل. جرّب تسجيل الدخول.';else if(c0==='auth/weak-password')msg='كلمة المرور ضعيفة.';else if(c0==='auth/invalid-email')msg='البريد الإلكتروني غير صحيح.';else if(c0==='auth/operation-not-allowed')msg='التسجيل بالبريد غير مفعّل في Firebase (Authentication ← Sign-in method ← Email/Password).';else if(c0==='auth/network-request-failed')msg='لا يوجد اتصال بالإنترنت.';else if(c0==='auth/too-many-requests')msg='محاولات كثيرة، أعد المحاولة لاحقًا.';else msg=(err&&(err.message||err.code))||'تعذّر إنشاء الحساب';showError('regError',msg);}
+  window._regBusy=false;
   btn.disabled=false;btn.textContent='إنشاء الحساب والدخول';
 }
 
@@ -1251,7 +1260,9 @@ async function _fetchRealLeaderboardRaw(){const M=getMarketMode()==='live'?'live
   }catch(e){window._lbErr=cleanText((e&&e.code)||'',30);try{toast('⚠️ تعذّر قراءة الترتيب ('+window._lbErr+')','warn');}catch(x){}return[];}
 }
 function timeAgo(ts){if(!ts)return'فترة';const d=Date.now()-ts;const m=Math.floor(d/60000),h=Math.floor(d/3600000),dy=Math.floor(d/86400000);if(m<1)return'الآن';if(m<60)return`${m} دقيقة`;if(h<24)return`${h} ساعة`;if(dy<30)return`${dy} يوم`;return`${Math.floor(dy/30)} شهر`;}
-function startPresenceSystem(){if(presenceInterval)clearInterval(presenceInterval);updatePresence();fetchRealStats();updateRealCountersUI();presenceInterval=setInterval(updatePresence,600000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)updatePresence(true);});setInterval(fetchRealStats,600000);let la=0;const on=()=>{const n=Date.now();if(n-la>600000){la=n;updatePresence();}};['click','touchstart','keydown'].forEach(e=>document.addEventListener(e,on,{passive:true}));}
+function startPresenceSystem(){if(presenceInterval)clearInterval(presenceInterval);updatePresence(true);fetchRealStats();updateRealCountersUI();presenceInterval=setInterval(updatePresence,600000);
+  if(window._presWired)return;window._presWired=true;
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)updatePresence(true);});setInterval(fetchRealStats,600000);let la=0;const on=()=>{const n=Date.now();if(n-la>600000){la=n;updatePresence();}};['click','touchstart','keydown'].forEach(e=>document.addEventListener(e,on,{passive:true}));}
 
 /* ============================================================
    SYNC (saveState + loadState)
@@ -1355,6 +1366,7 @@ if(!s){if(lerr)throw lerr;return false;}
 /* FIX #2: startApp بدون silent failure */
 async function startApp(){
   try{
+    window._lastPres=0;window._loadAborted=false;window._cloudOK=undefined;window._loadErr=null;window._myRank=null;window._rankTotal=null;window._lbErr=null;try{ttLbInvalidate();}catch(x){}
     hideAllAuth();
     const ma=document.getElementById('mainApp');if(ma)ma.style.display='flex';
     const l=(currentUser.name||'?').charAt(0).toUpperCase();
@@ -2635,9 +2647,22 @@ renderRank=async function(){await _rr0();try{const m=getMarketMode()==='live'?'�
  if(window._myRank&&!document.querySelector('.rank-card.me')){view.insertAdjacentHTML('beforeend','<div style="background:rgba(240,185,11,.1);border:1px solid rgba(240,185,11,.4);border-radius:13px;padding:11px 14px;margin-top:8px;display:flex;justify-content:space-between;align-items:center"><b style="color:#f0b90b">ترتيبك: #'+window._myRank+' من '+(window._rankTotal||window._myRank)+'</b><span style="font-size:11px;color:#cfd6e0">'+fmt(cash+holdingsValue())+' TND</span></div>');}
  if(window._lbErr)view.insertAdjacentHTML('beforeend','<div style="text-align:center;color:#f6465d;font-size:11px;margin-top:8px">تعذّرت قراءة الترتيب ('+window._lbErr+')</div>');}catch(e){}};
 window.renderRank=renderRank;
-async function refreshMyRank(){const e=document.getElementById('heroRank');if(!e||!fbDb||!currentUser)return;const M=getMarketMode()==='live'?'live':'practice',nm=M==='live'?'السوق':'التدريب';
- try{const v=cash+holdingsValue();const a=await fbDb.collection('users').where(M+'Value','>',v).count().get();const r=a.data().count+1;let t=r;try{const b=await fbDb.collection('users').where(M+'Value','>=',0).count().get();t=Math.max(b.data().count,r);}catch(x){}
-  window._myRank=r;window._rankTotal=t;e.innerHTML='🏆 ترتيبك في وضع '+nm+': <b>#'+r+'</b> من '+t+' متداول';}catch(x){e.innerHTML='🏆 ترتيبك غير متاح ('+cleanText((x&&x.code)||'',24)+')';}}
+let _rankBusy=false,_rankRetry=null;
+async function refreshMyRank(){const e=document.getElementById('heroRank');if(!e||!fbDb||!currentUser||_rankBusy)return;_rankBusy=true;
+ const M=getMarketMode()==='live'?'live':'practice',nm=M==='live'?'السوق':'التدريب';
+ const show=(r,t)=>{window._myRank=r;window._rankTotal=t;e.innerHTML='🏆 ترتيبك في وضع '+nm+': <b>#'+r+'</b> من '+t+' متداول';};
+ try{
+  // 1) تأكد أن قيمتك مكتوبة في السحابة قبل الحساب
+  if(!window._lastPres||Date.now()-window._lastPres>60000){try{await updatePresence(true);}catch(x){}}
+  const v=Math.max(0,Math.min(5e6,modeBoard()[M+'Value']));
+  let done=false;
+  // 2) المحاولة الأولى: استعلام العدّ
+  try{const a=await fbDb.collection('users').where(M+'Value','>',v).count().get();const r=a.data().count+1;let t=r;try{const b=await fbDb.collection('users').where(M+'Value','>=',0).count().get();t=Math.max(b.data().count,r);}catch(x){}show(r,t);done=true;}catch(x){}
+  // 3) البديل: نفس قائمة صفحة الترتيب
+  if(!done){const l=await fetchRealLeaderboard(true);if(l&&l.length){const i=l.findIndex(u=>u.uid===currentUser.id);if(i>=0){show(i+1,Math.max(l.length,i+1));done=true;}else if(l.length<33){show(l.length+1,l.length+1);done=true;}else{e.innerHTML='🏆 ترتيبك في وضع '+nm+': <b>خارج أفضل '+l.length+'</b>';done=true;}}}
+  if(!done){e.innerHTML='🏆 جاري تحديث ترتيبك…';clearTimeout(_rankRetry);_rankRetry=setTimeout(()=>{try{refreshMyRank();}catch(x){}},15000);}
+ }catch(x){e.innerHTML='🏆 جاري تحديث ترتيبك…';clearTimeout(_rankRetry);_rankRetry=setTimeout(()=>{try{refreshMyRank();}catch(y){}},15000);}
+ finally{_rankBusy=false;}}
 window.refreshMyRank=refreshMyRank;
 setInterval(()=>{try{if(currentUser&&!document.hidden)refreshMyRank();}catch(e){}},180000);
 (function _rankBoot(){let n=0;const t=setInterval(()=>{n++;try{if(currentUser&&fbDb&&stateLoaded){clearInterval(t);refreshMyRank();}else if(n>20)clearInterval(t);}catch(e){clearInterval(t);}},500);})();
