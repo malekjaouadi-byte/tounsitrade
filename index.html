@@ -472,7 +472,7 @@ main::-webkit-scrollbar{display:none}
 #authScreen .auth-form{position:absolute;left:18px;right:18px;bottom:108px;z-index:5}
 #authScreen .btn-social.gg{background:rgba(255,255,255,.08)!important;color:#cfd6e0!important;border:1px solid #232a31!important;box-shadow:none!important;height:44px;font-size:12.5px}
 #authScreen .auth-row{direction:rtl}
-#authScreen .auth-disclaimer{display:block;direction:rtl;text-align:center;width:100%;max-width:340px;margin:10px auto 0;padding:12px 14px;box-sizing:border-box;font-size:14px;line-height:1.8;font-weight:700;color:#fff;background:rgba(11,14,17,.72);border:1px solid rgba(240,185,11,.55);border-radius:14px;position:relative;z-index:4;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+#authScreen .auth-disclaimer{display:block;direction:rtl;text-align:center;width:100%;max-width:340px;margin:0 auto;padding:14px 16px;box-sizing:border-box;position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);font-size:14px;line-height:1.8;font-weight:700;color:#fff;background:rgba(11,14,17,.72);border:1px solid rgba(240,185,11,.55);border-radius:14px;z-index:4;text-shadow:0 1px 2px rgba(0,0,0,.6)}
 #authScreen .auth-form{width:auto!important;max-width:none!important;margin:0!important;padding:0!important;box-sizing:border-box}
 #authScreen .auth-footer{display:none!important}
 .splash-logo{position:relative;box-shadow:0 0 0 1px rgba(255,120,120,.4),0 0 48px rgba(255,20,20,.7)!important}
@@ -1382,6 +1382,7 @@ let loadOK=false;
     }catch(e){
       console.warn('loadState failed:',e); window._loadAborted=true; window._cloudOK=false; window._loadErr=cleanText((e&&e.code)||(e&&e.message)||'',30); loadOK=true; toast('⚠️ '+ttCloudErrMsg((e&&e.code)||(e&&e.message)||''),'warn'); }
 stateLoaded=loadOK;
+    try{await ttLoadPrivacy();}catch(e){}
     if(loadOK){_stateDirty=false;if(_flushTimer){clearTimeout(_flushTimer);_flushTimer=null;}}
 if(loadOK&&window._usedLocal){_stateDirty=true;setTimeout(()=>{try{_flushState();}catch(e){}},3000);}
     loadModeState(getMarketMode());
@@ -1423,7 +1424,7 @@ function updateBellBadge(){const u=notifications.filter(n=>!n.read).length;const
 function markAllRead(){notifications.forEach(n=>n.read=true);updateBellBadge();saveState();}
 
 let toastTimer;
-function toast(msg,kind){const t=document.getElementById('toast');if(!t)return;t.textContent=msg;t.className='toast on '+(kind==='good'?'good':(kind==='warn'?'warn':(kind==='error'?'error':'')));clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('on'),2800);}
+function toast(msg,kind){const t=document.getElementById('toast');if(!t)return;t.textContent=msg;t.className='toast on '+(kind==='good'?'good':(kind==='warn'?'warn':(kind==='error'?'error':'')));clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('on'),Math.min(9000,Math.max(3500,String(msg).length*90)));}
 function playAlertSound(){try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;const ctx=window._ac||(window._ac=new AC());if(ctx.state==='suspended')ctx.resume();const osc=ctx.createOscillator();const gn=ctx.createGain();osc.connect(gn);gn.connect(ctx.destination);osc.type='sine';osc.frequency.value=880;gn.gain.setValueAtTime(0.5,ctx.currentTime);gn.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.5);osc.start();osc.stop(ctx.currentTime+0.5);}catch(e){}try{if(navigator.vibrate)navigator.vibrate([200,100,200]);}catch(e){}}
 
 /* ============================================================
@@ -2469,15 +2470,23 @@ function openProfile(){
 }
 
 /* FIX #25: togglePrivacy */
-function togglePrivacy(){
+function ttPrivKey(){return 'tt_priv_'+(currentUser&&currentUser.id);}
+async function ttLoadPrivacy(){
+  if(!currentUser)return;
+  let loc=null;try{const v=localStorage.getItem(ttPrivKey());if(v!==null)loc=JSON.parse(v);}catch(e){}
+  let cloud=null;
+  if(fbDb){try{const u=await fbDb.collection('users').doc(currentUser.id).get();if(u.exists&&typeof u.data().privacyHidden==='boolean')cloud=u.data().privacyHidden;}catch(e){}}
+  if(loc&&typeof loc.v==='boolean'&&(cloud===null||loc.t>=(window._privCloudT||0)))currentUser.privacyHidden=loc.v;
+  else if(cloud!==null)currentUser.privacyHidden=cloud;
+}
+async function togglePrivacy(){
   if(!currentUser)return;
   currentUser.privacyHidden=!currentUser.privacyHidden;
-  if(fbDb){
-    fbDb.collection('users').doc(currentUser.id).set({privacyHidden:currentUser.privacyHidden,updatedAt:Date.now()},{merge:true}).then(()=>{try{ttLbInvalidate();}catch(x){}}).catch(e=>console.warn('privacy save failed',e));
-  }
+  try{localStorage.setItem(ttPrivKey(),JSON.stringify({v:currentUser.privacyHidden,t:Date.now()}));}catch(e){}
   toast(currentUser.privacyHidden?'🔒 تم إخفاء قيمتك':'👁 قيمتك مرئية الآن','good');
   closeSheet();
   setTimeout(()=>openProfile(),150);
+  try{await updatePresence(true);if(window._presErr)toast('⚠️ تعذّر مزامنة الخصوصية، سيُعاد المحاولة','warn');ttLbInvalidate();}catch(x){}
 }
 
 /* ============================================================
@@ -2920,7 +2929,9 @@ const ttAdv=(function(){
     c.querySelector('.adv-x').onclick=()=>dismiss(c);
     if(m.act){c.querySelector('.adv-act').onclick=()=>{try{m.act.fn();}catch(e){}dismiss(c);};}
     b.appendChild(c);
-    setTimeout(()=>dismiss(c),m.ms||9500);
+    {const txt=(m.title+' '+m.lines.join(' ')).replace(/<[^>]*>/g,'');let dur=Math.min(60000,Math.max(20000,12000+txt.length*110)),t0=Date.now(),left=dur,tm=setTimeout(()=>dismiss(c),left);
+     const pause=()=>{clearTimeout(tm);left-=Date.now()-t0;};const resume=()=>{clearTimeout(tm);t0=Date.now();tm=setTimeout(()=>dismiss(c),Math.max(8000,left));};
+     c.addEventListener('mouseenter',pause);c.addEventListener('mouseleave',resume);c.addEventListener('touchstart',pause,{passive:true});c.addEventListener('touchend',()=>{clearTimeout(tm);t0=Date.now();left=Math.max(left,12000);tm=setTimeout(()=>dismiss(c),left);},{passive:true});}
     try{const L=lsG('adv_log_'+mode(),[]);L.unshift({t:Date.now(),k:m.k||'info',title:m.title,line:String(m.lines[0]||'').replace(/<[^>]*>/g,'')});lsS('adv_log_'+mode(),L.slice(0,30));}catch(e){}
     if(m.k==='bad'||m.k==='warn'){try{pushNotification('rank','🧠 '+m.title,String(m.lines[0]||'').replace(/<[^>]*>/g,''));}catch(e){}}
   };
