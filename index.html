@@ -1193,6 +1193,7 @@ async function updatePresence(force){if(!currentUser||!fbDb)return;const _n=Date
       xp:userXP,
       badges:userBadges,
       privacyHidden:currentUser.privacyHidden===true,
+      balanceHidden:currentUser.balanceHidden===true,
       updatedAt:Date.now() },{merge:true}); window._presErr=null; }catch(e){window._presErr=cleanText((e&&e.code)||'',30);console.error('presence',e);}
 }
 async function fetchRealStats(){if(!fbDb)return;try{const t=await fbDb.collection('users').count().get();realStats.totalUsers=t.data().count;const f=Date.now()-8*60*1000;const o=await fbDb.collection('users').where('lastSeen','>',f).count().get();realStats.onlineNow=o.data().count;updateRealCountersUI();}catch(e){}}
@@ -1233,18 +1234,20 @@ async function _fetchRealLeaderboardRaw(){const M=getMarketMode()==='live'?'live
       const x=d.data();
       const isMe=d.id===(currentUser&&currentUser.id);
       const hidden=x.privacyHidden===true;
+      const balanceHidden=x.balanceHidden===true;
       l.push({
         uid:d.id,
         name:hidden?'متداول محمي':(cleanText(x.name)||'لاعب'),
         photo:hidden?null:cleanUrl(x.photo),
         avatarColor:hidden?'#5e6673':cleanColor(x.avatarColor),
-        totalValue:hidden?null:Math.max(0,Math.min(1e8,Number(x[M+'Value'])||STARTING_CASH)),
-        profitPct:hidden?null:Math.max(-100,Math.min(5000,Number(x[M+'Pct'])||0)),
+        totalValue:(hidden||balanceHidden)?null:Math.max(0,Math.min(1e8,Number(x[M+'Value'])||STARTING_CASH)),
+        profitPct:(hidden||balanceHidden)?null:Math.max(-100,Math.min(5000,Number(x[M+'Pct'])||0)),
         joined:x.joined||Date.now(),
         lastSeen:hidden?0:(x.lastSeen||0),
         xp:Math.max(0,Math.min(100000,Number(x.xp)||0)),
         badgesCount:Array.isArray(x.badges)?x.badges.length:0,
         hidden:hidden,
+        balanceHidden:balanceHidden,
         isMe:isMe
       });
     });
@@ -1348,7 +1351,7 @@ if(!s){if(lerr)throw lerr;return false;}
     // جلب privacyHidden من users collection
     try{
       const u=await fbDb.collection('users').doc(currentUser.id).get();
-      if(u.exists && u.data().privacyHidden===true) currentUser.privacyHidden=true;
+      if(u.exists){currentUser.privacyHidden=u.data().privacyHidden===true;currentUser.balanceHidden=u.data().balanceHidden===true;}
     }catch(e){}
     loadModeState(getMarketMode());
     return true;
@@ -1516,7 +1519,7 @@ function updateHero(){
 
 function isBalanceHidden(){try{return localStorage.getItem('tt_hide_balance')==='1';}catch(e){return !!window._ttHideBalance;}}
 function applyBalanceVisibility(){const hidden=isBalanceHidden(),mask='••••••';const ids=['pfTotalAssets','pfTotalPnl','pfTotalPct','pfSellAllAmount','pfSellAllSub','pfWinMain','pfWinSub','pfLoseMain','pfLoseSub'];ids.forEach(id=>{const el=document.getElementById(id);if(!el)return;if(hidden){if(!el.dataset.ttVisibleText)el.dataset.ttVisibleText=el.textContent;el.textContent=mask;}else if(el.dataset.ttVisibleText){el.textContent=el.dataset.ttVisibleText;delete el.dataset.ttVisibleText;}});const btn=document.getElementById('balanceVisibilityBtn');if(btn){btn.textContent=hidden?'🙈':'👁';btn.title=hidden?'إظهار الرصيد':'إخفاء الرصيد';}const cashEl=document.getElementById('heroCash');if(cashEl){if(hidden){if(!cashEl.dataset.ttMasked){cashEl.dataset.ttOriginal=cashEl.innerHTML;cashEl.dataset.ttMasked='1';}cashEl.innerHTML='💧 السيولة: '+mask+' TND · 📈 الأسهم: '+mask+' TND · 🔒 محجوز: '+mask+' TND';}else if(cashEl.dataset.ttMasked==='1'){cashEl.innerHTML=cashEl.dataset.ttOriginal||'';cashEl.dataset.ttMasked='';}}}
-function toggleBalanceVisibility(ev){if(ev){ev.preventDefault();ev.stopPropagation();}const next=!isBalanceHidden();window._ttHideBalance=next;try{localStorage.setItem('tt_hide_balance',next?'1':'0');}catch(e){}['pfTotalAssets','pfTotalPnl','pfTotalPct','pfSellAllAmount','pfSellAllSub','pfWinMain','pfWinSub','pfLoseMain','pfLoseSub'].forEach(id=>{const el=document.getElementById(id);if(el)delete el.dataset.ttVisibleText;});updateHero();if(currentTab==='portfolio')renderPortfolio();applyBalanceVisibility();}
+function toggleBalanceVisibility(ev){if(ev){ev.preventDefault();ev.stopPropagation();}const next=!isBalanceHidden();window._ttHideBalance=next;try{localStorage.setItem('tt_hide_balance',next?'1':'0');}catch(e){}if(currentUser){currentUser.balanceHidden=next;if(fbDb){fbDb.collection('users').doc(currentUser.id).set({balanceHidden:next,updatedAt:Date.now()},{merge:true}).then(()=>{try{ttLbInvalidate();}catch(x){}if(currentTab==='rank')renderRank();}).catch(e=>{console.warn('balance privacy save failed',e);toast('تعذّر حفظ إخفاء الرصيد في الترتيب','warn');});}}['pfTotalAssets','pfTotalPnl','pfTotalPct','pfSellAllAmount','pfSellAllSub','pfWinMain','pfWinSub','pfLoseMain','pfLoseSub'].forEach(id=>{const el=document.getElementById(id);if(el)delete el.dataset.ttVisibleText;});updateHero();if(currentTab==='portfolio')renderPortfolio();applyBalanceVisibility();}
 window.toggleBalanceVisibility=toggleBalanceVisibility;
 window.toggleBalanceVisibility=toggleBalanceVisibility;
 
@@ -1581,8 +1584,8 @@ async function renderRank(){
     else st='آخر ظهور: '+timeAgo(p.lastSeen);
     const jn=timeAgo(p.joined);
     const mc=i===0?'gold':i===1?'silver':i===2?'bronze':'';
-    const valueDisplay=p.hidden?'<span style="color:#5e6673">🔒 مخفي</span>':fmt(p.totalValue)+' TND';
-    const pctDisplay=p.hidden?'<span style="color:#5e6673;font-size:10px">🔒</span>':`<span style="color:${p.profitPct>=0?'#0ecb81':'#f6465d'}">${p.profitPct>=0?'+':''}${p.profitPct.toFixed(2)}%</span>`;
+    const valueDisplay=(p.hidden||p.balanceHidden)?'<span style="color:#5e6673">🔒 مخفي</span>':fmt(p.totalValue)+' TND';
+    const pctDisplay=(p.hidden||p.balanceHidden)?'<span style="color:#5e6673;font-size:10px">🔒</span>':`<span style="color:${p.profitPct>=0?'#0ecb81':'#f6465d'}">${p.profitPct>=0?'+':''}${p.profitPct.toFixed(2)}%</span>`;
     return`<div class="rank-card ${p.isMe?'me':''}"><div class="rank-num ${mc}">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</div><div class="rank-avatar" style="${ab}">${ac}<div class="status-dot ${on?'online':''}"></div></div><div class="rank-info">${p.name} ${p.isMe?'<span style="color:#f0b90b">· أنت</span>':''} ${(p.hidden&&!p.isMe)?'':ttTierBadge(p.isMe?userXP:p.xp)}<div class="meta">${st} · عضو منذ ${jn}${p.xp>0?` · ${p.xp} XP`:''}</div></div><div class="rank-value"><div class="v">${valueDisplay}</div><div class="pct">${pctDisplay}</div></div></div>`;
   });
   const listHTML=rowsArr.slice(0,10).join('')+(rowsArr.length>10?'<div class="sec" style="margin-top:14px"><span class="sec-t">المراكز 11 – '+rowsArr.length+'</span><span class="sec-line"></span></div>'+rowsArr.slice(10).join(''):'');
@@ -1598,7 +1601,7 @@ async function renderRank(){
         <div class="rank-num gold" style="font-size:12.5px;width:auto;min-width:38px">#${myRank.toLocaleString('en-US')}</div>
         <div class="rank-avatar" style="background:linear-gradient(135deg,#f0b90b,#b88700)">${currentUser.name.charAt(0).toUpperCase()}<div class="status-dot online"></div></div>
         <div class="rank-info">${currentUser.name} <span style="color:#f0b90b">· أنت</span> ${ttTierBadge(userXP)}<div class="meta">الترتيب <b>#${myRank.toLocaleString('en-US')}</b> من ${totalUsers.toLocaleString('en-US')}</div></div>
-        <div class="rank-value"><div class="v">${fmt(myVal)} TND</div><div class="pct" style="color:${myPnl>=0?'#0ecb81':'#f6465d'}">${myPnl>=0?'+':''}${myPnl.toFixed(2)}%</div></div>
+        <div class="rank-value"><div class="v">${isBalanceHidden()||currentUser.balanceHidden?'🔒 مخفي':fmt(myVal)+' TND'}</div><div class="pct" style="color:${myPnl>=0?'#0ecb81':'#f6465d'}">${isBalanceHidden()||currentUser.balanceHidden?'🔒':(myPnl>=0?'+':'')+myPnl.toFixed(2)+'%'}</div></div>
       </div>
       ${(()=>{const last=list[list.length-1];const need=last&&last.totalValue!=null?last.totalValue-myVal:0;return need>0?`<div style="text-align:center;font-size:11px;color:#7b8494;margin-top:10px;line-height:1.6">🎯 لتدخل أفضل ${list.length}، تحتاج <b style="color:#f0b90b">+${fmt(need)} TND</b></div>`:'';})()}
     `;
@@ -2645,7 +2648,7 @@ function jrBody(){const L=lsG('jr_'+getMarketMode(),[]);if(!L.length)return'<div
 const _rr0=renderRank;
 renderRank=async function(){await _rr0();try{const m=getMarketMode()==='live'?'السوق':'التدريب';
  view.insertAdjacentHTML('afterbegin','<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><button onclick="document.querySelector(\'.tab[data-tab=market]\').click()" style="padding:9px 14px;border:none;border-radius:11px;background:#1c222a;color:#eaecef;font-weight:800;font-family:inherit;cursor:pointer">← رجوع</button><span style="font-size:12px;color:#f0b90b;font-weight:800">ترتيب وضع '+m+'</span></div>');
- if(window._myRank&&!document.querySelector('.rank-card.me')){view.insertAdjacentHTML('beforeend','<div style="background:rgba(240,185,11,.1);border:1px solid rgba(240,185,11,.4);border-radius:13px;padding:11px 14px;margin-top:8px;display:flex;justify-content:space-between;align-items:center"><b style="color:#f0b90b">ترتيبك: #'+window._myRank+' من '+(window._rankTotal||window._myRank)+'</b><span style="font-size:11px;color:#cfd6e0">'+fmt(cash+holdingsValue())+' TND</span></div>');}
+ if(window._myRank&&!document.querySelector('.rank-card.me')){view.insertAdjacentHTML('beforeend','<div style="background:rgba(240,185,11,.1);border:1px solid rgba(240,185,11,.4);border-radius:13px;padding:11px 14px;margin-top:8px;display:flex;justify-content:space-between;align-items:center"><b style="color:#f0b90b">ترتيبك: #'+window._myRank+' من '+(window._rankTotal||window._myRank)+'</b><span style="font-size:11px;color:#cfd6e0">'+(isBalanceHidden()||currentUser.balanceHidden?'🔒 مخفي':fmt(portfolioTotalValue())+' TND')+'</span></div>');}
  if(window._lbErr)view.insertAdjacentHTML('beforeend','<div style="text-align:center;color:#f6465d;font-size:11px;margin-top:8px">تعذّرت قراءة الترتيب ('+window._lbErr+')</div>');}catch(e){}};
 window.renderRank=renderRank;
 async function refreshMyRank(){const e=document.getElementById('heroRank');if(!e||!fbDb||!currentUser)return;const M=getMarketMode()==='live'?'live':'practice',nm=M==='live'?'السوق':'التدريب';
