@@ -1243,8 +1243,8 @@ async function _fetchRealLeaderboardRaw(){const M=getMarketMode()==='live'?'live
         name:hidden?'متداول محمي':(cleanText(x.name)||'لاعب'),
         photo:hidden?null:cleanUrl(x.photo),
         avatarColor:hidden?'#5e6673':cleanColor(x.avatarColor),
-        totalValue:(hidden||balanceHidden)?null:Math.max(0,Math.min(1e8,Number(x[M+'Value'])||STARTING_CASH)),
-        profitPct:(hidden||balanceHidden)?null:Math.max(-100,Math.min(5000,Number(x[M+'Pct'])||0)),
+        totalValue:balanceHidden?null:Math.max(0,Math.min(1e8,Number(x[M+'Value'])||STARTING_CASH)),
+        profitPct:balanceHidden?null:Math.max(-100,Math.min(5000,Number(x[M+'Pct'])||0)),
         joined:x.joined||Date.now(),
         lastSeen:hidden?0:(x.lastSeen||0),
         xp:Math.max(0,Math.min(100000,Number(x.xp)||0)),
@@ -1546,18 +1546,17 @@ window.toggleBalanceVisibility=toggleBalanceVisibility;
 async function loadPodium(){
   const el=document.getElementById('podiumList');if(!el)return;
   try{
-    const list=await fetchRealLeaderboard();
+    if(currentUser&&fbDb){await updatePresence(true);ttLbInvalidate();}
+    const list=await fetchRealLeaderboard(true);
     const top=list.slice(0,10);
     if(!top.length){el.innerHTML='<div class="podium-empty">لا يوجد متداولون بعد — كن الأول! 🏆</div>';return;}
     el.innerHTML=top.map((p,i)=>{
       const m=i===0?'🥇':i===1?'🥈':i===2?'🥉':String(i+1);
-      const me=p.isMe?' <span style="color:#f0b90b">· أنت</span>':'';
-      if(p.hidden&&!p.isMe){
-        return`<div class="podium-row" onclick="switchToRank()"><div class="podium-medal">${m}</div><div class="podium-name" style="color:#5e6673">${p.name}${me}</div><div class="podium-pct" style="color:#5e6673;font-size:10px">🔒</div></div>`;
-      }
-      const col=p.profitPct>=0?'#0ecb81':'#f6465d';
-      const sg=p.profitPct>=0?'+':'';
-      return`<div class="podium-row" onclick="switchToRank()"><div class="podium-medal">${m}</div><div class="podium-name">${p.name}${me} ${ttTierBadge(p.isMe?userXP:p.xp,true)}</div><div class="podium-pct" style="color:${col}">${sg}${p.profitPct.toFixed(2)}%</div></div>`;
+      const me=(p.isMe&&!p.hidden)?' <span style="color:#f0b90b">· أنت</span>':'';
+      const tier=p.hidden?'':ttTierBadge(p.isMe?userXP:p.xp,true);
+      const value=p.balanceHidden?'🔒':((p.profitPct||0)>=0?'+':'')+(Number(p.profitPct)||0).toFixed(2)+'%';
+      const col=p.balanceHidden?'#5e6673':((p.profitPct||0)>=0?'#0ecb81':'#f6465d');
+      return`<div class="podium-row" onclick="switchToRank()"><div class="podium-medal">${m}</div><div class="podium-name" style="${p.hidden?'color:#5e6673':''}">${p.name}${me} ${tier}</div><div class="podium-pct" style="color:${col}">${value}</div></div>`;
     }).join('');
   }catch(e){el.innerHTML='<div class="podium-empty">تعذّر التحميل</div>';}
 }
@@ -1570,17 +1569,20 @@ async function renderRank(){
   const _rkP=(async()=>{
     if(!(currentUser&&fbDb))return;
     try{
-      const myValue=portfolioTotalValue();
-      const [higher,tt]=await Promise.all([
-        fbDb.collection('users').where(M+'Value','>',myValue).count().get(),
-        fbDb.collection('users').where(M+'Value','>=',0).count().get().catch(()=>null)
-      ]);
-      myRank=higher.data().count+1;
-      totalUsers=tt?Math.max(tt.data().count,myRank):myRank;
-      window._myRank=myRank;window._rankTotal=totalUsers;
+      // استخدم نفس ترتيب Firebase المعتمد في لوحة أفضل المتداولين، لا قيمة محلية قديمة.
+      await updatePresence(true);
+      const snap=await fbDb.collection('users').orderBy(M+'Value','desc').get();
+      let pos=0,found=false,total=0;
+      snap.forEach(d=>{total++;if(d.id===currentUser.id&&!found){pos=total;found=true;}});
+      if(!found){
+        const mine=await fbDb.collection('users').doc(currentUser.id).get();
+        if(mine.exists){const v=Number(mine.data()[M+'Value']||portfolioTotalValue());pos=1;snap.forEach(d=>{if(d.id!==currentUser.id&&Number(d.data()[M+'Value']||0)>v)pos++;});found=true;}
+      }
+      if(found){myRank=pos;totalUsers=Math.max(total,pos);window._myRank=myRank;window._rankTotal=totalUsers;}
     }catch(e){console.warn('rank calc failed',e);}
   })();
-  const [,list]=await Promise.all([fetchRealStats(),fetchRealLeaderboard(),_rkP]);
+  await _rkP;
+  const [,list]=await Promise.all([fetchRealStats(),fetchRealLeaderboard(true)]);
   const header=`<div class="index-strip" style="margin-bottom:12px"><div><div class="nm">مستخدم مسجل</div><div class="vv">${Math.max(1,realStats.totalUsers).toLocaleString('en-US')}</div></div><div style="text-align:left"><div class="nm">نشط الآن</div><div class="vv" style="color:#0ecb81">${Math.max(1,realStats.onlineNow).toLocaleString('en-US')}</div></div></div><div class="sec"><span class="sec-t">🏆 أفضل 10 متداولين</span><span class="sec-line"></span></div>
   <div style="background:#0e1216;border:1px solid #1c222a;border-radius:12px;padding:10px 12px;margin-bottom:12px;font-size:10.5px;color:#8b95a5;line-height:1.9">
     <div style="font-weight:800;color:#f0b90b;margin-bottom:3px">🎓 العلم يخفّض عمولتك — اجتز الدروس والاختبارات لترتقي</div>
@@ -1595,15 +1597,15 @@ async function renderRank(){
     const ab=p.photo?'':`background:linear-gradient(135deg,${p.avatarColor},${shade(p.avatarColor,-30)})`;
     const ac=p.photo?`<img src="${p.photo}" alt="">`:l;
     let st;
-    if(p.hidden&&!p.isMe)st='🔒 محمي';
+    if(p.hidden)st='🔒 محمي';
     else if(p.isMe)st='أنت الآن';
     else if(on)st='نشط الآن';
     else st='آخر ظهور: '+timeAgo(p.lastSeen);
     const jn=timeAgo(p.joined);
     const mc=i===0?'gold':i===1?'silver':i===2?'bronze':'';
-    const valueDisplay=(p.hidden||p.balanceHidden)?'<span style="color:#5e6673">🔒 مخفي</span>':fmt(p.totalValue)+' TND';
-    const pctDisplay=(p.hidden||p.balanceHidden)?'<span style="color:#5e6673;font-size:10px">🔒</span>':`<span style="color:${p.profitPct>=0?'#0ecb81':'#f6465d'}">${p.profitPct>=0?'+':''}${p.profitPct.toFixed(2)}%</span>`;
-    return`<div class="rank-card ${p.isMe?'me':''}"><div class="rank-num ${mc}">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</div><div class="rank-avatar" style="${ab}">${ac}<div class="status-dot ${on?'online':''}"></div></div><div class="rank-info">${p.name} ${p.isMe?'<span style="color:#f0b90b">· أنت</span>':''} ${(p.hidden&&!p.isMe)?'':ttTierBadge(p.isMe?userXP:p.xp)}<div class="meta">${st} · عضو منذ ${jn}${p.xp>0?` · ${p.xp} XP`:''}</div></div><div class="rank-value"><div class="v">${valueDisplay}</div><div class="pct">${pctDisplay}</div></div></div>`;
+    const valueDisplay=p.balanceHidden?'<span style="color:#5e6673">🔒 مخفي</span>':fmt(p.totalValue)+' TND';
+    const pctDisplay=p.balanceHidden?'<span style="color:#5e6673;font-size:10px">🔒</span>':`<span style="color:${p.profitPct>=0?'#0ecb81':'#f6465d'}">${p.profitPct>=0?'+':''}${p.profitPct.toFixed(2)}%</span>`;
+    return`<div class="rank-card ${p.isMe?'me':''}"><div class="rank-num ${mc}">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</div><div class="rank-avatar" style="${ab}">${ac}<div class="status-dot ${on?'online':''}"></div></div><div class="rank-info">${p.name} ${(p.isMe&&!p.hidden)?'<span style="color:#f0b90b">· أنت</span>':''} ${(p.hidden)?'':ttTierBadge(p.isMe?userXP:p.xp)}<div class="meta">${st} · عضو منذ ${jn}${p.xp>0?` · ${p.xp} XP`:''}</div></div><div class="rank-value"><div class="v">${valueDisplay}</div><div class="pct">${pctDisplay}</div></div></div>`;
   });
   const listHTML=rowsArr.slice(0,10).join('')+(rowsArr.length>10?'<div class="sec" style="margin-top:14px"><span class="sec-t">المراكز 11 – '+rowsArr.length+'</span><span class="sec-line"></span></div>'+rowsArr.slice(10).join(''):'');
   // عرض ترتيب المستخدم الحقيقي إذا كان خارج القائمة (مهما كان رقمه)
@@ -1616,9 +1618,9 @@ async function renderRank(){
       <div class="sec" style="margin-top:16px"><span class="sec-t">ترتيبك</span><span class="sec-line"></span></div>
       <div class="rank-card me" style="border-color:#f0b90b">
         <div class="rank-num gold" style="font-size:12.5px;width:auto;min-width:38px">#${myRank.toLocaleString('en-US')}</div>
-        <div class="rank-avatar" style="background:linear-gradient(135deg,#f0b90b,#b88700)">${currentUser.name.charAt(0).toUpperCase()}<div class="status-dot online"></div></div>
-        <div class="rank-info">${currentUser.name} <span style="color:#f0b90b">· أنت</span> ${ttTierBadge(userXP)}<div class="meta">الترتيب <b>#${myRank.toLocaleString('en-US')}</b> من ${totalUsers.toLocaleString('en-US')}</div></div>
-        <div class="rank-value"><div class="v">${isBalanceHidden()||currentUser.balanceHidden?'🔒 مخفي':fmt(myVal)+' TND'}</div><div class="pct" style="color:${myPnl>=0?'#0ecb81':'#f6465d'}">${isBalanceHidden()||currentUser.balanceHidden?'🔒':(myPnl>=0?'+':'')+myPnl.toFixed(2)+'%'}</div></div>
+        <div class="rank-avatar" style="background:linear-gradient(135deg,#f0b90b,#b88700)">${currentUser.privacyHidden===true?'؟':currentUser.name.charAt(0).toUpperCase()}<div class="status-dot online"></div></div>
+        <div class="rank-info">${currentUser.privacyHidden===true?'متداول محمي':currentUser.name} ${currentUser.privacyHidden===true?'':'<span style="color:#f0b90b">· أنت</span> '+ttTierBadge(userXP)}<div class="meta">الترتيب <b>#${myRank.toLocaleString('en-US')}</b> من ${totalUsers.toLocaleString('en-US')}</div></div>
+        <div class="rank-value"><div class="v">${currentUser.balanceHidden===true?'🔒 مخفي':fmt(myVal)+' TND'}</div><div class="pct" style="color:${myPnl>=0?'#0ecb81':'#f6465d'}">${currentUser.balanceHidden===true?'🔒':(myPnl>=0?'+':'')+myPnl.toFixed(2)+'%'}</div></div>
       </div>
       ${(()=>{const last=list[list.length-1];const need=last&&last.totalValue!=null?last.totalValue-myVal:0;return need>0?`<div style="text-align:center;font-size:11px;color:#7b8494;margin-top:10px;line-height:1.6">🎯 لتدخل أفضل ${list.length}، تحتاج <b style="color:#f0b90b">+${fmt(need)} TND</b></div>`:'';})()}
     `;
@@ -2477,9 +2479,14 @@ function openProfile(){
       <div class="priv-desc">💡 في الأسواق الحقيقية، المحافظ سرية. أنت وحدك تقرر ما تشاركه.</div>
       <div class="priv-row">
         <span class="priv-row-label">أظهر قيمة محفظتي في الترتيب</span>
-        <button class="priv-toggle ${hidden?'off':''}" onclick="togglePrivacy()"><span class="knob"></span></button>
+        <button type="button" aria-label="تغيير إظهار قيمة المحفظة" class="priv-toggle ${hidden?'off':''}" onclick="togglePrivacy()"><span class="knob"></span></button>
       </div>
-      <div class="priv-status">${hidden?'🔒 قيمتك ونسبتك مخفيتان في الترتيب':'👁 قيمتك ونسبتك مرئيتان للجميع'}</div>
+      <div class="priv-status">${hidden?'🔒 قيمة المحفظة ونسبة الربح مخفيتان':'👁 قيمة المحفظة ونسبة الربح ظاهرتان'}</div>
+      <div class="priv-row" style="margin-top:8px">
+        <span class="priv-row-label">أظهر اسمي وصورتي في الترتيب</span>
+        <button type="button" aria-label="تغيير إظهار الاسم في الترتيب" class="priv-toggle ${currentUser.privacyHidden===true?'off':''}" onclick="toggleNamePrivacy()"><span class="knob"></span></button>
+      </div>
+      <div class="priv-status">${currentUser.privacyHidden===true?'🔒 سيظهر اسمك كمتداول محمي دون صورتك':'👤 سيظهر اسمك وصورتك في الترتيب'}</div>
     </div>
     ${isM?`<button style="width:100%;padding:14px;border-radius:13px;font-size:14px;font-weight:800;font-family:inherit;cursor:pointer;border:none;margin-top:16px;background:#1c222a;color:#0ecb81" onclick="resetMarketMode();closeSheet()">العودة للوضع التلقائي</button>`:''}
     <button style="width:100%;padding:14px;border-radius:13px;font-size:14px;font-weight:800;font-family:inherit;cursor:pointer;border:none;margin-top:9px;background:#1c222a;color:#f0b90b" onclick="resetState()">إعادة تعيين المنصة التعليمية (هذا الوضع)</button>
@@ -2521,10 +2528,34 @@ async function togglePrivacy(){
   }
 }
 
+/* إخفاء الاسم والصورة في الترتيب، مستقل عن إخفاء قيمة المحفظة */
+async function toggleNamePrivacy(){
+  if(!currentUser){toast('سجّل الدخول أولًا','warn');return;}
+  const oldValue=currentUser.privacyHidden===true,nextValue=!oldValue;
+  const buttons=sheetBody.querySelectorAll('.priv-toggle');buttons.forEach(b=>{b.disabled=true;b.style.opacity='.6';});
+  currentUser.privacyHidden=nextValue;
+  try{
+    if(!fbDb)throw new Error('firebase-unavailable');
+    await fbDb.collection('users').doc(currentUser.id).set({privacyHidden:nextValue,updatedAt:Date.now()},{merge:true});
+    ttLbInvalidate();
+    await updatePresence(true);
+    ttLbInvalidate();
+    toast(nextValue?'🔒 سيظهر اسمك كمتداول محمي في الترتيب':'👤 سيظهر اسمك في الترتيب','good');
+    openProfile();
+    if(currentTab==='rank')await renderRank();
+  }catch(e){
+    currentUser.privacyHidden=oldValue;
+    console.error('name privacy save failed',e);
+    toast('تعذّر حفظ إعداد الاسم في Firebase؛ تحقق من الاتصال والصلاحيات','warn');
+    openProfile();
+  }finally{sheetBody.querySelectorAll('.priv-toggle').forEach(b=>{b.disabled=false;b.style.opacity='1';});}
+}
+window.toggleNamePrivacy=toggleNamePrivacy;
+
 /* ============================================================
    MARKET MODE
    ============================================================ */
-function toggleMarketMode(){setTimeout(()=>{try{updatePresence(true);}catch(e){}},400);setTimeout(()=>{try{if(currentTab==='rank')renderRank();}catch(e){}},900);saveModeState();const cur=getMarketMode();const nxt=cur==='live'?'practice':'live';manualMode=nxt;try{localStorage.setItem('tt_manual_mode',nxt);}catch(e){}loadModeState(nxt);lastMarketMode=null;updateMarketStatus();render();updateHero();updateBellBadge();if(nxt==='live'){toast('تم التبديل إلى وضع السوق','good');pushNotification('rank','وضع السوق','تم التبديل يدويًا.');}else{toast('تم التبديل إلى وضع التدريب','warn');pushNotification('rank','وضع التدريب','تم التبديل يدويًا.');}}
+function toggleMarketMode(){try{ttLbInvalidate();}catch(e){}setTimeout(()=>{try{updatePresence(true);}catch(e){}},400);setTimeout(()=>{try{if(currentTab==='rank')renderRank();}catch(e){}},900);saveModeState();const cur=getMarketMode();const nxt=cur==='live'?'practice':'live';manualMode=nxt;try{localStorage.setItem('tt_manual_mode',nxt);}catch(e){}loadModeState(nxt);lastMarketMode=null;updateMarketStatus();render();updateHero();updateBellBadge();if(nxt==='live'){toast('تم التبديل إلى وضع السوق','good');pushNotification('rank','وضع السوق','تم التبديل يدويًا.');}else{toast('تم التبديل إلى وضع التدريب','warn');pushNotification('rank','وضع التدريب','تم التبديل يدويًا.');}}
 function resetMarketMode(){saveModeState();manualMode=null;try{localStorage.removeItem('tt_manual_mode');}catch(e){}const m=getMarketMode();loadModeState(m);lastMarketMode=null;updateMarketStatus();render();updateHero();toast('عاد للوضع التلقائي','good');}
 let lastMarketMode=null;
 function updateMarketStatus(){
@@ -2685,7 +2716,7 @@ function jrBody(){const L=lsG('jr_'+getMarketMode(),[]);if(!L.length)return'<div
 const _rr0=renderRank;
 renderRank=async function(){await _rr0();try{const m=getMarketMode()==='live'?'السوق':'التدريب';
  view.insertAdjacentHTML('afterbegin','<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><button onclick="document.querySelector(\'.tab[data-tab=market]\').click()" style="padding:9px 14px;border:none;border-radius:11px;background:#1c222a;color:#eaecef;font-weight:800;font-family:inherit;cursor:pointer">← رجوع</button><span style="font-size:12px;color:#f0b90b;font-weight:800">ترتيب وضع '+m+'</span></div>');
- if(window._myRank&&!document.querySelector('.rank-card.me')){view.insertAdjacentHTML('beforeend','<div style="background:rgba(240,185,11,.1);border:1px solid rgba(240,185,11,.4);border-radius:13px;padding:11px 14px;margin-top:8px;display:flex;justify-content:space-between;align-items:center"><b style="color:#f0b90b">ترتيبك: #'+window._myRank+' من '+(window._rankTotal||window._myRank)+'</b><span style="font-size:11px;color:#cfd6e0">'+(isBalanceHidden()||currentUser.balanceHidden?'🔒 مخفي':fmt(portfolioTotalValue())+' TND')+'</span></div>');}
+ if(window._myRank&&!document.querySelector('.rank-card.me')){view.insertAdjacentHTML('beforeend','<div style="background:rgba(240,185,11,.1);border:1px solid rgba(240,185,11,.4);border-radius:13px;padding:11px 14px;margin-top:8px;display:flex;justify-content:space-between;align-items:center"><b style="color:#f0b90b">ترتيبك: #'+window._myRank+' من '+(window._rankTotal||window._myRank)+'</b><span style="font-size:11px;color:#cfd6e0">'+(currentUser.balanceHidden===true?'🔒 مخفي':fmt(portfolioTotalValue())+' TND')+'</span></div>');}
  if(window._lbErr)view.insertAdjacentHTML('beforeend','<div style="text-align:center;color:#f6465d;font-size:11px;margin-top:8px">تعذّرت قراءة الترتيب ('+window._lbErr+')</div>');}catch(e){}};
 window.renderRank=renderRank;
 async function refreshMyRank(){const e=document.getElementById('heroRank');if(!e||!fbDb||!currentUser)return;const M=getMarketMode()==='live'?'live':'practice',nm=M==='live'?'السوق':'التدريب';
