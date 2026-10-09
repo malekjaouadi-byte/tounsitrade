@@ -2472,16 +2472,29 @@ function openProfile(){
   sheet.classList.add('on');backdrop.classList.add('on');
 }
 
-/* FIX #25: togglePrivacy */
-function togglePrivacy(){
+/* إعداد إظهار قيمة المحفظة في الترتيب — مستقل عن إخفاء الهوية */
+async function togglePrivacy(){
   if(!currentUser)return;
-  currentUser.privacyHidden=!currentUser.privacyHidden;
-  if(fbDb){
-    fbDb.collection('users').doc(currentUser.id).set({privacyHidden:currentUser.privacyHidden,updatedAt:Date.now()},{merge:true}).then(()=>{try{ttLbInvalidate();}catch(x){}}).catch(e=>console.warn('privacy save failed',e));
+  if(!fbDb){toast('تعذّر الاتصال بقاعدة البيانات؛ لم يتم حفظ الإعداد','warn');return;}
+  const oldValue=currentUser.balanceHidden===true;
+  const nextValue=!oldValue;
+  // لا نغيّر privacyHidden: هذا الخيار يتحكم في إظهار قيمة المحفظة ونسبة الربح فقط.
+  currentUser.balanceHidden=nextValue;
+  try{
+    await fbDb.collection('users').doc(currentUser.id).set({balanceHidden:nextValue,updatedAt:Date.now()},{merge:true});
+    try{ttLbInvalidate();}catch(x){}
+    try{await updatePresence(true);}catch(x){}
+    toast(nextValue?'🔒 تم إخفاء قيمة محفظتك في الترتيب':'👁 أصبحت قيمة محفظتك مرئية في الترتيب','good');
+    closeSheet();
+    if(currentTab==='rank')await renderRank();
+    setTimeout(()=>openProfile(),150);
+  }catch(e){
+    currentUser.balanceHidden=oldValue;
+    console.error('portfolio visibility save failed',e);
+    toast('فشل حفظ الإعداد في Firebase. تحقق من صلاحيات Firestore ثم أعد المحاولة','warn');
+    closeSheet();
+    setTimeout(()=>openProfile(),150);
   }
-  toast(currentUser.privacyHidden?'🔒 تم إخفاء قيمتك':'👁 قيمتك مرئية الآن','good');
-  closeSheet();
-  setTimeout(()=>openProfile(),150);
 }
 
 /* ============================================================
