@@ -2446,7 +2446,7 @@ function openProfile(){
   const cl=Object.keys(lessonProgress.completed).length,tl=LESSONS.length;
   const mode=getMarketMode(),ml=mode==='live'?'وضع السوق':'وضع التدريب',isM=manualMode!==null;
   const lv=getLevel(userXP);
-  const hidden=currentUser.privacyHidden===true;
+  const hidden=currentUser.balanceHidden===true;
   sheetBody.innerHTML=`<div class="sh-head"><div style="display:flex;align-items:center;gap:12px"><div class="hero-avatar" style="width:52px;height:52px;font-size:22px;background:linear-gradient(135deg,${currentUser.avatarColor||'#f0b90b'},${shade(currentUser.avatarColor||'#f0b90b',-30)})">${av}<div class="online-badge"></div></div><div><div class="sh-tk" style="font-size:17px">${currentUser.name}</div><div class="sh-nm" style="margin-top:3px">${lv.icon} ${lv.name} · ${userXP} XP</div></div></div><button class="sh-close" onclick="closeSheet()">×</button></div>
     <div class="sh-stats" style="margin-top:16px"><div class="stat"><div class="sl">قيمة المحفظة</div><div class="sv">${fmt(mv)}</div></div><div class="stat"><div class="sl">الأرباح</div><div class="sv ${cls(mp)}">${mp>=0?'+':''}${mp.toFixed(2)}%</div></div><div class="stat"><div class="sl">المراكز</div><div class="sv">${Object.keys(holdings).length}</div></div></div>
     <div style="margin-top:14px"><div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #1c222a;font-size:12px"><span style="color:#7b8494">طريقة الدخول</span><span style="font-weight:700">${pl}</span></div>
@@ -2472,28 +2472,33 @@ function openProfile(){
   sheet.classList.add('on');backdrop.classList.add('on');
 }
 
-/* إعداد إظهار قيمة المحفظة في الترتيب — مستقل عن إخفاء الهوية */
+/* إعداد إظهار قيمة المحفظة في الترتيب — يعمل في وضعي التدريب والسوق */
 async function togglePrivacy(){
-  if(!currentUser)return;
-  if(!fbDb){toast('تعذّر الاتصال بقاعدة البيانات؛ لم يتم حفظ الإعداد','warn');return;}
+  if(!currentUser){toast('سجّل الدخول أولًا','warn');return;}
+  const btn=sheetBody.querySelector('.priv-toggle');
+  if(btn){btn.disabled=true;btn.style.opacity='.6';}
   const oldValue=currentUser.balanceHidden===true;
   const nextValue=!oldValue;
-  // لا نغيّر privacyHidden: هذا الخيار يتحكم في إظهار قيمة المحفظة ونسبة الربح فقط.
+  // حدّث الواجهة فورًا، ثم احفظ الخيار المستقل عن إخفاء الهوية.
   currentUser.balanceHidden=nextValue;
   try{
+    if(!fbDb)throw new Error('firebase-unavailable');
     await fbDb.collection('users').doc(currentUser.id).set({balanceHidden:nextValue,updatedAt:Date.now()},{merge:true});
     try{ttLbInvalidate();}catch(x){}
-    try{await updatePresence(true);}catch(x){}
-    toast(nextValue?'🔒 تم إخفاء قيمة محفظتك في الترتيب':'👁 أصبحت قيمة محفظتك مرئية في الترتيب','good');
-    closeSheet();
+    // حدّث قيمة الوضعين مع الاحتفاظ بإعداد الخصوصية.
+    try{await updatePresence(true);}catch(x){console.warn('presence refresh after privacy save',x);}
+    toast(nextValue?'🔒 تم إخفاء قيمة محفظتك ونسبة الربح في الترتيب':'👁 أصبحت قيمة محفظتك ونسبة الربح مرئيتين في الترتيب','good');
+    openProfile();
     if(currentTab==='rank')await renderRank();
-    setTimeout(()=>openProfile(),150);
+    // عند الرجوع إلى الترتيب، لا تستخدم بيانات مخزنة قديمة لأي من الوضعين.
+    try{ttLbInvalidate();}catch(x){}
   }catch(e){
     currentUser.balanceHidden=oldValue;
     console.error('portfolio visibility save failed',e);
-    toast('فشل حفظ الإعداد في Firebase. تحقق من صلاحيات Firestore ثم أعد المحاولة','warn');
-    closeSheet();
-    setTimeout(()=>openProfile(),150);
+    toast('لم يُحفظ الإعداد. تحقق من اتصال Firebase وصلاحيات Firestore ثم أعد المحاولة','warn');
+    openProfile();
+  }finally{
+    const b=sheetBody.querySelector('.priv-toggle');if(b){b.disabled=false;b.style.opacity='1';}
   }
 }
 
