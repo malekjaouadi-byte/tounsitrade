@@ -1312,7 +1312,7 @@ function saveState(){
 
 async function _flushState(){
   if(!stateLoaded||!currentUser||!fbDb||!_stateDirty)return false;
-  if(window._cloudOK===false){try{const _d=await fbDb.doc(stateDocPath()).get();if(_d.exists)return false;window._cloudOK=true;}catch(e){return false;}}
+  if(window._cloudOK===false){try{const _d=await fbDb.doc(stateDocPath()).get();let _local=null;try{_local=JSON.parse(localStorage.getItem('tt_bk_'+currentUser.id)||'null');}catch(_e){}const _remoteAt=_d.exists?Number((_d.data()||{}).updatedAt)||0:0;const _localAt=_local?Number(_local.updatedAt)||0:0;if(_d.exists&&(!_local||_remoteAt>=_localAt))return false;window._cloudOK=true;}catch(e){return false;}}
 _stateDirty=false;
   if(_flushTimer){clearTimeout(_flushTimer);_flushTimer=null;}
   try{
@@ -1330,7 +1330,7 @@ async function loadState(){
   if(!currentUser||!fbDb)return false;
   try{
     let rs=null,lerr=null;
-try{const doc=await fbDb.doc(stateDocPath()).get();if(doc.exists)rs=doc.data();}catch(e){lerr=e;}
+try{const doc=await Promise.race([fbDb.doc(stateDocPath()).get(),new Promise((_,reject)=>setTimeout(()=>reject(new Error('state-load-timeout')),8000))]);if(doc.exists)rs=doc.data();}catch(e){lerr=e;}
 let ls=null;try{ls=JSON.parse(localStorage.getItem('tt_bk_'+currentUser.id)||'null');}catch(e){}
 window._cloudOK=!lerr;window._loadErr=lerr?cleanText((lerr.code)||(lerr.message)||'',30):null;let s=rs;window._usedLocal=false;
 if(ls&&(!rs||(ls.updatedAt||0)>(rs.updatedAt||0))){s=ls;window._usedLocal=true;}
@@ -1353,7 +1353,7 @@ if(!s){if(lerr)throw lerr;return false;}
     if(s.adaptive)adaptiveState=s.adaptive;
     // جلب privacyHidden من users collection
     try{
-      const u=await fbDb.collection('users').doc(currentUser.id).get();
+      const u=await Promise.race([fbDb.collection('users').doc(currentUser.id).get(),new Promise((_,reject)=>setTimeout(()=>reject(new Error('profile-load-timeout')),4000))]);
       if(u.exists){const ud=u.data();currentUser.privacyHidden=ud.privacyHidden===true;currentUser.balanceHidden=ud.balanceHidden===true;if(typeof ud.hideBalanceOnDevice==='boolean'){const hb=ud.hideBalanceOnDevice;window._ttHideBalance=hb;try{localStorage.setItem('tt_hide_balance',hb?'1':'0');}catch(x){}}else{window._ttHideBalance=isBalanceHidden();}}
     }catch(e){}
     loadModeState(getMarketMode());
@@ -1413,7 +1413,7 @@ function render(){try{adjustLayoutForTabs();}catch(e){}try{if((currentTab==='hom
 function displayId(s){return ttGetCompanyDisplay(s.id,getMarketMode()).id;}
 function holdingsValue(){return Object.entries(holdings).reduce((sum,[id,h])=>{const s=STOCKS.find(x=>x.id===id);return sum+(s?s.price*h.qty:0);},0);}
 function reservedOrderValue(){return (pendingOrders||[]).reduce((sum,o)=>sum+(o.type==='buy'?(Number(o.reserveCost)||0):0),0);}
-function portfolioTotalValue(){return cash+holdingsValue();} // الأموال المحجوزة للأوامر ليست ضمن الرصيد المتاح أو قيمة المحفظة المعروضة
+function portfolioTotalValue(){return cash+holdingsValue()+reservedOrderValue();} // المبلغ المحجوز ما زال ملكًا للمستخدم ويُحتسب ضمن قيمة المحفظة لا ضمن السيولة المتاحة
 function totalActiveOrders(){return pendingOrders.length+alerts.length;}
 function canAddOrder(){return totalActiveOrders()<MAX_ORDERS;}
 function addTrade(sym,side,qty,price){try{_jrHook(sym,side,qty,price);}catch(e){}setTimeout(()=>{try{_flushState();}catch(e){}},2500);recentTrades.unshift({sym,side,qty,price,t:Date.now()});if(recentTrades.length>100)recentTrades.pop();}
@@ -2684,7 +2684,7 @@ document.addEventListener('pointerup',up);document.addEventListener('pointercanc
 document.addEventListener('gesturestart',e=>{if(inBox(e))e.preventDefault();});})();
 
 /* ===== ترتيب منفصل لكل وضع ===== */
-function modeBoard(){try{saveModeState();}catch(e){}const o={};for(const m of ['practice','live']){const st=STATE[m];if(!st)continue;let v=st.cash||0;for(const id in (st.holdings||{})){const h=st.holdings[id],z=(st.stocks||[]).find(x=>x.id===id);if(h&&z)v+=h.qty*z.price;}v=Math.max(0,Math.min(5e6,v));o[m+'Value']=v;o[m+'Pct']=Math.max(-100,Math.min(5000,(v/STARTING_CASH-1)*100));}return o;}
+function modeBoard(){try{saveModeState();}catch(e){}const o={};for(const m of ['practice','live']){const st=STATE[m];if(!st)continue;let v=st.cash||0;for(const id in (st.holdings||{})){const h=st.holdings[id],z=(st.stocks||[]).find(x=>x.id===id);if(h&&z)v+=h.qty*z.price;}for(const o of (st.pendingOrders||[])){if(o&&o.type==='buy')v+=Math.max(0,Number(o.reserveCost)||0);}v=Math.max(0,Math.min(5e6,v));o[m+'Value']=v;o[m+'Pct']=Math.max(-100,Math.min(5000,(v/STARTING_CASH-1)*100));}return o;}
 /* ===== ساعات العالم ===== */
 const CLK=[['تونس','Africa/Tunis','🇹🇳',[9,0,14,0]],['نيويورك','America/New_York','🇺🇸',[9,30,16,0]],['لندن','Europe/London','🇬🇧',[8,0,16,30]]];
 function clocksHTML(){return CLK.map(c=>{const p={};try{new Intl.DateTimeFormat('en-GB',{timeZone:c[1],hour:'2-digit',minute:'2-digit',second:'2-digit',weekday:'short',hourCycle:'h23'}).formatToParts(new Date()).forEach(x=>p[x.type]=x.value);}catch(e){return'';}const m=(+p.hour)*60+(+p.minute),wd=p.weekday!=='Sat'&&p.weekday!=='Sun',h=c[3],open=wd&&m>=h[0]*60+h[1]&&m<h[2]*60+h[3];return`<div class="c"><div class="n">${c[2]} ${c[0]} <span style="color:${open?'#0ecb81':'#f6465d'}">●</span></div><div class="t">${p.hour}:${p.minute}:${p.second}</div></div>`;}).join('');}
