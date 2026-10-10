@@ -2747,7 +2747,21 @@ renderRank=async function(){await _rr0();try{const m=getMarketMode()==='live'?'�
  if(window._lbErr)view.insertAdjacentHTML('beforeend','<div style="text-align:center;color:#f6465d;font-size:11px;margin-top:8px">تعذّرت قراءة الترتيب ('+window._lbErr+')</div>');}catch(e){}};
 window.renderRank=renderRank;
 async function refreshMyRank(){const e=document.getElementById('heroRank');if(!e||!fbDb||!currentUser)return;const M=getMarketMode()==='live'?'live':'practice',nm=M==='live'?'السوق':'التدريب';
- try{await updatePresence(true);const col=M+'Value';const snap=await fbDb.collection('users').orderBy(col,'desc').get();let rank=0,total=0,found=false;snap.forEach(d=>{total++;if(d.id==currentUser.id){rank=total;found=true;}});if(!found){const mine=await fbDb.collection('users').doc(currentUser.id).get();if(mine.exists){const val=Number(mine.data()[col]);rank=1;snap.forEach(d=>{if(d.id!==currentUser.id&&Number(d.data()[col]||0)>val)rank++;});total=Math.max(total,rank);found=true;}}if(!found)throw new Error('rank-user-missing');window._myRank=rank;window._rankTotal=total;e.innerHTML='🏆 ترتيبك في وضع '+nm+': <b>#'+rank+'</b> من '+total+' متداول';}catch(x){console.warn('personal rank failed',x);e.innerHTML='🏆 الترتيب قيد التحديث';setTimeout(()=>{if(currentUser&&document.getElementById('heroRank'))refreshMyRank();},10000);}}
+ try{
+   await updatePresence(true);
+   const col=M+'Value';
+   // Read all visible profiles, including users whose ranking field was not yet indexed/populated.
+   const snap=await fbDb.collection('users').get();
+   let mine=null,total=0,rank=1;
+   snap.forEach(d=>{total++;const data=d.data()||{};if(d.id===currentUser.id)mine=data;});
+   if(!mine){const m=await fbDb.collection('users').doc(currentUser.id).get();if(m.exists){mine=m.data()||{};total=Math.max(total+1,1);} }
+   if(!mine)throw new Error('rank-user-missing');
+   const mineValue=Number(mine[col]);
+   const safeMine=Number.isFinite(mineValue)&&mineValue>0?mineValue:STARTING_CASH;
+   snap.forEach(d=>{if(d.id===currentUser.id)return;const data=d.data()||{};const raw=Number(data[col]);const val=Number.isFinite(raw)&&raw>0?raw:STARTING_CASH;if(val>safeMine)rank++;});
+   window._myRank=rank;window._rankTotal=Math.max(total,rank);
+   e.innerHTML='🏆 ترتيبك في وضع '+nm+': <b>#'+rank+'</b> من '+window._rankTotal+' متداول';
+ }catch(x){console.warn('personal rank failed',x);e.innerHTML='🏆 الترتيب قيد التحديث';setTimeout(()=>{if(currentUser&&document.getElementById('heroRank'))refreshMyRank();},10000);}}
 window.refreshMyRank=refreshMyRank;
 setInterval(()=>{try{if(currentUser&&!document.hidden)refreshMyRank();}catch(e){}},180000);
 (function _rankBoot(){let n=0;const t=setInterval(()=>{n++;try{if(currentUser&&fbDb&&stateLoaded){clearInterval(t);refreshMyRank();}else if(n>20)clearInterval(t);}catch(e){clearInterval(t);}},500);})();
