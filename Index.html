@@ -1141,7 +1141,7 @@ async function loginEmail(){
   btn.disabled=false;btn.textContent='تسجيل الدخول';
 }
 
-async function logout(){if(!(await askConfirm('تسجيل الخروج؟ سيتم حفظ تقدمك.')))return;saveState();try{await _flushState();}catch(e){}closeSheet();try{await fbAuth.signOut();}catch(e){}appStarted=false;clearLocalState();toast('تم تسجيل الخروج','good');}
+async function logout(){if(!(await askConfirm('تسجيل الخروج؟ سيتم حفظ تقدمك.')))return;saveState();try{await _flushState(true);}catch(e){}closeSheet();try{await fbAuth.signOut();}catch(e){}appStarted=false;clearLocalState();toast('تم تسجيل الخروج','good');}
 
 function clearLocalState(){
   ['practice','live'].forEach(m=>{STATE[m]={cash:STARTING_CASH,holdings:{},pendingOrders:[],alerts:[],recentTrades:[],orderSeq:1,valueHistory:[{t:Date.now(),v:STARTING_CASH}],stocks:buildStocksFor(m),market:{value:9850,open:9850,drift:0.0000008,vol:0.0012,ret:0}};});
@@ -1299,7 +1299,7 @@ async function _saveStateNow(){
     try{
       saveModeState();
       await fbDb.doc(stateDocPath()).set(_buildState(),{merge:false});
-      window._lastCloud=Date.now();window._cloudErr=null;try{_hc();}catch(x){}
+      window._lastCloud=Date.now();window._lastCloudWriteAt=window._lastCloud;window._cloudErr=null;try{_hc();}catch(x){}
       return true;
     }catch(e){
       window._cloudErr=cleanText((e&&e.code)||(e&&e.message)||'error',30);try{_hc();}catch(x){}
@@ -1327,14 +1327,23 @@ function saveState(){
   _flushTimer=setTimeout(()=>{_flushTimer=null;_flushState();},1800);
 }
 
-async function _flushState(){
+async function _flushState(force=false){
   if(!stateLoaded||!currentUser||!fbDb||!_stateDirty)return false;
   if(window._cloudOK===false){try{const _d=await fbDb.doc(stateDocPath()).get();let _local=null;try{_local=JSON.parse(localStorage.getItem('tt_bk_'+currentUser.id)||'null');}catch(_e){}const _remoteAt=_d.exists?Number((_d.data()||{}).updatedAt)||0:0;const _localAt=_local?Number(_local.updatedAt)||0:0;if(_d.exists&&(!_local||_remoteAt>=_localAt))return false;window._cloudOK=true;}catch(e){return false;}}
-_stateDirty=false;
+  // Local backup is written immediately by saveState(); cloud writes are throttled to reduce Firestore load.
+  const last=Number(window._lastCloudWriteAt)||0;
+  const wait=SAVE_THROTTLE_MS-(Date.now()-last);
+  if(!force&&last>0&&wait>0){
+    if(_flushTimer)clearTimeout(_flushTimer);
+    _flushTimer=setTimeout(()=>{_flushTimer=null;_flushState(false);},wait+50);
+    return false;
+  }
+  _stateDirty=false;
   if(_flushTimer){clearTimeout(_flushTimer);_flushTimer=null;}
   try{
     const ok=await _saveStateNow();
-    if(!ok){_stateDirty=true;if(!_flushTimer)_flushTimer=setTimeout(()=>{_flushTimer=null;_flushState();},60000);}
+    if(!ok){_stateDirty=true;if(!_flushTimer)_flushTimer=setTimeout(()=>{_flushTimer=null;_flushState(false);},60000);}
+    else if(_stateDirty&&!_flushTimer){_flushTimer=setTimeout(()=>{_flushTimer=null;_flushState(false);},Math.max(50,SAVE_THROTTLE_MS-(Date.now()-(Number(window._lastCloudWriteAt)||Date.now()))+50));}
     return ok;
   }catch(e){
     _stateDirty=true;
@@ -2663,7 +2672,7 @@ function calBody(){const fr=lsG('lang','ar')==='fr',now=Date.now(),pend=lsG('dvp
   const st=now<e.ex?(fr?'Date : ':(isD?'قطع الكوبون: ':'تاريخ التنفيذ: '))+fd(e.ex):(isD&&now<e.pay)?(fr?'Détaché · paiement : ':'قُطع الكوبون · الدفع: ')+fd(e.pay):(fr?'✓ Effectué':'✓ تم');
   const mine=isD?(p?p.amt:q*e.dps):0;
   return`<div style="padding:11px 0;border-bottom:1px solid #1c222a"><div style="display:flex;justify-content:space-between;align-items:center"><b>${ttl}</b>${(q>0||p)?`<span style="font-size:10px;background:#1c222a;border-radius:8px;padding:3px 7px;color:#f0b90b">${fr?'Vous détenez':'تملكه'}</span>`:''}</div><div style="font-size:12px;color:${col};margin-top:4px">${st}</div>${(isD&&(q>0||p))?`<div style="font-size:11px;color:#8b95a5;margin-top:2px">${fr?'Montant estimé':'المبلغ المتوقع'}: ${mine.toFixed(2)} TND</div>`:''}</div>`;}).join('');}
-setInterval(divTick,60000);async function forceSave(){try{if(window._cloudOK===false||window._cloudErr){runDiag();return;}_stateDirty=true;const r=await _flushState();toast(r?'تم الحفظ ☁️':'حُفظ على جهازك — تعذّرت المزامنة السحابية الآن',r?'good':'warn');}catch(e){toast('تعذّر الحفظ','warn');}}
+setInterval(divTick,60000);async function forceSave(){try{if(window._cloudOK===false||window._cloudErr){runDiag();return;}_stateDirty=true;const r=await _flushState(true);toast(r?'تم الحفظ ☁️':'حُفظ على جهازك — تعذّرت المزامنة السحابية الآن',r?'good':'warn');}catch(e){toast('تعذّر الحفظ','warn');}}
 window.forceSave=forceSave;
 const APP_BUILD='نسخة 10-10-r15';
 function ttCloudErrMsg(c){c=String(c||'').toLowerCase();
@@ -2791,8 +2800,8 @@ window.openPhilosophy=openPhilosophy;window.togglePrivacy=togglePrivacy;
 let _ttN=0;setInterval(()=>{_ttN++;try{if(_ttN%2===0){if(!document.hidden)updateClocks();updateMarketStatus();}if(_ttN%3===0)tick();}catch(e){console.error('scheduler',e);}},500);
 setInterval(()=>{if(currentUser){const v=cash+holdingsValue();valueHistory.push({t:Date.now(),v});if(valueHistory.length>2000)valueHistory.shift();}},30000);
 updateMarketStatus();
-window.addEventListener('beforeunload',()=>{_flushState();});
-document.addEventListener('visibilitychange',()=>{if(document.hidden){_flushState();}});window.addEventListener('pagehide',()=>{_flushState();});
+window.addEventListener('beforeunload',()=>{_flushState(true);});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){_flushState(true);}});window.addEventListener('pagehide',()=>{_flushState(true);});
 </script>
 </body>
 <!--
