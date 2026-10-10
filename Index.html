@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#0b0e11"><link rel="apple-touch-icon" href="1000056746.jpg"><meta name="mobile-web-app-capable" content="yes">
 <meta name="description" content="TounsiTrade: محاكي تعليمي للتداول في البورصة التونسية برصيد افتراضي ودروس عربية مبسّطة.">
 <title>TounsiTrade — محاكي التداول التونسي</title>
@@ -569,311 +569,61 @@ button[aria-label="More"]{display:none!important}
 .advh-log:last-child{border-bottom:none}
 .advh-log small{color:#5e6673;font-size:9.5px;margin-right:6px}
 
-
-/* =========================================================
-   TounsiTrade UI Refresh — unified premium dark interface
-   Arabic-first, responsive, original Tunisian logo preserved.
-   CSS-only redesign: keeps existing DOM and app logic intact.
-   ========================================================= */
-:root{
-  --tt-bg:#07111f;--tt-surface:#0d1b2b;--tt-surface-2:#122338;
-  --tt-line:rgba(158,190,220,.14);--tt-text:#f3f7fc;--tt-muted:#91a4ba;
-  --tt-green:#19d69a;--tt-red:#ff667a;--tt-gold:#e8bd65;--tt-blue:#69a9ff;
-  --tt-radius:18px;--tt-shadow:0 12px 30px rgba(0,0,0,.22);
+/* TounsiTrade modern responsive redesign v2 — appended override */
+:root{--tt-bg:#080d16;--tt-panel:#101a2a;--tt-panel2:#142238;--tt-line:rgba(148,170,205,.16);--tt-accent:#19c99a;--tt-blue:#438cff;--tt-gold:#e8c36a;--tt-text:#edf3ff;--tt-muted:#92a2bb}
+html{background:var(--tt-bg);min-height:100%;scrollbar-color:#334762 #0b1220}
+body{background:radial-gradient(ellipse at 50% -15%,#1b3150 0,transparent 50%),var(--tt-bg);color:var(--tt-text);justify-content:stretch;align-items:stretch;min-height:100vh;min-height:100dvh}
+.app{width:100%;max-width:none;height:100vh;height:100dvh;min-height:100vh;min-height:100dvh;background:transparent;border:0;border-radius:0;box-shadow:none;overflow:hidden}
+#mainApp{width:100%;max-width:none;min-width:0}
+.topbar{padding:18px clamp(18px,3vw,42px) 14px;background:rgba(8,13,22,.82);border-bottom:1px solid var(--tt-line);backdrop-filter:blur(18px);gap:18px}
+.brand-name{letter-spacing:.2px}
+.icon-btn{border:1px solid var(--tt-line);background:var(--tt-panel);border-radius:13px;transition:transform .18s,border-color .18s,background .18s}
+.icon-btn:hover{transform:translateY(-1px);border-color:rgba(67,140,255,.6);background:var(--tt-panel2)}
+.hero{margin:18px clamp(16px,3vw,42px) 16px;padding:clamp(20px,2vw,30px);border-radius:24px;background:linear-gradient(120deg,rgba(28,55,87,.95),rgba(15,27,44,.98) 60%,rgba(17,47,55,.95));border:1px solid rgba(130,167,216,.22);box-shadow:0 16px 48px rgba(0,0,0,.15)}
+.stats-card,.market-status,.users-strip,.auth-content,.auth-form,.auth-screen,.register-screen,.login-screen{border-color:var(--tt-line)}
+button,.btn-primary,.btn-secondary,.btn-start,.market-status,.nav-item{transition:transform .16s ease,filter .16s ease,border-color .16s ease}
+button:active,.btn-primary:active,.btn-secondary:active,.btn-start:active{transform:scale(.985)}
+.btn-primary{background:linear-gradient(135deg,#18c99a,#0da982);box-shadow:0 7px 20px rgba(25,201,154,.13);border:0}
+.btn-secondary{border:1px solid var(--tt-line);background:#142238}
+.auth-screen{background:radial-gradient(ellipse at 50% 15%,#1a304b 0,transparent 55%),#080d16}
+.auth-content{border:1px solid var(--tt-line);background:rgba(15,25,41,.72);backdrop-filter:blur(16px);border-radius:26px;box-shadow:0 24px 80px rgba(0,0,0,.24)}
+.auth-input{background:#0b1422;border:1px solid #293951;border-radius:13px;color:var(--tt-text)}
+.auth-input:focus{border-color:var(--tt-blue);box-shadow:0 0 0 3px rgba(67,140,255,.12)}
+#view{min-width:0;overscroll-behavior:contain}
+#sheet{border:1px solid var(--tt-line);box-shadow:0 -20px 80px rgba(0,0,0,.4)}
+#sheetBody{scrollbar-width:thin;scrollbar-color:#334762 transparent}
+.market-status{border:1px solid var(--tt-line);border-radius:14px}
+.hero-links button,.name-choice button{border:1px solid var(--tt-line);border-radius:12px}
+input,select,textarea{accent-color:var(--tt-accent)}
+::-webkit-scrollbar{width:9px;height:9px}::-webkit-scrollbar-track{background:rgba(6,11,19,.35)}::-webkit-scrollbar-thumb{background:#2b3c55;border-radius:20px;border:2px solid transparent;background-clip:padding-box}
+@media(min-width:900px){
+ body{padding:0}
+ .app{max-width:none;width:100%;margin:0}
+ .topbar{min-height:78px;padding-inline:clamp(28px,4vw,64px)}
+ #mainApp{width:100%;height:100%;}
+ #view{width:100%;max-width:none;margin:0;padding-inline:clamp(20px,4vw,64px);}
+ .hero{margin-inline:0}
+ .stats-card{margin-inline:0}
+ .users-strip{margin-inline:0}
+ .world-clocks{padding-inline:clamp(20px,4vw,64px)}
+ .auth-content{width:min(560px,calc(100vw - 48px));max-width:560px;margin-inline:auto;padding:clamp(28px,3vw,44px)}
+ .auth-logo-wrap{margin-bottom:18px}
+ .auth-title{font-size:clamp(26px,2vw,34px)}
+ .auth-form{width:100%}
+ .auth-input{min-height:48px;font-size:15px}
+ .btn-primary,.btn-secondary,.btn-start{min-height:46px}
 }
-html{background:var(--tt-bg);color-scheme:dark;scroll-behavior:smooth}
-body{background:radial-gradient(ellipse at 50% -10%,#15365a 0%,#07111f 48%,#050b14 100%)!important;color:var(--tt-text)!important;font-family:Tahoma,"Segoe UI",system-ui,sans-serif!important}
-.app,#mainApp{background:linear-gradient(180deg,#091727 0%,#07111f 100%)!important;color:var(--tt-text)!important;box-shadow:0 0 0 1px rgba(157,192,225,.08),0 24px 80px rgba(0,0,0,.35)}
-#mainApp>div:first-child{background:rgba(7,17,31,.96)!important;backdrop-filter:blur(16px);border-bottom:1px solid var(--tt-line)}
-.topbar{padding:15px 17px 12px!important;gap:12px!important}
-.logo,.auth-logo{border-radius:15px!important;box-shadow:0 0 0 1px rgba(232,189,101,.55),0 5px 18px rgba(232,189,101,.13)!important;overflow:hidden}
-.brand-name{font-size:16px!important;letter-spacing:.1px!important;color:#f8fbff}
-.brand-sub{color:var(--tt-muted)!important}
-.icon-btn{width:42px!important;height:42px!important;border-radius:14px!important;background:linear-gradient(145deg,#14263b,#0d1a2a)!important;border:1px solid var(--tt-line)!important;box-shadow:0 5px 14px rgba(0,0,0,.16)}
-.users-strip{margin:0 16px 9px!important;background:rgba(25,214,154,.07)!important;border-color:rgba(25,214,154,.18)!important;color:#80f0c8!important;border-radius:12px!important;padding:8px 12px!important;font-size:10.5px!important}
-.wclk{gap:8px!important;padding:0 16px!important}
-.wclk .c{background:rgba(18,35,56,.76)!important;border:1px solid var(--tt-line)!important;border-radius:13px!important;padding:8px 4px!important}
-.wclk .n{color:var(--tt-muted)!important}
-.wclk .t{color:#edf5ff!important;font-size:14px!important}
-.tabs{margin:0 14px 12px!important;padding:5px!important;gap:5px!important;border-radius:16px!important;background:#0d1a2a!important;border:1px solid var(--tt-line)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.025)}
-.tab{border-radius:12px!important;padding:9px 2px!important;color:#8ca0b8!important;font-size:10.5px!important;gap:4px!important}
-.tab .ticon{font-size:17px!important}
-.tab.on{background:linear-gradient(145deg,#1c3854,#142941)!important;color:#fff!important;box-shadow:inset 0 0 0 1px rgba(105,169,255,.22),0 3px 10px rgba(0,0,0,.16)}
-.market-status{margin:0 15px 12px!important;padding:11px 14px!important;border-radius:14px!important;border:1px solid var(--tt-line)!important;box-shadow:0 4px 14px rgba(0,0,0,.12);background:rgba(18,35,56,.7)!important}
-.market-status.practice{border-color:rgba(232,189,101,.22)!important;background:linear-gradient(100deg,rgba(232,189,101,.10),rgba(18,35,56,.78))!important}
-.market-status.live{border-color:rgba(25,214,154,.22)!important;background:linear-gradient(100deg,rgba(25,214,154,.10),rgba(18,35,56,.78))!important}
-.hero{margin:0 15px 15px!important;padding:18px!important;border-radius:22px!important;background:radial-gradient(circle at 0% 0%,rgba(55,122,190,.24),transparent 45%),linear-gradient(145deg,#142a43,#0c1b2d 72%)!important;border:1px solid rgba(120,170,220,.2)!important;box-shadow:var(--tt-shadow)!important}
-.hero::after{background:radial-gradient(circle,rgba(105,169,255,.16),transparent 70%)!important;opacity:.8}
-.hero-l{color:#afc2d7!important;font-size:12px!important;font-weight:700}
-.hero-v{font-size:clamp(27px,7vw,34px)!important;font-weight:900!important;letter-spacing:-.6px!important;color:#fff!important;line-height:1.35}
-.hero-v span{color:#a7bad0!important;font-size:13px!important;letter-spacing:0}
-.hero-rank{color:#f0d18a!important}
-.hero-avatar{background:linear-gradient(145deg,#f0d18a,#b98532)!important;box-shadow:0 0 0 4px rgba(232,189,101,.11),0 5px 14px rgba(0,0,0,.22)}
-.pill{border-radius:10px!important;padding:6px 9px!important;font-size:10.5px!important}
-#view{padding-bottom:24px}
-/* Shared cards and panels across every app section */
-.card,.panel,.box-card,.lesson-card,.course-card,.profile-card,.settings-card,.stat-card,.summary-card,.trade-card,.order-card,.history-card,.leader-card,.quiz-card,.news-card,.challenge-card,.achievement-card,.modal-card{
-  border-radius:17px!important;border-color:var(--tt-line)!important;background:linear-gradient(145deg,rgba(17,35,55,.97),rgba(11,25,41,.97))!important;box-shadow:0 7px 20px rgba(0,0,0,.13)!important
+@media(min-width:1200px){
+ .hero{padding:28px 32px;border-radius:26px}
+ .topbar{padding-inline:48px}
+ #view{padding-inline:48px}
 }
-.section-title,.sec-title,.page-title,.view-title{color:#f1f6fc!important;font-weight:900!important;letter-spacing:-.15px}
-.stock-row{background:linear-gradient(110deg,#10243a,#0c1b2d)!important;border:1px solid var(--tt-line)!important;border-radius:15px!important;padding:12px 13px!important;box-shadow:0 4px 12px rgba(0,0,0,.1);transition:transform .16s ease,border-color .16s ease,background .16s ease!important}
-.stock-row:active{transform:scale(.985)!important;background:#17304a!important}
-.sr-ico{border-radius:12px!important}
-button,.btn-primary,.btn-secondary,.btn-social{transition:transform .15s ease,filter .15s ease,box-shadow .15s ease}
-button:active{filter:brightness(1.08)}
-.btn-primary{background:linear-gradient(135deg,#20d6a0,#0caa7c)!important;color:#041b18!important;box-shadow:0 7px 20px rgba(25,214,154,.17)!important;border-radius:13px!important}
-.btn-secondary{background:#15283d!important;border:1px solid var(--tt-line)!important;color:#e3edf8!important;border-radius:13px!important}
-button.y{background:linear-gradient(135deg,#f0d18a,#c69442)!important;color:#1d1609!important;border-radius:14px!important;box-shadow:0 8px 22px rgba(232,189,101,.18)!important}
-button.g{background:rgba(16,34,53,.92)!important;color:#edf5ff!important;border:1px solid rgba(155,190,225,.2)!important;border-radius:14px!important}
-input,select,textarea,.auth-input{background:#091827!important;color:#f2f7fd!important;border:1px solid rgba(144,178,211,.24)!important;border-radius:12px!important;outline:none}
-input:focus,select:focus,textarea:focus,.auth-input:focus{border-color:rgba(105,169,255,.75)!important;box-shadow:0 0 0 3px rgba(105,169,255,.12)!important}
-label,.auth-label{color:#b7c8da!important}
-.sheet{background:linear-gradient(180deg,#12253a,#0a1726)!important;border-top:1px solid rgba(144,178,211,.22)!important;border-radius:24px 24px 0 0!important;box-shadow:0 -16px 45px rgba(0,0,0,.32)!important}
-.grab{background:#51677e!important;width:42px!important;height:4px!important;border-radius:5px!important}
-.backdrop{backdrop-filter:blur(4px);background:rgba(2,8,16,.68)!important}
-.toast{border:1px solid var(--tt-line)!important;border-radius:14px!important;box-shadow:0 12px 28px rgba(0,0,0,.3)!important}
-.pf-btn-mini,.pf-btn-blue{border-radius:17px!important;box-shadow:0 9px 20px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.2)!important}
-.mkt-seg{background:#0c1a2a!important;border-color:var(--tt-line)!important;border-radius:15px!important}
-.mkt-seg-row button{border-radius:11px!important}
-.mkt-seg-row button.on.prac{background:rgba(25,214,154,.13)!important;border-color:rgba(25,214,154,.4)!important;color:#53e8b9!important}
-.mkt-seg-row button.on.live{background:rgba(255,102,122,.12)!important;border-color:rgba(255,102,122,.38)!important;color:#ff9aa8!important}
-.adv-card{background:rgba(12,27,44,.98)!important;border-color:var(--tt-line)!important;border-radius:16px!important;box-shadow:0 12px 30px rgba(0,0,0,.32)!important}
-.advh-box,.advh-pat div{background:#0c1a2a!important;border-color:var(--tt-line)!important;border-radius:14px!important}
-.advh-t,.advh-st b{color:#eef5fd!important}
-.auth-screen{background:radial-gradient(ellipse at 50% 0%,#183858 0%,#07111f 60%,#030912 100%)!important}
-#authScreen,#splash{background-color:#07111f!important}
-.auth-content{width:100%;max-width:460px;padding-left:18px!important;padding-right:18px!important}
-.auth-title{color:#f5f8fd!important;text-shadow:none!important}
-.auth-tag{color:#9fb4ca!important}
-.auth-form{background:rgba(12,27,44,.7)!important;border:1px solid rgba(144,178,211,.16)!important;border-radius:20px!important;padding:15px!important;box-shadow:0 12px 30px rgba(0,0,0,.18)}
-#authScreen .auth-form{background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important}
-#ttDisclaimer{border-color:rgba(232,189,101,.3)!important;background:rgba(232,189,101,.08)!important;color:#f0d89d!important;border-radius:13px!important}
-.auth-error{border-radius:12px!important}
-#splash .hero-art{filter:drop-shadow(0 10px 34px rgba(232,189,101,.15));}
-:focus-visible{outline:2px solid #69a9ff!important;outline-offset:3px!important}
-*{scrollbar-color:#2b4763 transparent;scrollbar-width:thin}
-@media(min-width:600px){body{padding:20px 0!important}.app,#mainApp{max-width:500px!important;height:min(94dvh,980px)!important;border-radius:25px!important;border:1px solid rgba(158,190,220,.13);overflow:hidden}.auth-screen{padding:16px!important}.auth-content{max-width:470px!important}}
-@media(max-width:380px){.topbar{padding:12px 13px 10px!important}.tabs{margin-left:10px!important;margin-right:10px!important}.tab{font-size:9.5px!important}.hero{margin-left:11px!important;margin-right:11px!important;padding:14px!important}.hero-v{font-size:25px!important}.users-strip{margin-left:11px!important;margin-right:11px!important}}
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
-
-</style>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<style id="modern-ui">
-/* =====================================================================
-   TounsiTrade — Modern UI v2 (Arabic RTL) — CSS-only layer, no logic changed
-   ===================================================================== */
-:root{
-  --m-bg:#060d18;--m-bg2:#0a1626;--m-card:rgba(20,36,58,.62);--m-card-solid:#0f1d31;
-  --m-line:rgba(160,195,230,.12);--m-line2:rgba(160,195,230,.22);
-  --m-text:#f2f6fc;--m-mut:#8fa3bb;--m-dim:#5f738b;
-  --m-up:#22e0a1;--m-dn:#ff5d73;--m-gold:#f2c76e;--m-blue:#6aa8ff;--m-vio:#a98bff;
-  --m-r:20px;--m-r-sm:14px;--m-nav:68px;
-  --m-font:"Cairo","Tajawal","Segoe UI",Tahoma,system-ui,sans-serif;
+@media(max-width:899px){
+ .app{width:100%;max-width:100%;height:100dvh}
+ .topbar{padding:12px 14px 10px}
+ .hero{margin:0 12px 12px;padding:15px;border-radius:18px}
+ #view{padding-inline:0}
 }
-html,body{font-family:var(--m-font)!important}
-body *{font-family:inherit}
-body{background:radial-gradient(1100px 600px at 80% -10%,rgba(106,168,255,.16),transparent 60%),radial-gradient(900px 500px at 0% 0%,rgba(242,199,110,.08),transparent 55%),var(--m-bg)!important;letter-spacing:0}
-.app,#mainApp{background:linear-gradient(180deg,var(--m-bg2),var(--m-bg))!important}
-
-/* ---------- Top bar ---------- */
-#mainApp>div:first-child{background:transparent!important;backdrop-filter:none!important;border:0!important}
-.topbar{padding:16px 18px 8px!important}
-.logo{width:44px!important;height:44px!important;border-radius:16px!important;box-shadow:0 0 0 1.5px rgba(242,199,110,.6),0 8px 24px rgba(242,199,110,.18)!important}
-.brand-name{font-size:18px!important;font-weight:900!important;background:linear-gradient(90deg,#fff,var(--m-gold));-webkit-background-clip:text;background-clip:text;color:transparent!important}
-.brand-sub{font-size:10.5px!important}
-.icon-btn{width:44px!important;height:44px!important;border-radius:16px!important;background:var(--m-card)!important;border:1px solid var(--m-line)!important;backdrop-filter:blur(10px);box-shadow:none!important}
-.bell-badge{border-color:var(--m-bg)!important;background:var(--m-dn)!important}
-.users-strip{margin:0 18px 8px!important;border-radius:999px!important;background:rgba(34,224,161,.07)!important;border:1px solid rgba(34,224,161,.18)!important;color:#7ff0c8!important;font-weight:700!important;padding:6px 14px!important}
-.wclk{padding:0 18px!important;gap:8px!important;margin:6px 0 10px!important}
-.wclk .c{background:var(--m-card)!important;border:1px solid var(--m-line)!important;border-radius:16px!important;backdrop-filter:blur(10px)}
-.wclk .n{font-size:10px!important;color:var(--m-mut)!important}
-.wclk .t{font-size:15px!important;font-weight:800!important}
-
-/* ---------- Bottom navigation ---------- */
-#mainApp>div[style*="overflow-y"]{padding-bottom:calc(var(--m-nav) + 28px + env(safe-area-inset-bottom,0px))!important}
-.tabs{position:absolute!important;left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:35;margin:0!important;padding:6px!important;gap:2px!important;height:var(--m-nav);border-radius:24px!important;background:rgba(10,22,38,.82)!important;border:1px solid var(--m-line2)!important;backdrop-filter:blur(22px) saturate(160%);-webkit-backdrop-filter:blur(22px) saturate(160%);box-shadow:0 18px 40px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.05)!important}
-.tab{border-radius:18px!important;justify-content:center;font-size:10.5px!important;font-weight:800!important;color:var(--m-dim)!important;gap:3px!important;padding:6px 0!important;position:relative;transition:all .22s ease!important}
-.tab .ticon{font-size:20px!important;filter:grayscale(1) opacity(.7);transition:all .22s}
-.tab.on{background:linear-gradient(160deg,rgba(106,168,255,.22),rgba(106,168,255,.06))!important;color:#fff!important;box-shadow:inset 0 0 0 1px rgba(106,168,255,.3)!important}
-.tab.on .ticon{filter:none;transform:translateY(-1px) scale(1.08)}
-.tab.on::after{content:"";position:absolute;top:3px;width:18px;height:3px;border-radius:3px;background:var(--m-gold)}
-button[aria-label="More"]{display:none!important}
-.toast{bottom:calc(var(--m-nav) + 30px)!important}
-
-/* ---------- Market status ---------- */
-.market-status{margin:0 18px 12px!important;border-radius:18px!important;padding:12px 16px!important;backdrop-filter:blur(10px)}
-.market-status .ms-switch{background:rgba(255,255,255,.1)!important;border-radius:999px!important;padding:4px 10px!important}
-
-/* ---------- Hero card ---------- */
-.hero{margin:0 18px 16px!important;padding:20px!important;border-radius:28px!important;border:1px solid rgba(160,195,230,.2)!important;background:radial-gradient(420px 220px at 100% 0%,rgba(106,168,255,.28),transparent 65%),radial-gradient(300px 200px at 0% 100%,rgba(242,199,110,.16),transparent 65%),linear-gradient(150deg,#16304f,#0c1c31 70%)!important;box-shadow:0 20px 50px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.08)!important}
-.hero-l{font-size:12px!important;color:#b6c8dc!important;font-weight:700!important}
-.hero-v{font-size:clamp(30px,8.5vw,40px)!important;font-weight:900!important;letter-spacing:-1px!important;line-height:1.25!important}
-.hero-v span{font-size:14px!important;font-weight:800!important;color:var(--m-gold)!important}
-#heroCash{font-size:11px!important;line-height:1.9!important;color:var(--m-mut)!important}
-.hero-rank{display:inline-flex;margin-top:12px!important;padding:7px 14px;border-radius:999px;background:rgba(242,199,110,.12);border:1px solid rgba(242,199,110,.3);color:var(--m-gold)!important;font-size:11.5px!important}
-.hero-links{gap:8px!important}
-.hero-links button{border-radius:999px!important;padding:9px 15px!important;background:rgba(255,255,255,.07)!important;border:1px solid var(--m-line2)!important;color:#fff!important;font-weight:800!important;backdrop-filter:blur(8px)}
-.hero-avatar{width:46px!important;height:46px!important;border:2px solid rgba(255,255,255,.2)!important;box-shadow:0 8px 20px rgba(0,0,0,.35)!important}
-.pill{border-radius:999px!important;padding:6px 12px!important;font-size:11px!important;font-weight:800!important;background:rgba(34,224,161,.14)!important;color:var(--m-up)!important}
-.pill.dn{background:rgba(255,93,115,.14)!important;color:var(--m-dn)!important}
-.pill.nu{background:rgba(255,255,255,.08)!important;color:var(--m-mut)!important}
-.pill.warn{background:rgba(242,199,110,.15)!important;color:var(--m-gold)!important}
-
-/* ---------- Content area ---------- */
-main#view{padding:0 18px 24px!important}
-.sec{margin:20px 0 12px!important}
-.sec-t{font-size:14px!important;font-weight:900!important;color:var(--m-text)!important}
-.sec-line{background:linear-gradient(90deg,var(--m-line2),transparent)!important}
-.badge-real,.badge-spon{border-radius:999px!important;padding:3px 10px!important}
-.index-strip,.pf-total-bar,.xp-wrap,.podium-wrap,.wk-card,.info-card,.term-item,.more-item,.rank-card,.pf-list,.order-panel,.cert-box,.philo-wrap{background:var(--m-card)!important;border:1px solid var(--m-line)!important;border-radius:var(--m-r)!important;backdrop-filter:blur(12px);box-shadow:0 10px 30px rgba(0,0,0,.18)!important}
-.index-strip{padding:15px 18px!important}
-.index-strip .vv{font-size:20px!important;font-weight:900!important}
-.index-strip .nm,.pf-total-bar .pt-l{color:var(--m-mut)!important}
-
-/* chips */
-.chips{gap:8px!important;padding:4px 18px 12px!important;margin:0 -18px!important}
-.chip{padding:9px 16px!important;border-radius:999px!important;background:var(--m-card)!important;border:1px solid var(--m-line)!important;color:var(--m-mut)!important;font-weight:800!important}
-.chip.on{background:linear-gradient(135deg,var(--m-gold),#d9a441)!important;border-color:transparent!important;color:#1b1406!important;box-shadow:0 8px 20px rgba(242,199,110,.28)}
-.chip.on span{opacity:.75!important}
-
-/* market segment */
-.mkt-seg{border-radius:22px!important;padding:6px!important;background:var(--m-card)!important;border:1px solid var(--m-line)!important}
-.mkt-seg-row button{border-radius:17px!important;padding:13px 6px!important;font-size:13px!important;font-weight:900!important}
-.mkt-seg-row button.on.prac{background:linear-gradient(135deg,rgba(34,224,161,.25),rgba(34,224,161,.08))!important;color:#58efbc!important}
-.mkt-seg-row button.on.live{background:linear-gradient(135deg,rgba(255,93,115,.25),rgba(255,93,115,.08))!important;color:#ff9aa9!important}
-
-/* stock rows */
-.stock-list{gap:10px!important}
-.stock-row{padding:14px!important;border-radius:20px!important;background:var(--m-card)!important;border:1px solid var(--m-line)!important;backdrop-filter:blur(12px);box-shadow:0 6px 18px rgba(0,0,0,.14)!important;gap:12px!important}
-.stock-row:active{transform:scale(.975)!important}
-.sr-ico{width:44px!important;height:44px!important;border-radius:15px!important;font-size:20px!important;background:linear-gradient(145deg,rgba(106,168,255,.18),rgba(106,168,255,.04))!important;border:1px solid var(--m-line)!important}
-.sr-sym{font-size:14px!important;font-weight:900!important}
-.sr-name{font-size:11px!important;color:var(--m-mut)!important}
-.sr-spark{width:62px!important;height:28px!important}
-.sr-pr{font-size:14.5px!important;font-weight:900!important}
-.sr-ch{display:inline-block;padding:2px 8px;border-radius:999px;font-size:10.5px!important;margin-top:4px!important;background:rgba(255,255,255,.06)}
-.sr-ch.up{background:rgba(34,224,161,.14)}
-.sr-ch.dn{background:rgba(255,93,115,.14)}
-.up{color:var(--m-up)!important}.dn{color:var(--m-dn)!important}
-
-/* portfolio */
-.pf-total-bar{padding:18px!important}
-.pf-grid-2{gap:10px!important}
-.pf-btn-mini,.pf-btn-blue{border-radius:22px!important;min-height:92px!important}
-.pf-btn-mini[style*="cursor:default"]{background:var(--m-card)!important;border:1px solid var(--m-line)!important;box-shadow:0 8px 22px rgba(0,0,0,.16)!important;color:var(--m-text)!important;display:flex!important;flex-direction:column;align-items:flex-start;justify-content:center;gap:3px;direction:rtl}
-.pf-btn-mini[style*="cursor:default"]::before,.pf-btn-mini[style*="cursor:default"]::after{display:none!important}
-.pf-btn-mini[style*="cursor:default"] .pm-title{color:var(--m-mut)!important;font-size:11px!important}
-.pf-btn-mini[style*="cursor:default"] .pm-main{font-size:16px!important;font-weight:900!important}
-.pf-btn-mini[style*="cursor:default"] .pm-sub{color:var(--m-dim)!important}
-.pf-list{overflow:hidden}
-.pf-row{padding:14px!important;border-color:var(--m-line)!important}
-.pf-row .pr-ico{width:38px!important;height:38px!important;border-radius:13px!important}
-.pf-empty{border-radius:var(--m-r)!important;border:1.5px dashed var(--m-line2)!important;background:rgba(255,255,255,.02)!important;color:var(--m-mut)!important}
-
-/* rank / podium */
-.podium-wrap{padding:18px!important}
-.podium-row{padding:11px 0!important;border-color:var(--m-line)!important}
-.podium-name{font-weight:800!important}
-.rank-card{padding:13px!important}
-.rank-card.me{background:linear-gradient(90deg,rgba(242,199,110,.14),var(--m-card))!important;border-color:rgba(242,199,110,.4)!important}
-
-/* weekly card, xp */
-.wk-card{padding:18px!important}
-.wk-bar,.xp-bar,.quiz-bar{height:9px!important;border-radius:999px!important;background:rgba(255,255,255,.07)!important}
-.wk-bar-fill,.xp-bar-fill,.quiz-bar-fill{border-radius:999px!important;background:linear-gradient(90deg,var(--m-gold),var(--m-up))!important}
-.wk-btn,.cert-btn{border-radius:16px!important;background:linear-gradient(135deg,var(--m-gold),#d9a441)!important;color:#1b1406!important;padding:14px!important}
-.xp-wrap{padding:16px!important}
-
-/* more / lists */
-.more-item{padding:15px!important;gap:14px!important}
-.more-item:active{transform:scale(.98)}
-.more-group{font-size:12px!important;font-weight:900!important;color:var(--m-gold)!important;margin:22px 4px 10px!important}
-.badge-card{border-radius:18px!important;background:var(--m-card)!important;border-color:var(--m-line)!important}
-.badge-card.owned{background:linear-gradient(145deg,rgba(242,199,110,.16),rgba(34,224,161,.06))!important;border-color:rgba(242,199,110,.4)!important}
-.disc{font-size:10.5px!important;color:var(--m-dim)!important;border-color:var(--m-line)!important}
-
-/* ---------- Buttons ---------- */
-.btn-primary{border-radius:18px!important;padding:16px!important;font-size:14.5px!important;font-weight:900!important;background:linear-gradient(135deg,var(--m-up),#10b583)!important;color:#03221a!important;box-shadow:0 12px 28px rgba(34,224,161,.25)!important}
-.btn-secondary{border-radius:18px!important;padding:15px!important}
-.btn-buy,.btn-sell,.fbtn{border-radius:22px!important}
-.qty-btn{border-radius:16px!important;background:var(--m-card-solid)!important;border:1px solid var(--m-line2)!important}
-.qty-in{border-radius:16px!important;height:46px!important;font-size:18px!important;background:rgba(0,0,0,.25)!important}
-.quick button{border-radius:12px!important;padding:10px 4px!important;background:var(--m-card)!important;border-color:var(--m-line)!important}
-.mode-toggle{border-radius:16px!important;background:rgba(0,0,0,.22)!important;border-color:var(--m-line)!important}
-
-/* ---------- Bottom sheet ---------- */
-.backdrop{background:rgba(2,6,12,.65)!important;backdrop-filter:blur(6px)}
-.sheet{border-radius:32px 32px 0 0!important;background:linear-gradient(180deg,#14283f,#0a1626 40%)!important;border:1px solid var(--m-line2)!important;border-bottom:0!important;box-shadow:0 -24px 60px rgba(0,0,0,.5)!important;max-height:92%!important}
-.grab{width:46px!important;height:5px!important;background:rgba(255,255,255,.22)!important}
-.sheet-body{padding:10px 20px 28px!important}
-.sh-tk{font-size:20px!important;font-weight:900!important}
-.sh-close{width:36px!important;height:36px!important;background:rgba(255,255,255,.08)!important;color:#fff!important}
-.sh-price{font-size:38px!important;font-weight:900!important;letter-spacing:-1px!important}
-.sh-chg{display:inline-block;padding:4px 12px;border-radius:999px;background:rgba(255,255,255,.07);font-size:12px!important}
-.sh-chg.up{background:rgba(34,224,161,.14)}.sh-chg.dn{background:rgba(255,93,115,.14)}
-.sh-stats .stat{background:var(--m-card)!important;border:1px solid var(--m-line)!important;border-radius:16px!important}
-#candleBox,#volumeBox{background:rgba(3,9,18,.7)!important;border-color:var(--m-line)!important;border-radius:20px!important}
-.ind-panel{background:var(--m-card)!important;border:1px solid var(--m-line)!important;border-radius:18px!important}
-.ind-chart{background:rgba(3,9,18,.6)!important;border-radius:12px!important}
-.ind-btn{height:42px!important;border-radius:14px!important;background:var(--m-card)!important;border-color:var(--m-line)!important}
-.ind-btn.on{background:rgba(242,199,110,.16)!important;border-color:var(--m-gold)!important;color:var(--m-gold)!important}
-.tf-row button{border-radius:12px!important}
-.trade-tools button{border-radius:14px!important;padding:12px 4px!important}
-
-/* ---------- Inputs ---------- */
-input,select,textarea,.auth-input{border-radius:16px!important;background:rgba(3,9,18,.6)!important;border:1px solid var(--m-line2)!important;color:var(--m-text)!important}
-input:focus,select:focus,textarea:focus,.auth-input:focus{border-color:var(--m-blue)!important;box-shadow:0 0 0 4px rgba(106,168,255,.14)!important}
-
-/* ---------- Quiz / modals ---------- */
-.quiz-modal{backdrop-filter:blur(10px)!important;background:rgba(2,6,12,.82)!important}
-.quiz-card{border-radius:30px!important;background:linear-gradient(180deg,#14283f,#0a1626)!important;border:1px solid var(--m-line2)!important;box-shadow:0 30px 70px rgba(0,0,0,.6)}
-.quiz-question{border-radius:18px!important;background:rgba(242,199,110,.08)!important;border-color:rgba(242,199,110,.25)!important}
-.quiz-opt{border-radius:16px!important;padding:15px 16px!important;background:var(--m-card)!important;border-color:var(--m-line2)!important}
-.quiz-opt.correct{background:rgba(34,224,161,.16)!important;border-color:var(--m-up)!important;color:var(--m-up)!important}
-.quiz-opt.wrong{background:rgba(255,93,115,.16)!important;border-color:var(--m-dn)!important;color:var(--m-dn)!important}
-.quiz-actions button{border-radius:16px!important}
-
-/* ---------- Advisor / toast ---------- */
-.adv-card{border-radius:20px!important;background:rgba(10,22,38,.92)!important;backdrop-filter:blur(18px);border:1px solid var(--m-line2)!important;border-right:4px solid var(--ac,#4a90ff)!important}
-.toast{border-radius:999px!important;padding:12px 22px!important;background:rgba(15,29,49,.95)!important;backdrop-filter:blur(14px);font-weight:700!important}
-.advh-box,.advh-pat div{border-radius:18px!important}
-.priv-box{border-radius:20px!important}
-
-/* ---------- Auth screens ---------- */
-.auth-screen{background:radial-gradient(800px 500px at 50% -10%,rgba(106,168,255,.28),transparent 60%),radial-gradient(600px 400px at 100% 100%,rgba(242,199,110,.12),transparent 60%),var(--m-bg)!important}
-#splash,#authScreen{background-color:var(--m-bg)!important}
-.auth-content{padding:28px 22px 30px!important}
-.auth-logo{border-radius:30px!important}
-.auth-title{font-size:26px!important;font-weight:900!important}
-.auth-label{font-size:12px!important;font-weight:800!important;color:var(--m-mut)!important}
-.auth-input{height:52px!important;font-size:15px!important;padding:0 18px!important}
-.name-choice button{border-radius:14px!important;padding:13px!important}
-.name-choice button.on{background:rgba(242,199,110,.16)!important;border-color:var(--m-gold)!important;color:var(--m-gold)!important}
-#authScreen .auth-row button{border-radius:20px!important;padding:17px 6px!important;border-width:0!important;box-shadow:none!important;font-weight:900!important}
-#authScreen .auth-row .y{background:linear-gradient(135deg,var(--m-gold),#d9a441)!important;color:#1b1406!important;box-shadow:0 14px 32px rgba(242,199,110,.3)!important}
-#authScreen .auth-row .g{background:var(--m-card)!important;border:1px solid var(--m-line2)!important;color:#fff!important}
-#authScreen .btn-social.gg{border-radius:16px!important;height:48px!important}
-#ttDisclaimer{border-radius:16px!important;font-weight:700!important}
-.auth-error{border-radius:14px!important}
-#registerScreen .auth-form,#loginScreen .auth-form{background:var(--m-card)!important;border:1px solid var(--m-line)!important;border-radius:26px!important;padding:20px!important;backdrop-filter:blur(14px)}
-
-/* ---------- Desktop frame ---------- */
-@media(min-width:600px){
-  body{padding:24px 0!important}
-  .app,#mainApp{max-width:480px!important;height:min(94dvh,960px)!important;border-radius:38px!important;border:1px solid var(--m-line2)!important;box-shadow:0 40px 100px rgba(0,0,0,.6)!important}
-}
-@media(max-width:380px){
-  .tab{font-size:9.5px!important}.tab .ticon{font-size:18px!important}
-  .hero{padding:16px!important}.hero-v{font-size:28px!important}
-  main#view,.topbar{padding-left:14px!important;padding-right:14px!important}
-}
-
-/* ---------- Motion ---------- */
-@keyframes mFade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-main#view>*{animation:mFade .35s ease both}
-main#view>*:nth-child(2){animation-delay:.04s}main#view>*:nth-child(3){animation-delay:.08s}main#view>*:nth-child(4){animation-delay:.12s}
-.stock-row,.more-item,.tab,.chip,.hero-links button{-webkit-tap-highlight-color:transparent}
-::-webkit-scrollbar{width:0;height:0}
 
 </style>
 <script>
@@ -902,7 +652,7 @@ main#view>*:nth-child(2){animation-delay:.04s}main#view>*:nth-child(3){animation
     <div class="stats-card">
       <div class="stat-item"><span class="stat-num">15</span><span class="stat-lbl">شركة</span></div>
       <div class="divider"></div>
-      <div class="stat-item"><span class="stat-num">32</span><span class="stat-lbl">درس</span></div>
+      <div class="stat-item"><span class="stat-num">25</span><span class="stat-lbl">درس</span></div>
       <div class="divider"></div>
       <div class="stat-item"><span class="stat-num" id="liveUsersCount">👥</span><span class="stat-lbl" id="liveUsersLabel">انضم للمجتمع</span></div>
     </div>
@@ -2234,7 +1984,7 @@ async function _doBuyCore(){
   cash-=tc;addTrade(s.id,'buy',q,s.price);
   trackWeeklyEvent('trade');unlockBadge('first_trade');
   toast(`تم شراء ${fmtQty(q)} × ${displayId(s)}`,'good');
-  ttDailyXP('buy',10,50);inputVal=buyMode==='qty'?1:50;saveState(true);renderSheet();updateHero();
+  addXP(10,'buy');inputVal=buyMode==='qty'?1:50;saveState(true);renderSheet();updateHero();
   if(recentTrades.length>=10)unlockBadge('ten_trades');
 }
 async function _doSellCore(){
@@ -2467,12 +2217,13 @@ function renderLessons(){
 }
 function openLesson(id){
   const l=LESSONS.find(x=>x.id===id);if(!l)return;
+if(lessonProgress.quiz&&lessonProgress.quiz[id]){toast('✅ أنهيت هذا الدرس واختباره، ولا يمكن إعادته','warn');return;}
   const wasNew=!lessonProgress.completed[id];
   lessonProgress.completed[id]=true;
   if(wasNew){
     if(Object.keys(lessonProgress.completed).length>=5)unlockBadge('five_lessons');
     if(Object.keys(lessonProgress.completed).length>=LESSONS.length)unlockBadge('graduated');
-    trackWeeklyEvent('lesson');
+    addXP(20,'lesson');trackWeeklyEvent('lesson');
   }
   saveState();
   const hasQuiz=!!getQuizFor(l.id);
@@ -2552,14 +2303,14 @@ function nextQuizStep(){
   if(activeQuiz.idx>=bank.length)renderQuizResult();
   else renderQuizModal();
 }
-function renderQuizResult(){const _pq=(lessonProgress.quiz||{})[activeQuiz.lessonId];const _firstDone=!(_pq&&_pq.pct>=60);
+function renderQuizResult(){const _pq=(lessonProgress.quiz||{})[activeQuiz.lessonId];const _firstDone=!_pq||_pq.started;
   const pct=Math.round((activeQuiz.score/activeQuiz.total)*100);
   const pass=pct>=60;
   if(!lessonProgress.quiz)lessonProgress.quiz={};
   lessonProgress.quiz[activeQuiz.lessonId]={score:activeQuiz.score,total:activeQuiz.total,pct,at:Date.now()};
   adaptTrackAnswer(activeQuiz.lessonId,pct);
   if(pass){
-    if(_firstDone){addXP(35,'quiz');try{trackWeeklyEvent('quiz',activeQuiz.lessonId);}catch(e){}}
+    if(_firstDone)addXP(15,'quiz');
     const passedCount=Object.values(lessonProgress.quiz).filter(q=>q.pct>=60).length;
     if(passedCount>=5)unlockBadge('quiz_master');
   }
@@ -2572,7 +2323,7 @@ function renderQuizResult(){const _pq=(lessonProgress.quiz||{})[activeQuiz.lesso
     <div class="qr-icon">${icon}</div>
     <div class="qr-title" style="color:${color}">${title}</div>
     <div class="qr-score">نتيجتك: ${activeQuiz.score}/${activeQuiz.total} (${pct}%)</div>
-    ${pass&&_firstDone?`<div class="qr-xp">+35 XP</div>`:(pass?`<div class="qr-xp">مراجعة ✓</div>`:'')}
+    ${pass?`<div class="qr-xp">+15 XP</div>`:''}
     <div style="display:flex;gap:10px;margin-top:12px">
       <button onclick="retryQuiz('${activeQuiz.lessonId}')" style="flex:1;padding:14px;border-radius:13px;border:none;background:#1c222a;color:#c3cad4;font-size:13px;font-weight:800;font-family:inherit;cursor:pointer">إعادة</button>
       <button onclick="closeQuizModal()" style="flex:1;padding:14px;border-radius:13px;border:none;background:linear-gradient(135deg,#f0b90b,#b88700);color:#0b0e11;font-size:13px;font-weight:800;font-family:inherit;cursor:pointer">تم</button>
@@ -2647,13 +2398,13 @@ function answerMixedQuiz(i){
 function nextMixedStep(){activeQuiz.idx++;if(activeQuiz.idx>=activeQuiz.mixed.length)renderMixedResult();else renderMixedModal();}
 function renderMixedResult(){
   const pct=Math.round((activeQuiz.score/activeQuiz.total)*100);
-  const pass=pct>=60;let _mx=0;if(pass){_mx=ttDailyXP('mixed',20,40);}saveState();
+  const pass=pct>=60;if(pass)addXP(20,'quiz');saveState();
   const modal=document.getElementById('quizModal');
   modal.innerHTML=`<div class="quiz-card"><div class="quiz-result">
     <div class="qr-icon">${pass?'🎉':'💪'}</div>
     <div class="qr-title" style="color:${pass?'#0ecb81':'#f6465d'}">${pass?'ممتاز!':'يحتاج مراجعة'}</div>
     <div class="qr-score">نتيجتك: ${activeQuiz.score}/${activeQuiz.total} (${pct}%)</div>
-    ${pass?`<div class="qr-xp">${_mx>0?'+'+_mx+' XP':'وصلت للحد اليومي من XP'}</div>`:''}
+    ${pass?`<div class="qr-xp">+20 XP</div>`:''}
     <div style="display:flex;gap:10px;margin-top:12px">
       <button onclick="startRandomQuiz()" style="flex:1;padding:14px;border-radius:13px;border:none;background:#1c222a;color:#c3cad4;font-size:13px;font-weight:800;font-family:inherit;cursor:pointer">جديد</button>
       <button onclick="closeQuizModal()" style="flex:1;padding:14px;border-radius:13px;border:none;background:linear-gradient(135deg,#f0b90b,#b88700);color:#0b0e11;font-size:13px;font-weight:800;font-family:inherit;cursor:pointer">تم</button>
@@ -3577,160 +3328,4 @@ const ttAdv=(function(){
 function openAdvisorHub(){ttAdv.openHub();}
 </script>
 
-<script>
-/* ===== TounsiTrade content & fairness update ===== */
-(function(){
-/* ---------- 1) New lessons ---------- */
-const APP={cat:'app',catName:'مزايا المنصة',catIcon:'🧭'};
-LESSONS.push(
-Object.assign({},APP,{id:'d1',icon:'💰',title:'توزيعات الأرباح وقطع الكوبون',time:'6 د',content:`<p><b>توزيع الأرباح</b> جزء من أرباح الشركة يُدفع للمساهمين. ولتستحقه يجب أن تملك السهم <b>قبل تاريخ قطع الكوبون</b>.</p><p><b>🔢 مثال:</b> تملك 200 سهم والتوزيع 0.5 د.ت للسهم → تستلم 100 د.ت. وفي يوم القطع ينخفض سعر السهم تقريبًا بقيمة التوزيع، لأن جزءًا من قيمة الشركة خرج إلى المساهمين.</p><p><b>⚠️ خطأ شائع:</b> شراء السهم قبل القطع بنية «ربح مضمون». السعر ينخفض بعد القطع، فالتوزيع ليس مالًا مجانيًا.</p><p><b>🛠️ في المنصة:</b> افتح «التقويم» من الصفحة الرئيسية لترى الأحداث. الزمن في المحاكاة مضغوط.</p><p><b>✅ الخلاصة:</b> التوزيع جزء من العائد الكلي ولا يلغي مخاطرة السعر.</p>`}),
-Object.assign({},APP,{id:'d2',icon:'🔀',title:'الأسهم المجانية والتجزئة',time:'6 د',content:`<p><b>الأسهم المجانية</b> و<b>التجزئة</b> تغيّران عدد أسهمك وسعر السهم، لا قيمة استثمارك الكلية.</p><p><b>🔢 مثال التجزئة:</b> 100 سهم × 10 د.ت = 1,000. بعد تجزئة 1→2: 200 سهم × 5 د.ت = 1,000، ويتعدّل متوسط تكلفتك إلى النصف.</p><p><b>🎁 الأسهم المجانية:</b> سهم جديد لكل 10 أسهم: تملك 110 بدل 100 والسعر يتعدّل بما يعادل ذلك، فالقيمة الكلية ثابتة نظريًا.</p><p><b>⚠️ خطأ شائع:</b> اعتبار السعر الأرخص بعد التجزئة «فرصة». الشركة هي نفسها.</p><p><b>🛠️ في المنصة:</b> تُلغى أوامرك المعلّقة على السهم عند التعديل ويُعاد المبلغ المحجوز، فأعد وضعها بالسعر الجديد.</p>`}),
-Object.assign({},APP,{id:'d3',icon:'⏱️',title:'ما قبل الافتتاح وأنواع الأوامر',time:'7 د',content:`<p>مرحلة <b>08:30 – 09:00</b> تُدخل فيها الأوامر أو تعدّلها أو تلغيها، لكنها <b>لا تُنفَّذ فورًا</b>؛ تُقابَل عند الافتتاح حسب السعر والأولوية الزمنية.</p><p><b>🎯 أنواع الأوامر في المنصة:</b></p><ul><li><b>شراء/بيع فوري:</b> بسعر السوق وقت التنفيذ.</li><li><b>شراء عند سعر:</b> ينتظر وصول السعر، ويُحجز المبلغ مسبقًا ويُعاد عند الإلغاء.</li><li><b>وقف الخسارة:</b> يبيع مركزك إذا نزل السعر إلى حدّك.</li><li><b>منبّه:</b> يخبرك فقط ولا ينفّذ شيئًا.</li></ul><p><b>⚠️ تنبيه:</b> وقف الخسارة لا يضمن البيع بالسعر المحدد تمامًا إذا تحرك السعر بسرعة.</p><p><b>✅ الخلاصة:</b> اختر نوع الأمر حسب هدفك: تنفيذ، أو سعر، أو حماية.</p>`}),
-Object.assign({},APP,{id:'d4',icon:'📓',title:'دفتر الصفقات: تعلّم من أخطائك',time:'6 د',content:`<p>«دفتر صفقاتي» يسجّل كل صفقة بعد بيعها ويحلّل أسباب الربح أو الخسارة.</p><p><b>🔍 ماذا تراجع؟</b></p><ul><li>نسبة النجاح ومتوسط الربح ومتوسط الخسارة</li><li>نقطة الضعف الأكثر تكرارًا</li><li>أثر الرسوم ومدة الاحتفاظ وحجم المركز</li></ul><p><b>🔢 مثال:</b> نسبة نجاح 40% لا تعني فشلًا إذا كان متوسط الربح ضعف متوسط الخسارة.</p><p><b>🛠️ عادة أسبوعية:</b> افتح الدفتر، اختر أسوأ صفقة، واكتب قاعدة واحدة تمنع تكرارها.</p><p><b>✅ الخلاصة:</b> من لا يسجّل أخطاءه يكررها.</p>`}),
-Object.assign({},APP,{id:'d5',icon:'📐',title:'حجم المركز: كم تشتري؟',time:'7 د',content:`<p>السؤال ليس «ماذا أشتري؟» فقط، بل <b>«كم أشتري؟»</b>.</p><p><b>📐 الصيغة:</b> عدد الأسهم = (رأس المال × نسبة المخاطرة) ÷ (سعر الدخول − سعر الوقف).</p><p><b>🔢 مثال (قبل الرسوم):</b> رأس المال 10,000 ونسبة المخاطرة 2% = 200 د.ت. دخول 50 ووقف 47 → خسارة السهم 3. عدد الأسهم = 200 ÷ 3 ≈ 66 سهمًا، أي مركز بنحو 3,300 د.ت.</p><p><b>⚠️ انتبه:</b> قد يكون المركز كبيرًا (33% من المحفظة) رغم أن المخاطرة 2%. راقب التركّز أيضًا.</p><p><b>✅ الخلاصة:</b> حدّد خسارتك المقبولة أولًا، ثم احسب الكمية.</p>`}),
-Object.assign({},APP,{id:'d6',icon:'🧠',title:'أنماط السلوك التي يرصدها المرشد',time:'6 د',content:`<p>يرصد المرشد الذكي ستة أنماط سلوكية شائعة:</p><ul><li>😤 <b>الانتقام من السوق:</b> شراء سريع لتعويض خسارة.</li><li>🔁 <b>الإفراط في التداول:</b> عمليات كثيرة ورسوم متراكمة.</li><li>🏃 <b>FOMO:</b> الشراء خوفًا من الفوات بعد صعود حاد.</li><li>⚓ <b>الإمساك بالخاسر:</b> انتظار عودة السعر دون سبب.</li><li>✂️ <b>البيع المبكر:</b> جني ربح صغير ثم ارتفاع كبير.</li><li>🧩 <b>التشتت:</b> التنقل بين أسهم كثيرة بلا خطة.</li></ul><p><b>💡 مهم:</b> هذه تنبيهات تعليمية ولا تعني أنك مخطئ. تجاهلها إن كانت خطتك واضحة.</p><p><b>🛠️ طبّق:</b> افتح «مركز المرشد الذكي» من «المزيد» وانظر أكثر نمط يتكرر معك.</p>`}),
-{cat:'tn',catName:'السوق التونسي',catIcon:'🇹🇳',id:'tn4',icon:'🧾',title:'قبل أن تتداول فعليًا',time:'6 د',content:`<p>التطبيق محاكاة تعليمية؛ أما التداول الفعلي فيتم عبر <b>وسيط مرخّص</b> لدى هيئة السوق المالية.</p><p><b>✅ قبل أن تبدأ فعليًا:</b></p><ul><li>تأكد من ترخيص الوسيط لدى الجهات الرسمية.</li><li>اطلب جدول العمولات والرسوم كتابةً.</li><li>اسأل عن شروط فتح الحساب وطرق إيداع الأموال وسحبها.</li><li>اسأل عن الضرائب المطبقة على التوزيعات والأرباح، وراجع النصوص الرسمية أو مختصًا.</li><li>ابدأ بمبلغ تقبل خسارته.</li></ul><p><b>⚠️ تنبيه:</b> أسعار هذا التطبيق وأسماء شركاته افتراضية، ونتائجك فيه لا تتنبأ بنتائجك الحقيقية.</p>`}
-);
-Object.assign(LESSON_STOCK_MAP,{d1:'TN1',d2:'TN2',d3:'TN3',d4:'TN4',d5:'TN5',d6:'S1',tn4:'TN1'});
-
-/* ---------- 2) Expand short lessons ---------- */
-const EXTRA={
-l5:`<p><b>🛠️ طبّق الآن:</b> افتح القاموس من «الدروس» وابحث عن 5 مصطلحات لا تعرفها، ثم اشرح كل واحد بجملة من عندك.</p>`,
-r3:`<p><b>🔢 مثال:</b> 3 أسهم بنوك تهبط معًا إذا ضعف القطاع، بينما بنك وغذاء وطاقة تخفف الأثر.</p><p><b>⚠️ خطأ شائع:</b> التنويع بعدد الأسهم لا بالقطاعات.</p><p><b>🛠️ طبّق الآن:</b> افتح «محفظتي» وانظر مرشدك الذكي: هل تتركز في قطاع واحد؟</p>`,
-t1:`<p><b>🔢 مثال:</b> RSI عند 82 بعد صعود سريع يحذّر من اندفاع الصعود، لكنه لا يعني هبوطًا مؤكدًا.</p><p><b>⚠️ خطأ شائع:</b> البيع الآلي فور تجاوز 70، فقد يبقى السهم في اتجاه قوي.</p><p><b>🛠️ طبّق الآن:</b> افتح أي سهم وقارن قراءة RSI بحركة الشموع.</p>`,
-t2:`<p><b>🔢 مثال:</b> سعر ارتد من 85 ثلاث مرات يجعل 85 دعمًا محتملًا؛ كسره بحجم كبير إشارة ضعف.</p><p><b>⚠️ خطأ شائع:</b> اعتبار المستوى «حاجزًا مضمونًا». هي مناطق احتمالية.</p><p><b>🛠️ طبّق الآن:</b> فعّل زر SR في نافذة السهم وراجع المستويات.</p>`,
-t3:`<p><b>🔢 مثال:</b> شمعة بجسم صغير وظلال طويلة تدل على تردد، وليست إشارة اتجاه وحدها.</p><p><b>⚠️ خطأ شائع:</b> الاعتماد على شمعة واحدة؛ انظر ما قبلها وما بعدها ومع الحجم.</p><p><b>🛠️ طبّق الآن:</b> بدّل الإطار 1m / 5m / 1h وانظر كيف يتغير شكل الشموع.</p>`,
-t4:`<p><b>🔢 مثال:</b> اختراق مقاومة مع ارتفاع واضح في الحجم أوثق من اختراق بحجم ضعيف.</p><p><b>⚠️ خطأ شائع:</b> تجاهل الحجم عند قراءة الاختراقات.</p><p><b>🛠️ طبّق الآن:</b> راقب الأعمدة تحت الشارت وقارن حجمها عند الحركات الكبيرة.</p>`,
-p1:`<p><b>🔢 مثال:</b> سهم نزل 3% فبعته ثم عاد للارتفاع: القرار قاده الخوف لا الخطة. وإذا بقيت في سهم بلغ هدفك طمعًا ثم نزل، فالطمع هو من قاد.</p><p><b>🛠️ طبّق الآن:</b> قبل كل شراء اكتب هدفًا ووقف خسارة والتزم بهما.</p>`,
-p2:`<p><b>🔢 مثال:</b> خسرت 5% فاشتريت بكمية مضاعفة لتعويضها؛ ارتفعت المخاطرة في أسوأ لحظة نفسيًا.</p><p><b>🛠️ طبّق الآن:</b> بعد أي خسارة افتح «دفتر صفقاتي» واقرأ سبب الخسارة قبل أي صفقة جديدة.</p>`,
-p3:`<p><b>🔢 مثال:</b> تنتظر سعرًا يناسب خطتك بدل شراء أي سهم؛ قد تقل الصفقات لكن ترتفع جودتها وتنخفض الرسوم.</p><p><b>⚠️ تذكير:</b> عدم التداول قرار مشروع.</p><p><b>🛠️ طبّق الآن:</b> ضع «شراء عند سعر» أو منبّهًا بدل مراقبة الشاشة.</p>`,
-p4:`<p><b>🔢 مثال:</b> سهم صعد 12% في ساعة فاشتريت عند القمة خوفًا من الفوات، ثم تراجع.</p><p><b>🛠️ طبّق الآن:</b> اسأل نفسك: ما سعر دخولي المخطط؟ أين وقف الخسارة؟ إن لم تعرف فانتظر.</p>`,
-s1:`<p><b>🔢 مثال:</b> 10 عمليات يوميًا تعني رسومًا تتكرر 10 مرات، وربح الصفقة الصغيرة قد يذهب في الرسوم.</p><p><b>🛠️ طبّق الآن:</b> افتح «دفتر صفقاتي» وانظر أثر الرسوم على نتائجك.</p>`,
-s2:`<p><b>🔢 مثال:</b> تشتري سهمًا قرب دعمه وتحتفظ به أيامًا نحو مقاومة قريبة بوقف خسارة واضح.</p><p><b>🛠️ طبّق الآن:</b> اختر سهمًا، حدّد الدعم والمقاومة بزر SR، واحسب نسبة المخاطرة/المكافأة.</p>`,
-s3:`<p><b>🔢 مثال:</b> الاستثمار المنتظم في سهم قوي يقلل أثر التقلب المؤقت، لكنه لا يضمن الربح.</p><p><b>🛠️ طبّق الآن:</b> لا تغيّر قرارك بسبب حركة يوم واحد؛ راجع خطتك دوريًا.</p>`,
-a1:`<p><b>🔢 مثال:</b> شركة أرباحها تنمو ودينها قليل تبدو أقوى من شركة أرباحها تتراجع، لكن السعر قد يعكس ذلك مسبقًا.</p><p><b>🛠️ طبّق الآن:</b> قارن سهمين في قطاع واحد من حيث السعر والقيمة العادلة المعروضة في نافذة السهم.</p>`,
-a2:`<p><b>🔢 مثال:</b> سهم P/E له 10 وآخر 40: الأول أرخص نسبيًا، لكن قد يكون نموه أضعف؛ لا تحكم من نسبة واحدة.</p><p><b>⚠️ خطأ شائع:</b> المقارنة بين قطاعات مختلفة بنفس الحد.</p><p><b>🛠️ طبّق الآن:</b> احسب Dividend Yield لسهم: التوزيع ÷ السعر × 100.</p>`,
-tn1:`<p><b>🛠️ طبّق الآن:</b> اكتب ثلاث محطات من الجدول الزمني وما الذي تغيّر في السوق بعد كل واحدة.</p>`,
-tn2:`<p><b>🔢 مثال:</b> إذا ضغطت أخبار سلبية على البنوك، تتأثر عدة أسهم في نفس الوقت.</p><p><b>🛠️ طبّق الآن:</b> في «السوق» رشّح بحسب القطاع وقارن حركة أسهمه.</p>`,
-tn3:`<p><b>🛠️ طبّق الآن:</b> في مرحلة ما قبل الافتتاح جرّب إدخال أمر «شراء عند سعر» وراقب كيف يُحجز المبلغ.</p>`
-};
-LESSONS.forEach(l=>{if(EXTRA[l.id]&&l.content.indexOf('طبّق الآن')<0)l.content+=EXTRA[l.id];});
-
-/* ---------- 3) Quizzes: extend to 5+ questions, with explanations ---------- */
-const Q={
-l5:[["أيّ مصطلح يصف أقل سعر يقبل به البائع؟",["Ask","Bid","Volume"],0,"Ask هو سعر البيع المعروض، وBid سعر الشراء."],["ما الفرق بين Market Order وLimit Order؟",["الأول بسعر السوق فورًا والثاني بسعر تحدده أو أفضل","الأول بسعر محدد والثاني فوري","لا فرق بينهما"],0,"أمر السوق يضمن التنفيذ لا السعر، وأمر الحد يضمن السعر لا التنفيذ."]],
-r1:[["اشتريت بسعر 50 ووضعت وقف الخسارة عند 47. ما أقصى خسارة للسهم تقريبًا؟",["3 د.ت (6%)","47 د.ت","لا خسارة"],0,"الفرق بين 50 و47 هو 3، أي 6% من سعر الشراء، قبل الرسوم."],["لماذا يفيد تحديد وقف الخسارة قبل الدخول؟",["لأنه يمنع القرار العاطفي أثناء التوتر","لأنه يضمن الربح","لأنه يلغي الرسوم"],0,"تحديد الخروج مسبقًا يحمي من القرارات الانفعالية."]],
-r2:[["دخلت بسعر 100، وقف 95، هدف 110. ما نسبة المخاطرة/المكافأة؟",["1:2","1:1","2:1 لصالح الخسارة"],0,"تخاطر بـ5 لتربح 10، أي 1:2."],["مع نسبة 1:3 وربح 3 صفقات من 10، ما النتيجة تقريبًا قبل الرسوم؟",["موجبة","سالبة","تعادل تمامًا"],0,"3×3=9 وحدات ربح مقابل 7 وحدات خسارة."]],
-r3:[["محفظتك: 3 أسهم بنوك فقط. ما المشكلة الرئيسية؟",["تركّز في قطاع واحد","كثرة القطاعات","قلة الرسوم"],0,"أسهم القطاع الواحد تتأثر بنفس العوامل فلا يتحقق التنويع."],["ما أفضل خطوة لتحسين التنويع؟",["إضافة أسهم من قطاعات مختلفة بأحجام معقولة","شراء سهم رابع من نفس القطاع","بيع كل شيء وانتظار فرصة"],0,"التنويع بين القطاعات يخفف أثر ضعف قطاع واحد."]],
-r4:[["لماذا تضر كثرة الصفقات الصغيرة بالأرباح؟",["لأن الرسوم تتكرر في كل عملية","لأن البورصة تمنعها","لأن السعر يتوقف"],0,"كل شراء وبيع يدفعان رسومًا فتتراكم."],["كيف تخفض عمولة الوسيط في TounsiTrade؟",["برفع مستوى XP عبر الدروس والاختبارات","بزيادة عدد الصفقات","بتغيير الوضع يدويًا"],0,"العمولة تنخفض عند 500 و1500 XP."]],
-t1:[["RSI = 82 على سهم صعد بسرعة. ماذا يوحي؟",["تشبع شرائي وقد يحدث تصحيح","فرصة شراء مؤكدة","السهم رخيص"],0,"RSI المرتفع تحذير من اندفاع الصعود وليس ضمانًا للهبوط."],["هل يكفي RSI وحده لاتخاذ قرار؟",["لا، يُستخدم مع الاتجاه والحجم ووقف الخسارة","نعم دائمًا","فقط عندما يكون 50"],0,"المؤشر أداة مساعدة وليس إشارة مضمونة."]],
-t2:[["سعر لامس 85 ثلاث مرات وارتد. ماذا يمثل 85؟",["دعمًا محتملًا","مقاومة مؤكدة","سعرًا عشوائيًا"],0,"تكرار الارتداد من مستوى يجعله دعمًا محتملًا."],["إذا كُسر الدعم بحجم مرتفع، ما الاحتمال الأقرب؟",["ضعف إضافي محتمل","صعود مؤكد","لا معنى للكسر"],0,"كسر الدعم بحجم كبير إشارة سلبية أقوى، دون ضمان."]],
-t3:[["شمعة جسمها صغير وظلالها طويلة تعني غالبًا؟",["تردد بين المشترين والبائعين","اتجاه صاعد قوي","إغلاق السوق"],0,"الجسم الصغير مع ظلال طويلة يدل على صراع دون حسم."],["الشمعة الحمراء تعني؟",["الإغلاق أقل من الافتتاح","الإغلاق أعلى من الافتتاح","لا تداول"],0,"اللون الأحمر: Close < Open."]],
-t4:[["سعر يصعد وحجم التداول ضعيف. كيف تقرأه؟",["صعود قد يكون ضعيفًا","اتجاه قوي مؤكد","إشارة بيع أكيدة"],0,"الصعود بلا مشاركة كبيرة أقل موثوقية."],["ارتفاع الحجم مع كسر مقاومة يعني غالبًا؟",["اختراق أقوى مصداقية","خطأ في البيانات","لا فائدة منه"],0,"الحجم الكبير يدعم صحة الاختراق."]],
-p1:[["سهمك نزل 3% فبعته فورًا ثم ارتد. أي شعور قاد القرار؟",["الخوف","الطمع","الصبر"],0,"البيع المتسرع عند أول هبوط يغلب عليه الخوف."],["أفضل أداة ضد قرارات الخوف والطمع؟",["خطة دخول وخروج مكتوبة قبل الصفقة","مراقبة الشاشة طوال الوقت","تغيير الهدف أثناء الحركة"],0,"الخطة المسبقة تقلل القرار الانفعالي."]],
-p2:[["خسرت 5% وتريد تعويضها بصفقة أكبر فورًا. ما أنسب تصرف؟",["التوقف ومراجعة الصفقة في دفتر صفقاتك","مضاعفة الكمية","شراء أي سهم يصعد"],0,"التعويض الفوري يرفع المخاطرة ويكرر الخطأ."],["أي سلوك يدل على الانتقام من السوق؟",["شراء متسرع بعد خسارة لتعويضها","تحليل هادئ لصفقة جديدة","وضع وقف خسارة"],0,"الدافع هو تعويض الخسارة لا فرصة محسوبة."]],
-p3:[["لماذا يساعد الصبر في التداول؟",["لأنه يقلل الصفقات الضعيفة والرسوم","لأنه يضمن الربح","لأنه يمنع كل خسارة"],0,"الصبر لا يضمن الربح لكنه يحسّن الانتقاء."],["لم تجد فرصة تناسب خطتك اليوم. ما التصرف المنطقي؟",["الانتظار دون صفقة","شراء أي سهم","زيادة المخاطرة"],0,"عدم التداول قرار مشروع."]],
-p4:[["سهم صعد 12% في ساعة وتريد الشراء خوفًا من الفوات. ماذا تفعل؟",["تتوقف وتراجع الخطة والسعر والمخاطرة","تشتري بكل السيولة","تتجاهل وقف الخسارة"],0,"FOMO يدفع للشراء عند القمم؛ اسأل: أين خطتي؟"],["أي علامة على FOMO؟",["الشراء لأنك ترى الآخرين يربحون","الشراء بعد دراسة وخطة","الانتظار حتى تتضح الإشارة"],0,"الدافع هو الخوف من الفوات لا التحليل."]],
-s1:[["أي عنصر يزداد غالبًا مع التداول اليومي؟",["الرسوم والضغط النفسي","الراحة","الاستثمار طويل الأمد"],0,"كثرة العمليات ترفع التكلفة والضغط."],["هل التداول اليومي مناسب لمن بدأ للتو؟",["غالبًا لا قبل اكتساب خبرة وانضباط","نعم دائمًا","لا يحتاج خطة"],0,"يتطلب وقتًا وانضباطًا وإدارة مخاطر."]],
-s2:[["الاحتفاظ بصفقة عدة أيام لالتقاط حركة متوسطة يسمى؟",["تداولًا متأرجحًا","تداولًا يوميًا","استثمارًا بلا هدف"],0,"المتأرجح يحتفظ من أيام إلى أسابيع."],["ما ميزة التداول المتأرجح؟",["صفقات أقل ورسوم أقل نسبيًا","لا مخاطرة","ربح فوري"],0,"عدد العمليات أقل عادة."]],
-s3:[["لماذا يُعد الوقت مهمًا للمستثمر طويل المدى؟",["يعطي الشركة فرصة للنمو وتقل تكلفة التداول","يلغي الخسارة","يمنع تقلب الأسعار"],0,"الوقت يفيد لكنه لا يضمن الربح."],["أي سلوك يناسب الاستثمار طويل المدى؟",["مراجعة دورية دون مطاردة كل تحرك","فتح الشاشة كل دقيقة","البيع عند أي هبوط"],0,"المراجعة الدورية تقلل القرارات العاطفية."]],
-tn1:[["أي جهة تشرف على السوق المالية في تونس؟",["هيئة السوق المالية CMF","وزارة السياحة","اتحاد الشغل"],0,"CMF هي الجهة المنظمة."],["أي مؤشر يتتبع أداء بورصة تونس؟",["TUNINDEX","NASDAQ","FTSE"],0,"TUNINDEX هو مؤشر بورصة تونس."]],
-tn2:[["إذا هبط قطاع البنوك كله، ماذا يحدث غالبًا لسهم بنك؟",["يتأثر بضغط القطاع","لا يتأثر أبدًا","يرتفع حتمًا"],0,"السهم يتأثر بالقطاع والسوق معًا."],["لماذا ننوّع بين القطاعات؟",["لتقليل أثر ضعف قطاع واحد","لزيادة الرسوم","لأن القانون يفرضه"],0,"التنويع يخفف أثر القطاع الضعيف."]],
-tn3:[["ماذا يحدث في مرحلة ما قبل الافتتاح؟",["تُدخل الأوامر دون تنفيذ فوري","التداول مغلق تمامًا","تنفذ الأوامر فورًا"],0,"تُقابَل الأوامر عند الافتتاح."],["متى تُنفَّذ الأوامر المتراكمة حسب الدرس؟",["عند الافتتاح 9:00","عند الإغلاق فقط","عند 8:30"],0,"عند الافتتاح وفق السعر والأولوية."]],
-a1:[["أي معلومة تنتمي للتحليل الأساسي؟",["أرباح الشركة وديونها وقطاعها","شكل الشمعة","مؤشر RSI"],0,"الأساسي يدرس الشركة من داخلها."],["كيف نجمع بين التحليل الأساسي والتقني؟",["الأساسي لاختيار الشركة والتقني لتوقيت الدخول","التقني لاختيار الشركة فقط","لا يجمعان"],0,"لكل منهما دور مختلف."]],
-a2:[["سهم P/E له 10 وآخر 40 في نفس القطاع. ماذا نستنتج وحده؟",["الأول أرخص نسبيًا لكن يلزم فحص الأسباب","الثاني أفضل حتمًا","الأول مفلس"],0,"النسبة وحدها لا تكفي للحكم."],["Dividend Yield يساوي؟",["التوزيع السنوي ÷ السعر × 100","السعر ÷ الربح","الربح ÷ عدد الأسهم"],0,"هي نسبة التوزيع إلى السعر."]],
-d1:[["لتستحق توزيع الأرباح يجب أن تملك السهم؟",["قبل تاريخ قطع الكوبون","بعد دفع الأرباح فقط","في أي وقت"],0,"من يملك السهم قبل القطع هو المستحق."],["ماذا يحدث غالبًا للسعر يوم قطع الكوبون؟",["ينخفض بقيمة التوزيع تقريبًا","يرتفع بقيمة التوزيع","لا يتغير أبدًا"],0,"جزء من قيمة الشركة خرج للمساهمين."],["تملك 200 سهم والتوزيع 0.5 د.ت للسهم. كم تستلم؟",["100 د.ت","10 د.ت","400 د.ت"],0,"200 × 0.5 = 100."],["هل شراء السهم قبل القطع ربح مضمون؟",["لا، السعر ينخفض بعد القطع","نعم دائمًا","فقط في التدريب"],0,"التوزيع لا يلغي مخاطرة السعر."],["أين ترى أحداث الأرباح في المنصة؟",["التقويم في الصفحة الرئيسية","شاشة الدخول","الشهادة"],0,"زر التقويم في بطاقة المحفظة."]],
-d2:[["تجزئة 1→2 على 100 سهم بسعر 10 تعطي؟",["200 سهم بسعر 5","100 سهم بسعر 20","200 سهم بسعر 10"],0,"القيمة الكلية تبقى 1,000."],["هل تغيّر التجزئة قيمة الشركة؟",["لا، تغيّر عدد الأسهم والسعر فقط","نعم تضاعفها","نعم تنصّفها"],0,"الشركة هي نفسها."],["ماذا يحدث لمتوسط تكلفتك بعد تجزئة 1→2؟",["ينخفض إلى النصف","يتضاعف","لا يتغير"],0,"عدد الأسهم تضاعف فتتوزع التكلفة."],["ماذا يعني سهم مجاني لكل 10 أسهم؟",["تزيد كميتك 10% ويتعدل السعر","تربح 10% نقدًا","يُلغى السهم"],0,"القيمة الكلية ثابتة نظريًا."],["ماذا يحدث لأوامرك المعلقة على سهم عُدّل سعره؟",["تُلغى ويُعاد المبلغ المحجوز","تبقى كما هي","تُنفذ فورًا"],0,"لأن سعر الأمر لم يعد مناسبًا."]],
-d3:[["ماذا يحدث للأوامر في ما قبل الافتتاح؟",["تُدخل أو تُعدّل أو تُلغى دون تنفيذ فوري","تنفذ فورًا","لا تُقبل أوامر"],0,"التنفيذ يكون عند الافتتاح."],["ما وقت مرحلة ما قبل الافتتاح؟",["08:30 – 09:00","09:00 – 14:00","14:00 – 15:00"],0,"قبل الجلسة بنصف ساعة."],["ما وظيفة المنبّه؟",["إعلامك دون تنفيذ صفقة","شراء تلقائي","بيع تلقائي"],0,"المنبّه لا ينفّذ أوامر."],["أمر «شراء عند سعر» في المنصة يحجز؟",["المبلغ اللازم ويُعاد عند الإلغاء","لا شيء","كل رصيدك دائمًا"],0,"الحجز يمنع إنفاق المبلغ مرتين."],["هل يضمن وقف الخسارة سعر البيع تمامًا؟",["لا، قد يختلف السعر إذا تحرك بسرعة","نعم دائمًا","فقط في الصباح"],0,"قد يحدث انزلاق في السعر."]],
-d4:[["ما فائدة دفتر الصفقات؟",["تحليل أسباب الربح والخسارة وتكرار الأخطاء","زيادة الرسوم","منح XP فقط"],0,"يحوّل التجربة إلى تعلّم."],["نسبة نجاح 40% مع متوسط ربح ضعف متوسط الخسارة تعني؟",["قد تكون النتيجة موجبة","خسارة حتمية","تعادلًا دائمًا"],0,"0.4×2 − 0.6×1 = +0.2 قبل الرسوم."],["أفضل عادة أسبوعية؟",["مراجعة أسوأ صفقة وكتابة قاعدة تمنع تكرارها","حذف الصفقات الخاسرة","تجاهل الدفتر"],0,"قاعدة واحدة واضحة أفضل من لوم النفس."],["إذا تكرر «تأثير الرسوم» في خسائرك فماذا يوحي؟",["أنك تتداول كثيرًا بأحجام صغيرة","أن السوق معطّل","أن الرسوم صفر"],0,"الرسوم تأكل الحركات الصغيرة."],["متى يظهر التحليل في الدفتر؟",["بعد بيع الصفقة","قبل الشراء","عند الدخول فقط"],0,"يُسجَّل عند الإغلاق."]],
-d5:[["عدد الأسهم = ؟",["(رأس المال × نسبة المخاطرة) ÷ (الدخول − الوقف)","السعر ÷ رأس المال","الوقف × الدخول"],0,"نبدأ من الخسارة المقبولة."],["رأس المال 10,000 ومخاطرة 2%: المبلغ المعرّض للخسارة؟",["200 د.ت","2,000 د.ت","20 د.ت"],0,"10,000 × 2% = 200."],["دخول 50 ووقف 47 والمخاطرة 200: كم سهمًا تقريبًا؟",["66","200","3"],0,"200 ÷ 3 ≈ 66."],["لماذا نراقب التركّز رغم أن المخاطرة 2%؟",["لأن حجم المركز قد يبقى كبيرًا من المحفظة","لأن التركز لا يهم","لأن الرسوم تتلاشى"],0,"المركز بـ3,300 يمثل ثلث المحفظة."],["ما الأولوية في حجم المركز؟",["تحديد الخسارة المقبولة أولًا","اختيار أكبر كمية ممكنة","الشراء بكل السيولة"],0,"ثم تُحسب الكمية."]],
-d6:[["الشراء السريع بعد خسارة لتعويضها يسمى؟",["الانتقام من السوق","التنويع","الصبر"],0,"الدافع هو التعويض لا الفرصة."],["هل تعني تنبيهات المرشد أنك مخطئ؟",["لا، هي تنبيهات تعليمية للتفكير","نعم دائمًا","تعني أنك مفلس"],0,"القرار يبقى قرارك."],["الإمساك بالخاسر يعني؟",["انتظار عودة السعر دون سبب جديد","بيع بخسارة","وضع وقف خسارة"],0,"ينتظر المتداول العودة دون خطة."],["ما علامة FOMO؟",["الشراء خوفًا من فوات صعود سريع","الشراء حسب خطة","عدم الشراء"],0,"الدافع هو الخوف من الفوات."],["أين تجد مركز المرشد؟",["المزيد ← مركز المرشد الذكي","شاشة الدخول","الشهادة"],0,"من تبويب «المزيد»."]],
-tn4:[["كيف يتم التداول الفعلي في البورصة؟",["عبر وسيط مرخّص","مباشرة دون وسيط","عبر هذا التطبيق"],0,"التطبيق محاكاة فقط."],["ماذا تطلب من الوسيط قبل فتح حساب؟",["جدول العمولات والرسوم","ربحًا مضمونًا","إخفاء الرسوم"],0,"الرسوم تؤثر في نتيجتك."],["بخصوص الضرائب على الأرباح والتوزيعات، ما التصرف الصحيح؟",["الرجوع إلى النصوص الرسمية أو مختص","افتراض أنها صفر","الاعتماد على التطبيق"],0,"الأحكام قد تتغير."],["هل تتنبأ نتائجك في التطبيق بنتائجك الحقيقية؟",["لا، الأسعار والشركات افتراضية","نعم تمامًا","نعم إذا ربحت أسبوعًا"],0,"المحاكاة تعليمية فقط."],["بأي مبلغ تبدأ فعليًا؟",["مبلغ تقبل خسارته","كل مدخراتك","قرض"],0,"لا تخاطر بما لا تحتمل خسارته."]]
-};
-Object.keys(Q).forEach(id=>{if(!QUIZ_BANK[id])QUIZ_BANK[id]=[];Q[id].forEach(q=>QUIZ_BANK[id].push(q));});
-
-/* ---------- 4) Fair XP ---------- */
-window.ttDailyXP=function(kind,amt,cap){try{const k='xpd_'+kind+'_'+dayId();const used=Number(lsG(k,0))||0;const g=Math.max(0,Math.min(amt,cap-used));if(g>0){lsS(k,used+g);addXP(g,kind);}return g;}catch(e){addXP(amt,kind);return amt;}};
-addXP=function(amount,reason){const old=userXP;userXP=Math.max(0,userXP+amount);
- if(old<500&&userXP>=500){pushNotification('rank','🎉 وصلت متوسط!','انخفضت عمولة الوسيط لديك إلى 0.40% 🔵');try{toast('🔵 عمولتك الآن 0.40%','good');}catch(e){}}
- if(old<1500&&userXP>=1500){pushNotification('rank','👑 وصلت النخبة!','انخفضت عمولة الوسيط لديك إلى 0.15% 👑');try{toast('👑 عمولتك الآن 0.15%','good');}catch(e){}}
- saveState();};
-awardPnL=function(profit,cost){const k=pnlPoints(profit,cost);if(!k)return;if(k>0){const g=ttDailyXP('pnl',k,120);if(g>0)toast('+'+g+' XP 📈','good');}else{addXP(k,'loss');toast(k+' XP 📉','warn');}};
-
-/* ---------- 5) Quiz feedback with explanation + wrong-question memory ---------- */
-function _wq(lessonId,text,ok){try{const m=lsG('wq',{}),k=lessonId+'|'+text;if(ok){if(m[k]){delete m[k];lsS('wq',m);}}else{m[k]=Date.now();const ks=Object.keys(m);if(ks.length>60)delete m[ks.sort((a,b)=>m[a]-m[b])[0]];lsS('wq',m);}}catch(e){}}
-function _expl(q){const fb=document.getElementById('quizFeedback');if(fb&&q&&q[3]){fb.style.whiteSpace='pre-line';fb.textContent+='\n💡 '+q[3];}}
-const _aq=answerQuiz;
-answerQuiz=function(i){const b=getQuizFor(activeQuiz.lessonId),q=b&&b[activeQuiz.idx];if(!q)return _aq(i);_wq(activeQuiz.lessonId,q[0],i===activeQuiz.newCorrectIdx);_aq(i);_expl(q);};
-const _am=answerMixedQuiz;
-answerMixedQuiz=function(i){const e=activeQuiz.mixed&&activeQuiz.mixed[activeQuiz.idx];if(!e)return _am(i);_wq(e.lessonId,e.q[0],i===activeQuiz.newCorrectIdx);_am(i);_expl(e.q);};
-startRandomQuiz=function(){
- const all=Object.keys(QUIZ_BANK);if(!all.length)return toast('لا يوجد محتوى');
- const pool=[];all.forEach(id=>{QUIZ_BANK[id].forEach(q=>pool.push({lessonId:id,q}));});
- const wrong=lsG('wq',{}),first=pool.filter(p=>wrong[p.lessonId+'|'+p.q[0]]);
- const picked=shuffleArray(first).slice(0,4);
- const rest=shuffleArray(pool.filter(p=>picked.indexOf(p)<0));
- while(picked.length<10&&rest.length)picked.push(rest.shift());
- activeQuiz={lessonId:'__mixed__',idx:0,answers:[],score:0,total:picked.length,mixed:picked,shuffledOptions:null,newCorrectIdx:0};
- closeSheet();setTimeout(()=>renderMixedModal(),50);
-};
-
-/* ---------- 6) Quality-focused weekly challenges ---------- */
-WEEKLY_CHALLENGES.splice(0,WEEKLY_CHALLENGES.length,
-{id:'w_sl3',icon:'🛡️',name:'احمِ 3 مراكز بوقف خسارة',desc:'امتلك 3 مراكز مفتوحة على الأقل وضع وقف خسارة على كل منها',target:3,xp:70,unit:'مركز',type:'sl_cover'},
-{id:'w_sectors',icon:'🧺',name:'نوّع استثمارك',desc:'امتلك أسهمًا من 3 قطاعات مختلفة',target:3,xp:60,unit:'قطاع',type:'sectors_held'},
-{id:'w_quiz3',icon:'🧠',name:'3 دروس باختبارات ناجحة',desc:'أنهِ 3 دروس مختلفة هذا الأسبوع واجتز اختباراتها (60% فأكثر)',target:3,xp:80,unit:'درس',type:'quiz_pass'},
-{id:'w_calm',icon:'🎯',name:'ربح هادئ',desc:'أغلق صفقتين رابحتين دون تجاوز 8 عمليات هذا الأسبوع',target:2,xp:70,unit:'صفقة',type:'winning_calm'},
-{id:'w_journal',icon:'📓',name:'راجع دفتر صفقاتك',desc:'افتح «دفتر صفقاتي» في 3 أيام مختلفة وراجع أسباب الربح والخسارة',target:3,xp:50,unit:'يوم',type:'journal_days'});
-getWeeklyChallenge=function(){let c=WEEKLY_CHALLENGES.find(x=>x.id===weeklyState.challengeId);if(!c){c=pickChallengeForWeek(weeklyState.weekKey||getWeekKey());weeklyState.challengeId=c.id;}return c;};
-computeWeeklyProgress=function(){const ch=getWeeklyChallenge(),ws=weeklyState;let p=0;
- if(ch.type==='sl_cover')p=Object.keys(holdings).filter(id=>holdings[id]&&holdings[id].qty>0&&pendingOrders.some(o=>o.type==='sl'&&o.stockId===id)).length;
- else if(ch.type==='sectors_held'){const s=new Set();Object.keys(holdings).forEach(id=>{const st=STOCKS.find(x=>x.id===id);if(st&&holdings[id].qty>0)s.add(st.sector);});p=s.size;}
- else if(ch.type==='quiz_pass')p=(ws.quizLessons||[]).length;
- else if(ch.type==='winning_calm')p=(ws.tradesThisWeek||0)<=8?(ws.winnersThisWeek||0):0;
- else if(ch.type==='journal_days')p=(ws.journalDays||[]).length;
- ws.progress=Math.min(p,ch.target);return ws.progress;};
-isWeeklyComplete=function(){computeWeeklyProgress();return weeklyState.progress>=getWeeklyChallenge().target;};
-trackWeeklyEvent=function(kind,amount){if(!weeklyState.weekKey)rolloverWeeklyIfNeeded();const ws=weeklyState;if(amount===undefined)amount=1;
- if(kind==='trade')ws.tradesThisWeek=(ws.tradesThisWeek||0)+amount;
- else if(kind==='lesson')ws.lessonsThisWeek=(ws.lessonsThisWeek||0)+amount;
- else if(kind==='sl')ws.slPlacedThisWeek=(ws.slPlacedThisWeek||0)+amount;
- else if(kind==='winner')ws.winnersThisWeek=(ws.winnersThisWeek||0)+amount;
- else if(kind==='quiz'){ws.quizLessons=ws.quizLessons||[];if(ws.quizLessons.indexOf(amount)<0)ws.quizLessons.push(amount);}
- else if(kind==='journal'){ws.journalDays=ws.journalDays||[];if(ws.journalDays.indexOf(amount)<0)ws.journalDays.push(amount);}
- computeWeeklyProgress();saveState();};
-const _rwc=renderWeeklyCard;
-renderWeeklyCard=function(){try{computeWeeklyProgress();}catch(e){}return _rwc.apply(this,arguments);};
-const _rh=renderHub;
-renderHub=function(){try{if(hubTab==='jr')trackWeeklyEvent('journal',dayId());}catch(e){}return _rh.apply(this,arguments);};
-window.renderHub=renderHub;
-
-/* ---------- 7) Daily challenges: quality, not volume ---------- */
-HT.ar.c1='ضع وقف خسارة على كل مركز مفتوح';
-HT.fr.c1='Placez un stop-loss sur chaque position ouverte';
-chStatus=function(){const ids=Object.keys(holdings).filter(id=>holdings[id]&&holdings[id].qty>0);
- const allSL=ids.length>0&&ids.every(id=>pendingOrders.some(o=>o.type==='sl'&&o.stockId===id));
- const sec=new Set(ids.map(id=>{const z=STOCKS.find(q=>q.id===id);return z&&z.sector;}).filter(Boolean)).size;
- const pv=portVal();return[allSL,sec>=3,ids.length>0&&pv>0&&cash/pv>=0.1];};
-
-/* ---------- 8) Knowledge ranking ---------- */
-window.ttSetRankView=function(v){window._rankView=v;renderRank();};
-function ttRankToggle(){const v=window._rankView==='know'?'know':'perf';return '<div class="mkt-seg"><div class="mkt-seg-row"><button class="'+(v==='perf'?'on prac':'')+'" onclick="ttSetRankView(\'perf\')">💰 الأداء</button><button class="'+(v==='know'?'on prac':'')+'" onclick="ttSetRankView(\'know\')">🎓 المعرفة</button></div></div>';}
-async function renderKnowledgeRank(){
- view.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><button onclick="document.querySelector(\'.tab[data-tab=market]\').click()" style="padding:9px 14px;border:none;border-radius:11px;background:#1c222a;color:#eaecef;font-weight:800;font-family:inherit;cursor:pointer">← رجوع</button><span style="font-size:12px;color:#f0b90b;font-weight:800">ترتيب المعرفة</span></div>'+ttRankToggle()+ttSkeleton(6);
- let rows=[];
- try{const s=await fbDb.collection('users').orderBy('xp','desc').limit(20).get();s.forEach(d=>{const x=d.data(),me=d.id===currentUser.id,hid=x.privacyHidden===true;rows.push({me,hid,name:hid?'متداول محمي':(cleanText(x.name)||'لاعب'),xp:me?userXP:Math.max(0,Math.min(100000,Number(x.xp)||0)),b:me?userBadges.length:(Array.isArray(x.badges)?x.badges.length:0)});});}catch(e){rows=null;}
- const head=view.innerHTML.split(ttSkeleton(6))[0];
- if(!rows){view.innerHTML=head+'<div class="pf-empty"><div class="ico">⚠️</div><div>تعذّر تحميل الترتيب</div></div>';return;}
- rows.sort((a,b)=>b.xp-a.xp);
- view.innerHTML=head+'<div style="font-size:11px;color:#8b95a5;line-height:1.8;margin-bottom:10px">يُحسب من الدروس والاختبارات والشارات والتحديات — لا من الأرباح فقط.</div>'+(rows.length?rows.map((r,i)=>'<div class="rank-card '+(r.me?'me':'')+'"><div class="rank-num '+(i===0?'gold':i===1?'silver':i===2?'bronze':'')+'">'+(i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1)+'</div><div class="rank-info" style="'+(r.hid?'color:#5e6673':'')+'">'+r.name+(r.me&&!r.hid?' <span style="color:#f0b90b">· أنت</span>':'')+' '+(r.hid?'':ttTierBadge(r.xp,true))+'<div class="meta">🏆 '+r.b+' شارة</div></div><div class="rank-value"><div class="v">'+r.xp+' XP</div></div></div>').join(''):'<div class="pf-empty"><div class="ico">🎓</div><div>لا بيانات بعد</div></div>')+'<div class="disc">الترتيب يعرض المستخدمين الحقيقيين فقط.</div>';
-}
-const _rr1=renderRank;
-renderRank=async function(){if(window._rankView==='know')return renderKnowledgeRank();await _rr1.apply(this,arguments);try{view.insertAdjacentHTML('afterbegin',ttRankToggle());}catch(e){}};
-window.renderRank=renderRank;
-const _str=switchToRank;
-switchToRank=function(){window._rankView='perf';return _str.apply(this,arguments);};
-})();
-
-</script>
 </html>
