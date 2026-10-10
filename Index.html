@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes">
 <meta name="theme-color" content="#0b0e11"><link rel="apple-touch-icon" href="1000056746.jpg"><meta name="mobile-web-app-capable" content="yes">
 <meta name="description" content="TounsiTrade: محاكي تعليمي للتداول في البورصة التونسية برصيد افتراضي ودروس عربية مبسّطة.">
 <title>TounsiTrade — محاكي التداول التونسي</title>
@@ -568,6 +568,94 @@ button[aria-label="More"]{display:none!important}
 .advh-log{font-size:11px;line-height:1.7;color:#aab2bf;padding:6px 0;border-bottom:1px solid #1a2027}
 .advh-log:last-child{border-bottom:none}
 .advh-log small{color:#5e6673;font-size:9.5px;margin-right:6px}
+
+
+/* =========================================================
+   TounsiTrade UI Refresh — unified premium dark interface
+   Arabic-first, responsive, original Tunisian logo preserved.
+   CSS-only redesign: keeps existing DOM and app logic intact.
+   ========================================================= */
+:root{
+  --tt-bg:#07111f;--tt-surface:#0d1b2b;--tt-surface-2:#122338;
+  --tt-line:rgba(158,190,220,.14);--tt-text:#f3f7fc;--tt-muted:#91a4ba;
+  --tt-green:#19d69a;--tt-red:#ff667a;--tt-gold:#e8bd65;--tt-blue:#69a9ff;
+  --tt-radius:18px;--tt-shadow:0 12px 30px rgba(0,0,0,.22);
+}
+html{background:var(--tt-bg);color-scheme:dark;scroll-behavior:smooth}
+body{background:radial-gradient(ellipse at 50% -10%,#15365a 0%,#07111f 48%,#050b14 100%)!important;color:var(--tt-text)!important;font-family:Tahoma,"Segoe UI",system-ui,sans-serif!important}
+.app,#mainApp{background:linear-gradient(180deg,#091727 0%,#07111f 100%)!important;color:var(--tt-text)!important;box-shadow:0 0 0 1px rgba(157,192,225,.08),0 24px 80px rgba(0,0,0,.35)}
+#mainApp>div:first-child{background:rgba(7,17,31,.96)!important;backdrop-filter:blur(16px);border-bottom:1px solid var(--tt-line)}
+.topbar{padding:15px 17px 12px!important;gap:12px!important}
+.logo,.auth-logo{border-radius:15px!important;box-shadow:0 0 0 1px rgba(232,189,101,.55),0 5px 18px rgba(232,189,101,.13)!important;overflow:hidden}
+.brand-name{font-size:16px!important;letter-spacing:.1px!important;color:#f8fbff}
+.brand-sub{color:var(--tt-muted)!important}
+.icon-btn{width:42px!important;height:42px!important;border-radius:14px!important;background:linear-gradient(145deg,#14263b,#0d1a2a)!important;border:1px solid var(--tt-line)!important;box-shadow:0 5px 14px rgba(0,0,0,.16)}
+.users-strip{margin:0 16px 9px!important;background:rgba(25,214,154,.07)!important;border-color:rgba(25,214,154,.18)!important;color:#80f0c8!important;border-radius:12px!important;padding:8px 12px!important;font-size:10.5px!important}
+.wclk{gap:8px!important;padding:0 16px!important}
+.wclk .c{background:rgba(18,35,56,.76)!important;border:1px solid var(--tt-line)!important;border-radius:13px!important;padding:8px 4px!important}
+.wclk .n{color:var(--tt-muted)!important}
+.wclk .t{color:#edf5ff!important;font-size:14px!important}
+.tabs{margin:0 14px 12px!important;padding:5px!important;gap:5px!important;border-radius:16px!important;background:#0d1a2a!important;border:1px solid var(--tt-line)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.025)}
+.tab{border-radius:12px!important;padding:9px 2px!important;color:#8ca0b8!important;font-size:10.5px!important;gap:4px!important}
+.tab .ticon{font-size:17px!important}
+.tab.on{background:linear-gradient(145deg,#1c3854,#142941)!important;color:#fff!important;box-shadow:inset 0 0 0 1px rgba(105,169,255,.22),0 3px 10px rgba(0,0,0,.16)}
+.market-status{margin:0 15px 12px!important;padding:11px 14px!important;border-radius:14px!important;border:1px solid var(--tt-line)!important;box-shadow:0 4px 14px rgba(0,0,0,.12);background:rgba(18,35,56,.7)!important}
+.market-status.practice{border-color:rgba(232,189,101,.22)!important;background:linear-gradient(100deg,rgba(232,189,101,.10),rgba(18,35,56,.78))!important}
+.market-status.live{border-color:rgba(25,214,154,.22)!important;background:linear-gradient(100deg,rgba(25,214,154,.10),rgba(18,35,56,.78))!important}
+.hero{margin:0 15px 15px!important;padding:18px!important;border-radius:22px!important;background:radial-gradient(circle at 0% 0%,rgba(55,122,190,.24),transparent 45%),linear-gradient(145deg,#142a43,#0c1b2d 72%)!important;border:1px solid rgba(120,170,220,.2)!important;box-shadow:var(--tt-shadow)!important}
+.hero::after{background:radial-gradient(circle,rgba(105,169,255,.16),transparent 70%)!important;opacity:.8}
+.hero-l{color:#afc2d7!important;font-size:12px!important;font-weight:700}
+.hero-v{font-size:clamp(27px,7vw,34px)!important;font-weight:900!important;letter-spacing:-.6px!important;color:#fff!important;line-height:1.35}
+.hero-v span{color:#a7bad0!important;font-size:13px!important;letter-spacing:0}
+.hero-rank{color:#f0d18a!important}
+.hero-avatar{background:linear-gradient(145deg,#f0d18a,#b98532)!important;box-shadow:0 0 0 4px rgba(232,189,101,.11),0 5px 14px rgba(0,0,0,.22)}
+.pill{border-radius:10px!important;padding:6px 9px!important;font-size:10.5px!important}
+#view{padding-bottom:24px}
+/* Shared cards and panels across every app section */
+.card,.panel,.box-card,.lesson-card,.course-card,.profile-card,.settings-card,.stat-card,.summary-card,.trade-card,.order-card,.history-card,.leader-card,.quiz-card,.news-card,.challenge-card,.achievement-card,.modal-card{
+  border-radius:17px!important;border-color:var(--tt-line)!important;background:linear-gradient(145deg,rgba(17,35,55,.97),rgba(11,25,41,.97))!important;box-shadow:0 7px 20px rgba(0,0,0,.13)!important
+}
+.section-title,.sec-title,.page-title,.view-title{color:#f1f6fc!important;font-weight:900!important;letter-spacing:-.15px}
+.stock-row{background:linear-gradient(110deg,#10243a,#0c1b2d)!important;border:1px solid var(--tt-line)!important;border-radius:15px!important;padding:12px 13px!important;box-shadow:0 4px 12px rgba(0,0,0,.1);transition:transform .16s ease,border-color .16s ease,background .16s ease!important}
+.stock-row:active{transform:scale(.985)!important;background:#17304a!important}
+.sr-ico{border-radius:12px!important}
+button,.btn-primary,.btn-secondary,.btn-social{transition:transform .15s ease,filter .15s ease,box-shadow .15s ease}
+button:active{filter:brightness(1.08)}
+.btn-primary{background:linear-gradient(135deg,#20d6a0,#0caa7c)!important;color:#041b18!important;box-shadow:0 7px 20px rgba(25,214,154,.17)!important;border-radius:13px!important}
+.btn-secondary{background:#15283d!important;border:1px solid var(--tt-line)!important;color:#e3edf8!important;border-radius:13px!important}
+button.y{background:linear-gradient(135deg,#f0d18a,#c69442)!important;color:#1d1609!important;border-radius:14px!important;box-shadow:0 8px 22px rgba(232,189,101,.18)!important}
+button.g{background:rgba(16,34,53,.92)!important;color:#edf5ff!important;border:1px solid rgba(155,190,225,.2)!important;border-radius:14px!important}
+input,select,textarea,.auth-input{background:#091827!important;color:#f2f7fd!important;border:1px solid rgba(144,178,211,.24)!important;border-radius:12px!important;outline:none}
+input:focus,select:focus,textarea:focus,.auth-input:focus{border-color:rgba(105,169,255,.75)!important;box-shadow:0 0 0 3px rgba(105,169,255,.12)!important}
+label,.auth-label{color:#b7c8da!important}
+.sheet{background:linear-gradient(180deg,#12253a,#0a1726)!important;border-top:1px solid rgba(144,178,211,.22)!important;border-radius:24px 24px 0 0!important;box-shadow:0 -16px 45px rgba(0,0,0,.32)!important}
+.grab{background:#51677e!important;width:42px!important;height:4px!important;border-radius:5px!important}
+.backdrop{backdrop-filter:blur(4px);background:rgba(2,8,16,.68)!important}
+.toast{border:1px solid var(--tt-line)!important;border-radius:14px!important;box-shadow:0 12px 28px rgba(0,0,0,.3)!important}
+.pf-btn-mini,.pf-btn-blue{border-radius:17px!important;box-shadow:0 9px 20px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.2)!important}
+.mkt-seg{background:#0c1a2a!important;border-color:var(--tt-line)!important;border-radius:15px!important}
+.mkt-seg-row button{border-radius:11px!important}
+.mkt-seg-row button.on.prac{background:rgba(25,214,154,.13)!important;border-color:rgba(25,214,154,.4)!important;color:#53e8b9!important}
+.mkt-seg-row button.on.live{background:rgba(255,102,122,.12)!important;border-color:rgba(255,102,122,.38)!important;color:#ff9aa8!important}
+.adv-card{background:rgba(12,27,44,.98)!important;border-color:var(--tt-line)!important;border-radius:16px!important;box-shadow:0 12px 30px rgba(0,0,0,.32)!important}
+.advh-box,.advh-pat div{background:#0c1a2a!important;border-color:var(--tt-line)!important;border-radius:14px!important}
+.advh-t,.advh-st b{color:#eef5fd!important}
+.auth-screen{background:radial-gradient(ellipse at 50% 0%,#183858 0%,#07111f 60%,#030912 100%)!important}
+#authScreen,#splash{background-color:#07111f!important}
+.auth-content{width:100%;max-width:460px;padding-left:18px!important;padding-right:18px!important}
+.auth-title{color:#f5f8fd!important;text-shadow:none!important}
+.auth-tag{color:#9fb4ca!important}
+.auth-form{background:rgba(12,27,44,.7)!important;border:1px solid rgba(144,178,211,.16)!important;border-radius:20px!important;padding:15px!important;box-shadow:0 12px 30px rgba(0,0,0,.18)}
+#authScreen .auth-form{background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important}
+#ttDisclaimer{border-color:rgba(232,189,101,.3)!important;background:rgba(232,189,101,.08)!important;color:#f0d89d!important;border-radius:13px!important}
+.auth-error{border-radius:12px!important}
+#splash .hero-art{filter:drop-shadow(0 10px 34px rgba(232,189,101,.15));}
+:focus-visible{outline:2px solid #69a9ff!important;outline-offset:3px!important}
+*{scrollbar-color:#2b4763 transparent;scrollbar-width:thin}
+@media(min-width:600px){body{padding:20px 0!important}.app,#mainApp{max-width:500px!important;height:min(94dvh,980px)!important;border-radius:25px!important;border:1px solid rgba(158,190,220,.13);overflow:hidden}.auth-screen{padding:16px!important}.auth-content{max-width:470px!important}}
+@media(max-width:380px){.topbar{padding:12px 13px 10px!important}.tabs{margin-left:10px!important;margin-right:10px!important}.tab{font-size:9.5px!important}.hero{margin-left:11px!important;margin-right:11px!important;padding:14px!important}.hero-v{font-size:25px!important}.users-strip{margin-left:11px!important;margin-right:11px!important}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
 </style>
 <script>
   // ⚠️ بدّل YOUR_FORM_ID بمعرّف Formspree
@@ -825,14 +913,14 @@ const SECTORS={'بنوك':{drift:0.000002,vol:0.0025,ret:0},'نسيج':{drift:0.
    STATE
    ============================================================ */
 const STATE={
-  practice:{cash:STARTING_CASH,holdings:{},pendingOrders:[],alerts:[],recentTrades:[],orderSeq:1,valueHistory:[{t:Date.now(),v:STARTING_CASH}],stocks:[],market:{value:9850,open:9850,drift:0.0000008,vol:0.0012,ret:0}},
-  live:{cash:STARTING_CASH,holdings:{},pendingOrders:[],alerts:[],recentTrades:[],orderSeq:1,valueHistory:[{t:Date.now(),v:STARTING_CASH}],stocks:[],market:{value:9850,open:9850,drift:0.0000008,vol:0.0012,ret:0}}
+  practice:{cash:STARTING_CASH,realizedPnl:0,holdings:{},pendingOrders:[],alerts:[],recentTrades:[],orderSeq:1,valueHistory:[{t:Date.now(),v:STARTING_CASH}],stocks:[],market:{value:9850,open:9850,drift:0.0000008,vol:0.0012,ret:0}},
+  live:{cash:STARTING_CASH,realizedPnl:0,holdings:{},pendingOrders:[],alerts:[],recentTrades:[],orderSeq:1,valueHistory:[{t:Date.now(),v:STARTING_CASH}],stocks:[],market:{value:9850,open:9850,drift:0.0000008,vol:0.0012,ret:0}}
 };
 let currentUser=null,appStarted=false,nameMode='pseudo',notifications=[];
 let lessonProgress={completed:{},quiz:{}},sentMessages=[],stateLoaded=false,saveTimer=null;
 let realStats={totalUsers:0,onlineNow:0},presenceInterval=null,currentTimeframe='1m';
 let rankPeriod='all',userXP=0,userBadges=[];
-let cash=STARTING_CASH,holdings={},pendingOrders=[],alerts=[],orderSeq=1;
+let cash=STARTING_CASH,realizedPnl=0,holdings={},pendingOrders=[],alerts=[],orderSeq=1;
 let valueHistory=[{t:Date.now(),v:STARTING_CASH}],recentTrades=[];
 let STOCKS=[],MARKET={value:9850,open:9850,drift:0.0000008,vol:0.0012,ret:0};
 
@@ -884,12 +972,12 @@ function unlockBadge(id){if(userBadges.includes(id))return;const b=BADGES.find(x
 function buildStocksFor(mode){return STOCKS_INIT.map(s=>({...s,price:s.initial,open:s.initial,chg:0,spark:Array.from({length:400},()=>s.initial)}));}
 function loadModeState(mode){
   if(!STATE[mode].stocks.length){STATE[mode].stocks=buildStocksFor(mode);STATE[mode].market={value:9850,open:9850,drift:0.0000008,vol:0.0012,ret:0};}
-  const s=STATE[mode];cash=s.cash;holdings=s.holdings;pendingOrders=s.pendingOrders;alerts=s.alerts;recentTrades=s.recentTrades;orderSeq=s.orderSeq;valueHistory=s.valueHistory;STOCKS=s.stocks;MARKET=s.market;
+  const s=STATE[mode];cash=s.cash;realizedPnl=Number.isFinite(Number(s.realizedPnl))?Number(s.realizedPnl):0;holdings=s.holdings;pendingOrders=s.pendingOrders;alerts=s.alerts;recentTrades=s.recentTrades;orderSeq=s.orderSeq;valueHistory=s.valueHistory;STOCKS=s.stocks;MARKET=s.market;
   if(typeof MARKET.drift!=='number'||isNaN(MARKET.drift))MARKET.drift=0.0000008;
   if(typeof MARKET.vol!=='number'||isNaN(MARKET.vol))MARKET.vol=0.0012;
   if(typeof MARKET.ret!=='number'||isNaN(MARKET.ret))MARKET.ret=0;
 }
-function saveModeState(){try{if(currentUser)localStorage.setItem('tt_last_mode_'+currentUser.id,getMarketMode());}catch(e){}const m=getMarketMode();const s=STATE[m];s.cash=cash;s.holdings=holdings;s.pendingOrders=pendingOrders;s.alerts=alerts;s.recentTrades=recentTrades;s.orderSeq=orderSeq;s.valueHistory=valueHistory;s.stocks=STOCKS;s.market=MARKET;}
+function saveModeState(){try{if(currentUser)localStorage.setItem('tt_last_mode_'+currentUser.id,getMarketMode());}catch(e){}const m=getMarketMode();const s=STATE[m];s.cash=cash;s.realizedPnl=realizedPnl;s.holdings=holdings;s.pendingOrders=pendingOrders;s.alerts=alerts;s.recentTrades=recentTrades;s.orderSeq=orderSeq;s.valueHistory=valueHistory;s.stocks=STOCKS;s.market=MARKET;}
 STATE.practice.stocks=buildStocksFor('practice');
 STATE.live.stocks=buildStocksFor('live');
 loadModeState(getMarketMode());
@@ -1157,7 +1245,7 @@ function clearLocalState(){
   // Prevent a delayed save timer from the previous account running after another user signs in.
   if(_flushTimer){clearTimeout(_flushTimer);_flushTimer=null;}
   _stateDirty=false;
-  ['practice','live'].forEach(m=>{STATE[m]={cash:STARTING_CASH,holdings:{},pendingOrders:[],alerts:[],recentTrades:[],orderSeq:1,valueHistory:[{t:Date.now(),v:STARTING_CASH}],stocks:buildStocksFor(m),market:{value:9850,open:9850,drift:0.0000008,vol:0.0012,ret:0}};});
+  ['practice','live'].forEach(m=>{STATE[m]={cash:STARTING_CASH,realizedPnl:0,holdings:{},pendingOrders:[],alerts:[],recentTrades:[],orderSeq:1,valueHistory:[{t:Date.now(),v:STARTING_CASH}],stocks:buildStocksFor(m),market:{value:9850,open:9850,drift:0.0000008,vol:0.0012,ret:0}};});
   notifications=[];sentMessages=[];lessonProgress={completed:{},quiz:{}};rankPeriod='all';userXP=0;userBadges=[];stateLoaded=false;
   weeklyState={weekKey:null,challengeId:null,baselineValue:0,tradesThisWeek:0,lessonsThisWeek:0,slPlacedThisWeek:0,winnersThisWeek:0,progress:0,claimed:false};
   adaptiveState={attempts:{},lastUpdate:0};
@@ -1168,7 +1256,7 @@ function clearLocalState(){
 async function resetState(){
   if(!(await askConfirm('إعادة تعيين المنصة التعليمية؟ سيتم حذف تقدمك في هذا الوضع والعودة إلى 10,000 TND.')))return;
   const m=getMarketMode();
-  STATE[m]={cash:STARTING_CASH,holdings:{},pendingOrders:[],alerts:[],recentTrades:[],orderSeq:1,valueHistory:[{t:Date.now(),v:STARTING_CASH}],stocks:buildStocksFor(m),market:{value:9850,open:9850,drift:0.0000008,vol:0.0012,ret:0}};
+  STATE[m]={cash:STARTING_CASH,realizedPnl:0,holdings:{},pendingOrders:[],alerts:[],recentTrades:[],orderSeq:1,valueHistory:[{t:Date.now(),v:STARTING_CASH}],stocks:buildStocksFor(m),market:{value:9850,open:9850,drift:0.0000008,vol:0.0012,ret:0}};
   loadModeState(m);closeSheet();currentTab='home';
   document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x.dataset.tab==='home'));
   render();updateHero();updateBellBadge();saveState();toast('تم إعادة التعيين','good');
@@ -1279,8 +1367,8 @@ function startPresenceSystem(){if(presenceInterval)clearInterval(presenceInterva
 function stateDocPath(){return'userStates/'+currentUser.id;}
 function _buildState(){saveModeState();return {
       mode:getMarketMode(),
-      practice:{cash:STATE.practice.cash,holdings:STATE.practice.holdings,pendingOrders:STATE.practice.pendingOrders,alerts:STATE.practice.alerts,orderSeq:STATE.practice.orderSeq,valueHistory:STATE.practice.valueHistory.slice(-500),recentTrades:STATE.practice.recentTrades.slice(0,20),stocks:STATE.practice.stocks.map(s=>({id:s.id,price:s.price,open:s.open,chg:s.chg,spark:s.spark.slice(-120),fair:s.fair||null,initial:s.initial||null})),market:{value:STATE.practice.market.value,open:STATE.practice.market.open}},
-      live:{cash:STATE.live.cash,holdings:STATE.live.holdings,pendingOrders:STATE.live.pendingOrders,alerts:STATE.live.alerts,orderSeq:STATE.live.orderSeq,valueHistory:STATE.live.valueHistory.slice(-500),recentTrades:STATE.live.recentTrades.slice(0,20),stocks:STATE.live.stocks.map(s=>({id:s.id,price:s.price,open:s.open,chg:s.chg,spark:s.spark.slice(-120),fair:s.fair||null,initial:s.initial||null})),market:{value:STATE.live.market.value,open:STATE.live.market.open}},
+      practice:{cash:STATE.practice.cash,realizedPnl:STATE.practice.realizedPnl||0,holdings:STATE.practice.holdings,pendingOrders:STATE.practice.pendingOrders,alerts:STATE.practice.alerts,orderSeq:STATE.practice.orderSeq,valueHistory:STATE.practice.valueHistory.slice(-500),recentTrades:STATE.practice.recentTrades.slice(0,20),stocks:STATE.practice.stocks.map(s=>({id:s.id,price:s.price,open:s.open,chg:s.chg,spark:s.spark.slice(-120),fair:s.fair||null,initial:s.initial||null})),market:{value:STATE.practice.market.value,open:STATE.practice.market.open}},
+      live:{cash:STATE.live.cash,realizedPnl:STATE.live.realizedPnl||0,holdings:STATE.live.holdings,pendingOrders:STATE.live.pendingOrders,alerts:STATE.live.alerts,orderSeq:STATE.live.orderSeq,valueHistory:STATE.live.valueHistory.slice(-500),recentTrades:STATE.live.recentTrades.slice(0,20),stocks:STATE.live.stocks.map(s=>({id:s.id,price:s.price,open:s.open,chg:s.chg,spark:s.spark.slice(-120),fair:s.fair||null,initial:s.initial||null})),market:{value:STATE.live.market.value,open:STATE.live.market.open}},
       rankPeriod,notifications:notifications.slice(0,50),lessonProgress,
       sentMessages:sentMessages.slice(0,30),userXP,userBadges,
       weekly:weeklyState,adaptive:adaptiveState,
@@ -1378,7 +1466,7 @@ if(window._loadAborted)return false;
 if(!s){if(lerr)throw lerr;return false;}
     ['practice','live'].forEach(m=>{
       const d=s[m];if(!d)return;
-      STATE[m]={cash:(typeof d.cash==='number')?d.cash:STARTING_CASH,holdings:d.holdings||{},pendingOrders:d.pendingOrders||[],alerts:d.alerts||[],recentTrades:d.recentTrades||[],orderSeq:d.orderSeq||1,valueHistory:d.valueHistory||[{t:Date.now(),v:STARTING_CASH}],stocks:buildStocksFor(m),market:{value:9850,open:9850,drift:0.0000008,vol:0.0012,ret:0}};
+      STATE[m]={cash:(typeof d.cash==='number')?d.cash:STARTING_CASH,realizedPnl:Number.isFinite(Number(d.realizedPnl))?Number(d.realizedPnl):0,holdings:d.holdings||{},pendingOrders:d.pendingOrders||[],alerts:d.alerts||[],recentTrades:d.recentTrades||[],orderSeq:d.orderSeq||1,valueHistory:d.valueHistory||[{t:Date.now(),v:STARTING_CASH}],stocks:buildStocksFor(m),market:{value:9850,open:9850,drift:0.0000008,vol:0.0012,ret:0}};
       if(Array.isArray(d.stocks)){d.stocks.forEach(sv=>{const st=STATE[m].stocks.find(x=>x.id===sv.id);if(st){st.price=sv.price;st.open=sv.open;st.chg=sv.chg;if(sv.fair>0)st.fair=sv.fair;if(sv.initial>0)st.initial=sv.initial;if(sv.spark)st.spark=sv.spark;}});}
       if(d.market){STATE[m].market.value=d.market.value??9850;STATE[m].market.open=d.market.open??9850;}
     });
@@ -1936,11 +2024,13 @@ async function _doSellCore(){
   const h=holdings[s.id];const q=Number(currentQty());
   if(!Number.isFinite(q)||q<=0)return toast('الكمية غير صحيحة','warn');
   if(!h||!Number.isFinite(Number(h.qty))||h.qty<q-0.0001)return toast('لا تملك كمية كافية','warn');
+  if(!Number.isFinite(Number(h.avg))||Number(h.avg)<0)return toast('تكلفة الشراء المسجلة غير سليمة؛ أوقفنا البيع لحماية سجلّك.','warn');
   const f=ttCalculateFees(s.price,q);const net=Number(f.stockValue)-Number(f.totalFees);
   if(!Number.isFinite(net)||net<0)return toast('تعذّر حساب صافي البيع؛ لم يتم تنفيذ الأمر.','warn');
   const profit=net-h.avg*q;
+  if(!Number.isFinite(profit))return toast('تعذّر التحقق من نتيجة البيع؛ لم يتم تنفيذ الأمر.','warn');
   if(!(await askConfirm(`تأكيد البيع؟\n${displayId(s)}\nالكمية: ${fmtQty(q)}\nالمستلم: ${fmt(net)} TND`)))return;
-  cash+=net;h.qty-=q;
+  cash+=net;realizedPnl+=profit;h.qty-=q;
   if(h.qty<0.0001){delete holdings[s.id];pendingOrders=pendingOrders.filter(o=>!(o.type==='sl'&&o.stockId===s.id));}
   addTrade(s.id,'sell',q,s.price);
   trackWeeklyEvent('trade');
@@ -2010,6 +2100,7 @@ function ttCoachHTML(){
 function renderPortfolio(){
   const entries=Object.entries(holdings);
   const hv=holdingsValue(),reserved=reservedOrderValue(),total=portfolioTotalValue(),totalPnl=total-STARTING_CASH,totalPct=(totalPnl/STARTING_CASH)*100;
+  // realizedPnl is tracked from sales made after this field was introduced; legacy sales cannot be reconstructed reliably.
   const unrealizedPnl=entries.reduce((sum,[id,h])=>{const st=STOCKS.find(x=>x.id===id);return sum+(st?((Number(st.price)||0)-(Number(h.avg)||0))*Number(h.qty||0):0);},0);
   let wc=0,lc=0,wp=0,lp=0,wcost=0,lcst=0;
   entries.forEach(([id,h])=>{const s=STOCKS.find(x=>x.id===id);if(!s)return;const v=s.price*h.qty,c=h.avg*h.qty,p=v-c;if(p>0){wc++;wp+=p;wcost+=c;}else if(p<0){lc++;lp+=p;lcst+=c;}});
@@ -2021,6 +2112,7 @@ function renderPortfolio(){
       <div class="pf-btn-mini" style="cursor:default"><div class="pm-title">🔒 السيولة المحجوزة</div><div class="pm-main">${fmt(reserved)} TND</div><div class="pm-sub">ضمن الأوامر المعلّقة</div></div>
       <div class="pf-btn-mini" style="cursor:default"><div class="pm-title">📈 قيمة الأسهم</div><div class="pm-main">${fmt(hv)} TND</div><div class="pm-sub">حسب الأسعار الحالية داخل المحاكاة</div></div>
       <div class="pf-btn-mini" style="cursor:default"><div class="pm-title">${unrealizedPnl>=0?'🟢':'🔴'} الربح/الخسارة غير المحققة</div><div class="pm-main ${cls(unrealizedPnl)}">${unrealizedPnl>=0?'+':''}${fmt(unrealizedPnl)} TND</div><div class="pm-sub">على المراكز المفتوحة فقط</div></div>
+      <div class="pf-btn-mini" style="cursor:default"><div class="pm-title">${realizedPnl>=0?'🟢':'🔴'} الربح/الخسارة المحققة</div><div class="pm-main ${cls(realizedPnl)}">${realizedPnl>=0?'+':''}${fmt(realizedPnl)} TND</div><div class="pm-sub">من المبيعات المنفذة منذ تفعيل هذا التتبع</div></div>
     </div>
     ${ttCoachHTML()}
     ${entries.length===0?`<div class="pf-empty" style="padding:60px 20px"><div class="ico" style="font-size:38px">📊</div><div style="font-size:12.5px">لا تملك أي مركز بعد</div><div class="sub">اذهب إلى «السوق» وابدأ التداول</div></div>`:`
