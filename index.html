@@ -1354,7 +1354,7 @@ if(!s){if(lerr)throw lerr;return false;}
     // جلب privacyHidden من users collection
     try{
       const u=await Promise.race([fbDb.collection('users').doc(currentUser.id).get(),new Promise((_,reject)=>setTimeout(()=>reject(new Error('profile-load-timeout')),4000))]);
-      if(u.exists){const ud=u.data();currentUser.privacyHidden=ud.privacyHidden===true;currentUser.balanceHidden=ud.balanceHidden===true;if(typeof ud.hideBalanceOnDevice==='boolean'){const hb=ud.hideBalanceOnDevice;window._ttHideBalance=hb;try{localStorage.setItem('tt_hide_balance',hb?'1':'0');}catch(x){}}else{window._ttHideBalance=isBalanceHidden();}}
+      if(u.exists){const ud=u.data();try{const lp=localStorage.getItem('tt_priv_privacyHidden_'+currentUser.id);const lb=localStorage.getItem('tt_priv_balanceHidden_'+currentUser.id);currentUser.privacyHidden=lp!==null?lp==='1':ud.privacyHidden===true;currentUser.balanceHidden=lb!==null?lb==='1':ud.balanceHidden===true;}catch(x){currentUser.privacyHidden=ud.privacyHidden===true;currentUser.balanceHidden=ud.balanceHidden===true;}try{const hbLocal=localStorage.getItem('tt_hide_balance');if(hbLocal!==null){window._ttHideBalance=hbLocal==='1';}else if(typeof ud.hideBalanceOnDevice==='boolean'){window._ttHideBalance=ud.hideBalanceOnDevice;localStorage.setItem('tt_hide_balance',window._ttHideBalance?'1':'0');}else{window._ttHideBalance=false;}}catch(x){window._ttHideBalance=ud.hideBalanceOnDevice===true;}}
     }catch(e){}
     loadModeState(getMarketMode());
     return true;
@@ -1531,18 +1531,26 @@ function applyBalanceVisibility(){
   const hidden=isBalanceHidden(),mask='••••••';
   const ids=['pfTotalAssets','pfTotalPnl','pfTotalPct','pfSellAllAmount','pfSellAllSub','pfWinMain','pfWinSub','pfLoseMain','pfLoseSub'];
   ids.forEach(id=>{const el=document.getElementById(id);if(!el)return;if(hidden){el.textContent=mask;el.dataset.ttMasked='1';}else if(el.dataset.ttMasked==='1'){delete el.dataset.ttMasked;/* القيمة الأصلية يعيدها renderPortfolio أو updatePortfolioLive */}});
+  // أخفِ أيضًا الربح والخسارة لكل مركز، لا الإجمالي فقط.
+  document.querySelectorAll('[data-pfid] .pv, [data-pfid] .pp').forEach(el=>{if(hidden){el.textContent=mask;el.dataset.ttMasked='1';}else if(el.dataset.ttMasked==='1'){delete el.dataset.ttMasked;}});
   const btn=document.getElementById('balanceVisibilityBtn');if(btn){btn.textContent=hidden?'🙈':'👁';btn.title=hidden?'إظهار الرصيد':'إخفاء الرصيد';btn.setAttribute('aria-pressed',hidden?'true':'false');}
   const hp=document.getElementById('heroPnl');if(hp&&hidden)hp.textContent=mask;
   const cashEl=document.getElementById('heroCash');if(cashEl&&hidden)cashEl.textContent='💧 السيولة: '+mask+' TND · 📈 الأسهم: '+mask+' TND · 🔒 محجوز: '+mask+' TND';
 }
 function toggleBalanceVisibility(ev){
   if(ev){ev.preventDefault();ev.stopPropagation();}
-  const next=!isBalanceHidden();window._ttHideBalance=next;
-  try{localStorage.setItem('tt_hide_balance',next?'1':'0');}catch(e){toast('تعذّر حفظ الإعداد على هذا الجهاز','warn');}
-  // هذا الإعداد مستقل عن إخفاء قيمة الحساب في لوحة الترتيب.
-  if(currentTab==='portfolio')renderPortfolio();else{updateHero();applyBalanceVisibility();}
-  if(currentUser&&fbDb){fbDb.collection('users').doc(currentUser.id).set({hideBalanceOnDevice:next,updatedAt:Date.now()},{merge:true}).then(()=>toast(next?'تم إخفاء الرصيد وحفظ الإعداد':'تم إظهار الرصيد وحفظ الإعداد','good')).catch(e=>{console.warn('hide balance preference save failed',e);toast('تم تغيير الإخفاء على هذا الجهاز، لكن تعذّر حفظه في الحساب','warn');});}
-  else toast(next?'تم إخفاء الرصيد على هذا الجهاز':'تم إظهار الرصيد','good');
+  const next=!isBalanceHidden();
+  window._ttHideBalance=next;
+  // Apply immediately: the button must work even if Firebase is slow/unavailable.
+  try{localStorage.setItem('tt_hide_balance',next?'1':'0');}catch(e){}
+  try{if(currentTab==='portfolio')renderPortfolio();else{updateHero();applyBalanceVisibility();}}catch(e){console.warn('apply balance visibility',e);}
+  // Save remotely in the background; remote failure must not undo the local toggle.
+  if(currentUser&&fbDb){
+    try{fbDb.collection('users').doc(currentUser.id).set({hideBalanceOnDevice:next,updatedAt:Date.now()},{merge:true})
+      .then(()=>toast(next?'تم إخفاء الرصيد':'تم إظهار الرصيد','good'))
+      .catch(e=>{console.warn('hide balance preference save failed',e);toast('تم تغيير الإخفاء على هذا الجهاز؛ تعذّر حفظه في الحساب','warn');});
+    }catch(e){console.warn('hide balance preference save failed',e);}
+  }else toast(next?'تم إخفاء الرصيد':'تم إظهار الرصيد','good');
 }
 window.toggleBalanceVisibility=toggleBalanceVisibility;
 
@@ -1933,7 +1941,7 @@ function ttCoachHTML(){
 }
 function renderPortfolio(){
   const entries=Object.entries(holdings);
-  const hv=holdingsValue(),total=cash+hv,totalPnl=total-STARTING_CASH,totalPct=(totalPnl/STARTING_CASH)*100;
+  const hv=holdingsValue(),total=portfolioTotalValue(),totalPnl=total-STARTING_CASH,totalPct=(totalPnl/STARTING_CASH)*100;
   let wc=0,lc=0,wp=0,lp=0,wcost=0,lcst=0;
   entries.forEach(([id,h])=>{const s=STOCKS.find(x=>x.id===id);if(!s)return;const v=s.price*h.qty,c=h.avg*h.qty,p=v-c;if(p>0){wc++;wp+=p;wcost+=c;}else if(p<0){lc++;lp+=p;lcst+=c;}});
   const wpct=wcost>0?(wp/wcost)*100:0,lpct=lcst>0?(lp/lcst)*100:0,exitAmount=cash+hv;
@@ -1973,7 +1981,7 @@ function updatePortfolioLive(){
     if(pp){pp.textContent=(pct>=0?'+':'')+pct.toFixed(2)+'%';pp.className='pp '+cls(p);}
   });
   const hv=holdingsValue();
-  const total=cash+hv;
+  const total=portfolioTotalValue();
   const totalPnl=total-STARTING_CASH;
   const totalPct=(totalPnl/STARTING_CASH)*100;
   const ta=document.getElementById('pfTotalAssets');
@@ -1983,7 +1991,7 @@ function updatePortfolioLive(){
   const tpc=document.getElementById('pfTotalPct');
   if(tpc)tpc.textContent='('+(totalPct>=0?'+':'')+totalPct.toFixed(2)+'%)';
   const sa=document.getElementById('pfSellAllAmount');
-  if(sa)sa.textContent=fmt(total)+' TND';
+  if(sa)sa.textContent=fmt(cash+hv)+' TND';
   const ss=document.getElementById('pfSellAllSub');
   if(ss)ss.textContent='صافي: '+(totalPnl>=0?'+':'')+fmt(totalPnl)+' TND';
   let wc=0,lc=0,wp=0,lp=0,wcost=0,lcst=0;
@@ -2473,7 +2481,7 @@ function openProfile(){
   const lv=getLevel(userXP);
   const hidden=currentUser.balanceHidden===true;
   sheetBody.innerHTML=`<div class="sh-head"><div style="display:flex;align-items:center;gap:12px"><div class="hero-avatar" style="width:52px;height:52px;font-size:22px;background:linear-gradient(135deg,${currentUser.avatarColor||'#f0b90b'},${shade(currentUser.avatarColor||'#f0b90b',-30)})">${av}<div class="online-badge"></div></div><div><div class="sh-tk" style="font-size:17px">${currentUser.name}</div><div class="sh-nm" style="margin-top:3px">${lv.icon} ${lv.name} · ${userXP} XP</div></div></div><button class="sh-close" onclick="closeSheet()">×</button></div>
-    <div class="sh-stats" style="margin-top:16px"><div class="stat"><div class="sl">قيمة المحفظة</div><div class="sv">${fmt(mv)}</div></div><div class="stat"><div class="sl">الأرباح</div><div class="sv ${cls(mp)}">${mp>=0?'+':''}${mp.toFixed(2)}%</div></div><div class="stat"><div class="sl">المراكز</div><div class="sv">${Object.keys(holdings).length}</div></div></div>
+    <div class="sh-stats" style="margin-top:16px"><div class="stat"><div class="sl">قيمة المحفظة</div><div class="sv">${hidden?'🔒 مخفي':fmt(mv)}</div></div><div class="stat"><div class="sl">الأرباح</div><div class="sv ${cls(mp)}">${hidden?'🔒 مخفي':(mp>=0?'+':'')+mp.toFixed(2)+'%'}</div></div><div class="stat"><div class="sl">المراكز</div><div class="sv">${Object.keys(holdings).length}</div></div></div>
     <div style="margin-top:14px"><div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #1c222a;font-size:12px"><span style="color:#7b8494">طريقة الدخول</span><span style="font-weight:700">${pl}</span></div>
     ${currentUser.email?`<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #1c222a;font-size:12px"><span style="color:#7b8494">البريد</span><span style="font-weight:700;font-size:11px">${currentUser.email}</span></div>`:''}
     <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #1c222a;font-size:12px"><span style="color:#7b8494">الأوامر النشطة</span><span style="font-weight:700">${totalActiveOrders()}/${MAX_ORDERS}</span></div>
@@ -2502,60 +2510,46 @@ function openProfile(){
   sheet.classList.add('on');backdrop.classList.add('on');
 }
 
-/* إعداد إظهار قيمة المحفظة في الترتيب — يعمل في وضعي التدريب والسوق */
+/* إعدادات الخصوصية: تطبيق محلي فوري ثم مزامنة Firebase دون تعطيل الزر */
+function ttSavePrivacyLocal(field,value){
+  if(!currentUser||!currentUser.id)return;
+  try{localStorage.setItem('tt_priv_'+field+'_'+currentUser.id,value?'1':'0');}catch(e){}
+}
+function ttPrivacyToast(msg){try{toast(msg,'good');}catch(e){console.log(msg);}}
 async function togglePrivacy(){
   if(!currentUser){toast('سجّل الدخول أولًا','warn');return;}
-  const btn=sheetBody.querySelector('.priv-toggle');
-  if(btn){btn.disabled=true;btn.style.opacity='.6';}
-  const oldValue=currentUser.balanceHidden===true;
-  const nextValue=!oldValue;
-  // حدّث الواجهة فورًا، ثم احفظ الخيار المستقل عن إخفاء الهوية.
+  const nextValue=currentUser.balanceHidden!==true;
   currentUser.balanceHidden=nextValue;
+  ttSavePrivacyLocal('balanceHidden',nextValue);
+  try{ttLbInvalidate();}catch(e){}
+  // Re-render profile immediately so the switch visibly changes in both market modes.
+  try{openProfile();}catch(e){}
+  try{if(currentTab==='rank')renderRank();}catch(e){}
+  if(!fbDb){ttPrivacyToast(nextValue?'تم إخفاء قيمة المحفظة على هذا الجهاز':'تم إظهار قيمة المحفظة');return;}
   try{
-    if(!fbDb)throw new Error('firebase-unavailable');
-    saveModeState();
     await fbDb.collection('users').doc(currentUser.id).set({balanceHidden:nextValue,updatedAt:Date.now()},{merge:true});
-    try{ttLbInvalidate();}catch(x){}
-    // احفظ قيم التدريب والسوق فورًا، مع إبقاء إعداد الخصوصية مستقلًا.
-    try{await updatePresence(true);}catch(x){console.warn('presence refresh after privacy save',x);}
-    try{ttLbInvalidate();}catch(x){}
-    toast(nextValue?'🔒 تم إخفاء قيمة محفظتك ونسبة الربح في الترتيب':'👁 أصبحت قيمة محفظتك ونسبة الربح مرئيتين في الترتيب','good');
-    openProfile();
-    if(currentTab==='rank')await renderRank();
-    // عند الرجوع إلى الترتيب، لا تستخدم بيانات مخزنة قديمة لأي من الوضعين.
-    try{ttLbInvalidate();}catch(x){}
-  }catch(e){
-    currentUser.balanceHidden=oldValue;
-    console.error('portfolio visibility save failed',e);
-    toast('لم يُحفظ الإعداد. تحقق من اتصال Firebase وصلاحيات Firestore ثم أعد المحاولة','warn');
-    openProfile();
-  }finally{
-    const b=sheetBody.querySelector('.priv-toggle');if(b){b.disabled=false;b.style.opacity='1';}
-  }
+    try{await updatePresence(true);}catch(e){console.warn('presence refresh after privacy save',e);}
+    try{ttLbInvalidate();if(currentTab==='rank')await renderRank();}catch(e){}
+    ttPrivacyToast(nextValue?'تم إخفاء قيمة المحفظة ونسبة الربح في الترتيب':'أصبحت قيمة المحفظة ونسبة الربح ظاهرتين في الترتيب');
+  }catch(e){console.error('portfolio visibility save failed',e);toast('تم تطبيق الإعداد محليًا، لكن تعذّر حفظه في Firebase. تحقق من الاتصال والصلاحيات','warn');}
 }
-
-/* إخفاء الاسم والصورة في الترتيب، مستقل عن إخفاء قيمة المحفظة */
 async function toggleNamePrivacy(){
   if(!currentUser){toast('سجّل الدخول أولًا','warn');return;}
-  const oldValue=currentUser.privacyHidden===true,nextValue=!oldValue;
-  const buttons=sheetBody.querySelectorAll('.priv-toggle');buttons.forEach(b=>{b.disabled=true;b.style.opacity='.6';});
+  const nextValue=currentUser.privacyHidden!==true;
   currentUser.privacyHidden=nextValue;
+  ttSavePrivacyLocal('privacyHidden',nextValue);
+  try{ttLbInvalidate();}catch(e){}
+  try{openProfile();}catch(e){}
+  try{if(currentTab==='rank')renderRank();}catch(e){}
+  if(!fbDb){ttPrivacyToast(nextValue?'سيظهر اسمك كمتداول محمي على هذا الجهاز':'سيظهر اسمك في الترتيب');return;}
   try{
-    if(!fbDb)throw new Error('firebase-unavailable');
     await fbDb.collection('users').doc(currentUser.id).set({privacyHidden:nextValue,updatedAt:Date.now()},{merge:true});
-    ttLbInvalidate();
-    await updatePresence(true);
-    ttLbInvalidate();
-    toast(nextValue?'🔒 سيظهر اسمك كمتداول محمي في الترتيب':'👤 سيظهر اسمك في الترتيب','good');
-    openProfile();
-    if(currentTab==='rank')await renderRank();
-  }catch(e){
-    currentUser.privacyHidden=oldValue;
-    console.error('name privacy save failed',e);
-    toast('تعذّر حفظ إعداد الاسم في Firebase؛ تحقق من الاتصال والصلاحيات','warn');
-    openProfile();
-  }finally{sheetBody.querySelectorAll('.priv-toggle').forEach(b=>{b.disabled=false;b.style.opacity='1';});}
+    try{await updatePresence(true);}catch(e){console.warn('presence refresh after name privacy save',e);}
+    try{ttLbInvalidate();if(currentTab==='rank')await renderRank();}catch(e){}
+    ttPrivacyToast(nextValue?'سيظهر اسمك كمتداول محمي في الترتيب':'سيظهر اسمك وصورتك في الترتيب');
+  }catch(e){console.error('name privacy save failed',e);toast('تم تطبيق الإعداد محليًا، لكن تعذّر حفظه في Firebase. تحقق من الاتصال والصلاحيات','warn');}
 }
+window.togglePrivacy=togglePrivacy;
 window.toggleNamePrivacy=toggleNamePrivacy;
 
 /* ============================================================
@@ -2637,7 +2631,7 @@ function divTick(){try{if(!currentUser)return;const u=currentUser.id,now=Date.no
  divEvents().forEach(e=>{const z=STOCKS.find(q=>q.id===e.sym);if(!z)return;if(e.ex<now-3*864e5){if(!done[e.id]){done[e.id]=1;done[e.id+'g']=1;ch=true;}return;}
   if(e.ex<=now&&!done[e.id]){done[e.id]=1;ch=true;
    if(e.type==='div'){z.price=Math.max(0.01,z.price-e.dps);z.fair=Math.max(0.01,z.fair-e.dps);const q=(holdings[e.sym]||{}).qty||0;if(q>0){pend.push({id:e.id,sym:e.sym,amt:q*e.dps,pay:e.pay});pushNotification('dividend','✂️ قطع كوبون '+displayId(z),'انخفض السعر بقيمة '+e.dps.toFixed(3)+' د. ستستلم '+(q*e.dps).toFixed(2)+' د بعد 24 ساعة.');}}
-   else{const r=e.ratio,h=holdings[e.sym];z.price=Math.max(0.01,z.price/r);z.fair=Math.max(0.01,z.fair/r);z.initial=z.initial/r;_adjHist(z,r);let cx=0;for(let i=pendingOrders.length-1;i>=0;i--)if(pendingOrders[i].stockId===z.id){pendingOrders.splice(i,1);cx++;}if(cx)pushNotification('split','⚠️ أوامر ملغاة','أُلغيت '+cx+' أوامر معلّقة على '+displayId(z)+' بسبب تعديل السعر.');if(h&&h.qty>0){const nq=Math.floor(h.qty*r);h.avg=h.avg*h.qty/nq;h.qty=nq;}
+   else{const r=e.ratio,h=holdings[e.sym];z.price=Math.max(0.01,z.price/r);z.fair=Math.max(0.01,z.fair/r);z.initial=z.initial/r;_adjHist(z,r);let cx=0,refund=0;for(let i=pendingOrders.length-1;i>=0;i--){const po=pendingOrders[i];if(po.stockId===z.id){if(po.type==='buy'){const held=Math.max(0,Number(po.reserveCost)||0);cash+=held;refund+=held;}pendingOrders.splice(i,1);cx++;}}if(cx)pushNotification('split','⚠️ أوامر ملغاة','أُلغيت '+cx+' أوامر معلّقة على '+displayId(z)+' بسبب تعديل السعر.'+(refund>0?' وأُعيد '+refund.toFixed(2)+' د.ت من المبالغ المحجوزة.':''));if(h&&h.qty>0){const oldQty=h.qty,nq=Math.max(0.01,Math.round(oldQty*r*100)/100);h.avg=h.avg*oldQty/nq;h.qty=nq;}
     pushNotification('split',(e.type==='split'?'🔀 تجزئة ':'🎁 أسهم مجانية ')+displayId(z),e.type==='split'?'كل سهم صار سهمين والسعر قُسّم على 2؛ قيمة محفظتك لم تتغير.':'سهم مجاني لكل 10 أسهم؛ تعدّلت كميتك ومتوسط تكلفتك والسعر.');saveState();}}
   if(e.type==='div'&&e.pay<=now&&!done[e.id+'g']){done[e.id+'g']=1;ch=true;z.fair*=1+e.dps*0.9/z.fair;}});
  const keep=[];pend.forEach(p=>{if(p.pay<=now){cash+=p.amt;ch=true;pushNotification('dividend','💰 توزيع أرباح '+p.sym,'استلمت '+p.amt.toFixed(2)+' TND (محاكاة).');saveState();}else keep.push(p);});
@@ -2653,7 +2647,7 @@ function calBody(){const fr=lsG('lang','ar')==='fr',now=Date.now(),pend=lsG('dvp
   return`<div style="padding:11px 0;border-bottom:1px solid #1c222a"><div style="display:flex;justify-content:space-between;align-items:center"><b>${ttl}</b>${(q>0||p)?`<span style="font-size:10px;background:#1c222a;border-radius:8px;padding:3px 7px;color:#f0b90b">${fr?'Vous détenez':'تملكه'}</span>`:''}</div><div style="font-size:12px;color:${col};margin-top:4px">${st}</div>${(isD&&(q>0||p))?`<div style="font-size:11px;color:#8b95a5;margin-top:2px">${fr?'Montant estimé':'المبلغ المتوقع'}: ${mine.toFixed(2)} TND</div>`:''}</div>`;}).join('');}
 setInterval(divTick,60000);async function forceSave(){try{if(window._cloudOK===false||window._cloudErr){runDiag();return;}_stateDirty=true;const r=await _flushState();toast(r?'تم الحفظ ☁️':'حُفظ على جهازك — تعذّرت المزامنة السحابية الآن',r?'good':'warn');}catch(e){toast('تعذّر الحفظ','warn');}}
 window.forceSave=forceSave;
-const APP_BUILD='نسخة 07-10-r12';
+const APP_BUILD='نسخة 10-10-r15';
 function ttCloudErrMsg(c){c=String(c||'').toLowerCase();
   if(c.indexOf('permission')>-1)return'المزامنة السحابية متوقفة (صلاحيات الخادم) — تقدّمك محفوظ على جهازك';
   if(c.indexOf('unavailable')>-1||c.indexOf('network')>-1||c.indexOf('offline')>-1||c.indexOf('deadline')>-1)return'لا يوجد اتصال بالإنترنت — سيُحفظ تقدّمك عند عودته';
