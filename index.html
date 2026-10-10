@@ -1277,6 +1277,23 @@ let _savingP=null;
 /* يعيد true فقط بعد اكتمال الكتابة فعلًا في Firestore، وfalse عند الفشل */
 async function _saveStateNow(){
   if(!stateLoaded||!currentUser||!fbDb)return false;
+  // Never write a default/uncertain state after a cloud-load timeout.
+  if(window._loadAborted===true)return false;
+  if(window._cloudOK===false){
+    try{
+      const remote=await fbDb.doc(stateDocPath()).get();
+      const remoteAt=remote.exists?Number((remote.data()||{}).updatedAt)||0:0;
+      let local=null;try{local=JSON.parse(localStorage.getItem('tt_bk_'+currentUser.id)||'null');}catch(e){}
+      const localAt=local?Number(local.updatedAt)||0:0;
+      if(remote.exists&&remoteAt>=localAt){
+        window._cloudErr='cloud-newer-than-local';
+        try{toast('حُميت بياناتك: توجد نسخة سحابية أحدث، أعد تحميل التطبيق قبل الحفظ.','warn');}catch(e){}
+        return false;
+      }
+      window._cloudOK=true;
+      window._loadAborted=false;
+    }catch(e){window._cloudErr=cleanText((e&&e.code)||(e&&e.message)||'cloud-check-failed',40);return false;}
+  }
   if(_savingP)return _savingP;
   _savingP=(async()=>{
     try{
@@ -1364,6 +1381,7 @@ if(!s){if(lerr)throw lerr;return false;}
 /* FIX #2: startApp بدون silent failure */
 async function startApp(){
   try{
+    window._loadAborted=false;
     hideAllAuth();
     const ma=document.getElementById('mainApp');if(ma)ma.style.display='flex';
     const l=(currentUser.name||'?').charAt(0).toUpperCase();
@@ -1377,7 +1395,7 @@ let loadOK=false;
       await Promise.race([loadState(),new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),20000))]);
       loadOK=true;
     }catch(e){
-      console.warn('loadState failed:',e); window._loadAborted=true; window._cloudOK=false; window._loadErr=cleanText((e&&e.code)||(e&&e.message)||'',30); loadOK=true; toast('⚠️ '+ttCloudErrMsg((e&&e.code)||(e&&e.message)||''),'warn'); }
+      console.warn('loadState failed:',e); window._loadAborted=true; window._cloudOK=false; window._loadErr=cleanText((e&&e.code)||(e&&e.message)||'',30); loadOK=true; toast('⚠️ لم نتمكن من تأكيد تحميل التقدم. سيبقى الحفظ السحابي موقوفًا مؤقتًا لحماية بياناتك؛ تحقق من الاتصال ثم أعد تحميل التطبيق.','warn'); }
 stateLoaded=loadOK;
     if(loadOK){_stateDirty=false;if(_flushTimer){clearTimeout(_flushTimer);_flushTimer=null;}}
 if(loadOK&&window._usedLocal){_stateDirty=true;setTimeout(()=>{try{_flushState();}catch(e){}},3000);}
@@ -2555,7 +2573,7 @@ window.toggleNamePrivacy=toggleNamePrivacy;
 /* ============================================================
    MARKET MODE
    ============================================================ */
-function toggleMarketMode(){try{ttLbInvalidate();}catch(e){}setTimeout(()=>{try{updatePresence(true);}catch(e){}},400);setTimeout(()=>{try{if(currentTab==='rank')renderRank();}catch(e){}},900);saveModeState();const cur=getMarketMode();const nxt=cur==='live'?'practice':'live';manualMode=nxt;try{localStorage.setItem('tt_manual_mode',nxt);}catch(e){}loadModeState(nxt);lastMarketMode=null;updateMarketStatus();render();updateHero();updateBellBadge();if(nxt==='live'){toast('تم التبديل إلى وضع السوق','good');pushNotification('rank','وضع السوق','تم التبديل يدويًا.');}else{toast('تم التبديل إلى وضع التدريب','warn');pushNotification('rank','وضع التدريب','تم التبديل يدويًا.');}}
+function toggleMarketMode(){try{saveModeState();if(currentUser&&stateLoaded){const snap=_buildState();snap.updatedAt=Date.now();snap.unsynced=true;localStorage.setItem('tt_bk_'+currentUser.id,JSON.stringify(snap));}}catch(e){console.warn('pre-switch local save failed',e);}try{ttLbInvalidate();}catch(e){}const cur=getMarketMode(),nxt=cur==='live'?'practice':'live';manualMode=nxt;try{localStorage.setItem('tt_manual_mode',nxt);}catch(e){}loadModeState(nxt);lastMarketMode=null;updateMarketStatus();render();updateHero();updateBellBadge();try{saveState();}catch(e){}setTimeout(()=>{try{updatePresence(true);}catch(e){}},400);setTimeout(()=>{try{if(currentTab==='rank')renderRank();}catch(e){}},900);if(nxt==='live'){toast('تم التبديل إلى وضع السوق','good');pushNotification('rank','وضع السوق','تم التبديل يدويًا.');}else{toast('تم التبديل إلى وضع التدريب','warn');pushNotification('rank','وضع التدريب','تم التبديل يدويًا.');}}
 function resetMarketMode(){saveModeState();manualMode=null;try{localStorage.removeItem('tt_manual_mode');}catch(e){}const m=getMarketMode();loadModeState(m);lastMarketMode=null;updateMarketStatus();render();updateHero();toast('عاد للوضع التلقائي','good');}
 let lastMarketMode=null;
 function updateMarketStatus(){
