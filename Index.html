@@ -1141,9 +1141,22 @@ async function loginEmail(){
   btn.disabled=false;btn.textContent='تسجيل الدخول';
 }
 
-async function logout(){if(!(await askConfirm('تسجيل الخروج؟ سيتم حفظ تقدمك.')))return;saveState();try{await _flushState(true);}catch(e){}closeSheet();try{await fbAuth.signOut();}catch(e){}appStarted=false;clearLocalState();toast('تم تسجيل الخروج','good');}
+async function logout(){
+  if(!(await askConfirm('تسجيل الخروج؟ سيتم حفظ تقدمك.')))return;
+  // Save a local recovery copy before attempting the cloud flush.
+  try{if(currentUser&&stateLoaded){const snap=_buildState();snap.updatedAt=Date.now();snap.unsynced=true;localStorage.setItem('tt_bk_'+currentUser.id,JSON.stringify(snap));}}catch(e){console.warn('logout local backup failed',e);}
+  saveState();let cloudSaved=false;
+  try{cloudSaved=await _flushState(true);}catch(e){console.warn('logout cloud flush failed',e);}
+  closeSheet();
+  try{await fbAuth.signOut();}catch(e){toast('تعذّر تسجيل الخروج من Firebase؛ تحقق من الاتصال.','warn');return;}
+  appStarted=false;clearLocalState();
+  toast(cloudSaved?'تم تسجيل الخروج وحفظ التقدم':'تم تسجيل الخروج؛ احتفظنا بنسخة محلية وقد تحتاج إلى مزامنتها عند عودة الاتصال','warn');
+}
 
 function clearLocalState(){
+  // Prevent a delayed save timer from the previous account running after another user signs in.
+  if(_flushTimer){clearTimeout(_flushTimer);_flushTimer=null;}
+  _stateDirty=false;
   ['practice','live'].forEach(m=>{STATE[m]={cash:STARTING_CASH,holdings:{},pendingOrders:[],alerts:[],recentTrades:[],orderSeq:1,valueHistory:[{t:Date.now(),v:STARTING_CASH}],stocks:buildStocksFor(m),market:{value:9850,open:9850,drift:0.0000008,vol:0.0012,ret:0}};});
   notifications=[];sentMessages=[];lessonProgress={completed:{},quiz:{}};rankPeriod='all';userXP=0;userBadges=[];stateLoaded=false;
   weeklyState={weekKey:null,challengeId:null,baselineValue:0,tradesThisWeek:0,lessonsThisWeek:0,slPlacedThisWeek:0,winnersThisWeek:0,progress:0,claimed:false};
