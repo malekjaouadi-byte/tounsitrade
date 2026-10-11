@@ -2529,15 +2529,17 @@ let queue=[],showing=false,hideT=null,lastScanFloat=0,burst=0;
 /* ---------- CSS + عنصر الرسالة العائمة ---------- */
 const st=document.createElement('style');
 st.textContent=`
-#guideFloat{position:fixed;top:calc(env(safe-area-inset-top,0px) + 10px);left:50%;width:min(94vw,480px);z-index:150;direction:rtl;transform:translate(-50%,-160%);opacity:0;transition:transform .35s cubic-bezier(.2,.9,.3,1),opacity .25s;pointer-events:none;-webkit-tap-highlight-color:transparent}
-#guideFloat.on{transform:translate(-50%,0);opacity:1;pointer-events:auto}
-#guideFloat .gf{background:linear-gradient(160deg,#18202a,#10151b);border:2px solid var(--gc,#f0b90b);border-radius:18px;padding:14px 16px 11px;box-shadow:0 14px 44px rgba(0,0,0,.65),0 0 0 1px rgba(255,255,255,.04);cursor:pointer;font-family:inherit;color:#fff}
-#guideFloat .gf-h{display:flex;align-items:center;gap:9px;margin-bottom:6px}
-#guideFloat .gf-i{font-size:24px;line-height:1}
-#guideFloat .gf-t{font-size:16.5px;font-weight:900;color:var(--gc,#f0b90b);flex:1;line-height:1.4}
-#guideFloat .gf-b{font-size:15px;font-weight:700;line-height:1.85;color:#f2f5f8}
-#guideFloat .gf-l{margin-top:7px;font-size:12.5px;font-weight:800;color:#8fb8ff}
-#guideFloat .gf-f{display:flex;justify-content:space-between;margin-top:8px;font-size:11px;color:#7b8494;font-weight:600}
+#guideFloat{position:fixed;top:0;right:0;bottom:0;left:0;z-index:150;direction:rtl;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(0,0,0,.55);opacity:0;pointer-events:none;transition:opacity .25s;-webkit-tap-highlight-color:transparent}
+#guideFloat.on{opacity:1;pointer-events:auto}
+#guideFloat .gf{width:min(92vw,520px);max-height:82vh;overflow:auto;background:linear-gradient(160deg,#1a232e,#10151b);border:2.5px solid var(--gc,#f0b90b);border-radius:24px;padding:22px 22px 16px;box-shadow:0 20px 60px rgba(0,0,0,.75);cursor:pointer;font-family:inherit;color:#fff;transform:scale(.86);transition:transform .3s cubic-bezier(.2,.9,.3,1)}
+#guideFloat.on .gf{transform:scale(1)}
+#guideFloat .gf-h{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+#guideFloat .gf-i{font-size:38px;line-height:1}
+#guideFloat .gf-t{font-size:22px;font-weight:900;color:var(--gc,#f0b90b);flex:1;line-height:1.4}
+#guideFloat .gf-b{font-size:19.5px;font-weight:700;line-height:1.95;color:#f4f7fa}
+#guideFloat .gf-l{margin-top:12px;font-size:16px;font-weight:800;color:#8fb8ff;line-height:1.7}
+#guideFloat .gf-f{display:flex;justify-content:space-between;gap:10px;margin-top:14px;padding-top:10px;border-top:1px solid #26303b;font-size:12.5px;color:#8b95a5;font-weight:700;line-height:1.6}
+#guideFloat .gf-x{font-size:15px;font-weight:900;color:#fff;background:var(--gc,#f0b90b);color:#0b0e11;border-radius:12px;padding:8px 16px;white-space:nowrap}
 .gd-card{background:linear-gradient(160deg,#141b23,#0f1419);border:1px solid #262f3a;border-radius:16px;padding:13px 14px;margin:12px 0}
 .gd-head{display:flex;align-items:center;gap:8px;margin-bottom:6px}
 .gd-head b{font-size:15px;flex:1}
@@ -2560,7 +2562,7 @@ const fl=document.createElement('div');fl.id='guideFloat';fl.setAttribute('role'
 function closeFloat(){clearTimeout(hideT);fl.classList.remove('on');showing=false;setTimeout(next,400);}
 function next(){if(showing||!queue.length)return;const t=queue.shift();showing=true;
   const lt=t.ls?lessonTitle(t.ls):null;
-  fl.innerHTML=`<div class="gf" style="--gc:${LV[t.lv]||LV.info}"><div class="gf-h"><span class="gf-i">${esc(t.ic)}</span><span class="gf-t">${esc(t.ti)}</span></div><div class="gf-b">${esc(t.tx)}</div>${lt?`<div class="gf-l">📖 الدرس المقترح: ${esc(lt)}</div>`:''}<div class="gf-f"><span>🧠 المرشد الذكي · تحليل تعليمي وليس نصيحة استثمارية</span><span>المس للإغلاق</span></div></div>`;
+  fl.innerHTML=`<div class="gf" style="--gc:${LV[t.lv]||LV.info}"><div class="gf-h"><span class="gf-i">${esc(t.ic)}</span><span class="gf-t">${esc(t.ti)}</span></div><div class="gf-b">${esc(t.tx)}</div>${lt?`<div class="gf-l">📖 الدرس المقترح: ${esc(lt)}</div>`:''}<div class="gf-f"><span>🧠 تحليل تعليمي وليس نصيحة استثمارية</span><span class="gf-x">المس للإغلاق</span></div></div>`;
   fl.onclick=closeFloat;
   requestAnimationFrame(()=>fl.classList.add('on'));
   try{if(navigator.vibrate)navigator.vibrate(25);}catch(e){}
@@ -2632,14 +2634,38 @@ addTrade=function(sym,side,qty,price){_at0.apply(this,arguments);try{setTimeout(
 
 /* ---------- فحص دوري هادئ ---------- */
 function idle(){try{if(!canFloat()||!stateLoaded)return false;if(sheet.classList.contains('on'))return false;const q=document.getElementById('quizModal');if(q&&q.classList.contains('on'))return false;}catch(e){return false;}return true;}
+const dayKey=()=>new Date().toISOString().slice(0,10);
 function scan(){try{burst=0;if(!idle()||showing||queue.length)return;if(Date.now()-lastScanFloat<3*60000)return;
+  const fire=(k,o,cd)=>{if(addTip(k,o,{cd})){lastScanFloat=Date.now();return true;}return false;};
   const ids=Object.keys(holdings);
-  for(const id of ids){const z=stockOf(id),h=holdings[id];if(!z||!h)continue;const dn=displayId(z),sh=share(id);
-    const pct=h.avg>0?(z.price-h.avg)/h.avg*100:0;
-    if(sh>=60&&addTip('conc:'+id,{lv:'risk',ic:'⚖️',ti:'تركيز مرتفع في '+dn,tx:dn+' يمثل '+sh.toFixed(0)+'% من أصولك. تنويع المحفظة يقلل أثر هبوط سهم واحد.',ls:'r3'},{cd:180})){lastScanFloat=Date.now();return;}
-    if(pct<=-5&&!hasSL(id)&&addTip('nosl:'+id,{lv:'risk',ic:'🛑',ti:dn+' خسارته '+Math.abs(pct).toFixed(1)+'% بلا وقف',tx:'مركزك في '+dn+' هابط '+Math.abs(pct).toFixed(1)+'% ولا يوجد وقف خسارة. قرّر الآن: خطة خروج واضحة أفضل من الانتظار والأمل.',ls:'r1'},{cd:120})){lastScanFloat=Date.now();return;}}
+  /* 1) قبل الإغلاق (وضع السوق الحقيقي فقط) */
+  try{if(ids.length&&getMarketMode()==='live'&&isMarketOpen()){const m=Math.round(getTimeUntilClose()/60000);
+    if(m>0&&m<=15){const nosl=ids.filter(id=>!hasSL(id)).map(id=>displayId(stockOf(id))).filter(Boolean);
+      if(fire('close:'+dayKey(),{lv:'warn',ic:'⏰',ti:'السوق يغلق بعد '+m+' دقيقة',tx:'لديك '+ids.length+' مركز مفتوح.'+(nosl.length?' بلا وقف خسارة: '+nosl.join('، ')+'.':'')+' قرّر الآن: هل تُبقي المراكز حتى الجلسة القادمة أم تُغلقها؟',ls:nosl.length?'r1':'s1'},600))return;}}}catch(e){}
+  /* 2) قرب وقف الخسارة */
+  for(const o of pendingOrders){if(o.type!=='sl')continue;const z=stockOf(o.stockId);if(!z||!(o.price>0)||!holdings[o.stockId])continue;const gap=(z.price-o.price)/z.price*100;
+    if(gap>=0&&gap<=1.5&&fire('nearsl:'+o.id,{lv:'risk',ic:'🚨',ti:displayId(z)+' يقترب من وقف الخسارة',tx:'السعر '+z.price.toFixed(3)+' ووقف خسارتك عند '+o.price.toFixed(3)+' (بفارق '+gap.toFixed(1)+'%). جهّز نفسك للخروج بهدوء ولا تغيّر الوقف خوفًا.',ls:'r1'},30))return;}
+  /* 3) ملكية وتركيز وخسارة بلا وقف */
+  for(const id of ids){const z=stockOf(id),h=holdings[id];if(!z||!h)continue;const dn=displayId(z),sh=share(id),pct=h.avg>0?(z.price-h.avg)/h.avg*100:0;
+    if(sh>=60&&fire('conc:'+id,{lv:'risk',ic:'⚖️',ti:'تركيز مرتفع في '+dn,tx:dn+' يمثل '+sh.toFixed(0)+'% من أصولك. تنويع المحفظة يقلل أثر هبوط سهم واحد.',ls:'r3'},180))return;
+    if(pct<=-5&&!hasSL(id)&&fire('nosl:'+id,{lv:'risk',ic:'🛑',ti:dn+' خسارته '+Math.abs(pct).toFixed(1)+'% بلا وقف',tx:'مركزك في '+dn+' هابط '+Math.abs(pct).toFixed(1)+'% ولا يوجد وقف خسارة. خطة خروج واضحة أفضل من الانتظار والأمل.',ls:'r1'},120))return;}
+  /* 4) قرب منبه سعري */
+  for(const a of alerts){const z=stockOf(a.stockId);if(!z||!(a.price>0))continue;const gap=Math.abs(z.price-a.price)/a.price*100;
+    if(gap<=1&&fire('nearal:'+a.id,{lv:'info',ic:'🔔',ti:displayId(z)+' قرب منبهك',tx:'السعر '+z.price.toFixed(3)+' وقريب من منبهك عند '+a.price.toFixed(3)+' (بفارق '+gap.toFixed(1)+'%). راجع خطتك قبل أن تتحرك.',ls:null},30))return;}
+  /* 5) خبر عن سهم تملكه */
+  try{const n=(typeof hubNews!=='undefined'&&hubNews[0])?hubNews[0]:null;
+    if(n&&Date.now()-n.t<5*60000){const hit=ids.map(id=>stockOf(id)).filter(Boolean).find(z=>n.txt.indexOf(displayId(z))>-1);
+      if(hit&&fire('news:'+n.t,{lv:n.up?'good':'warn',ic:n.up?'📰':'⚠️',ti:'خبر عن '+displayId(hit)+' الذي تملكه',tx:n.txt+' الأخبار تحرّك السعر سريعًا؛ لا تتخذ قرارًا من العنوان وحده، وراجع وقف خسارتك.',ls:null},0))return;}}catch(e){}
+  /* 6) سهم فوق قيمته العادلة */
+  for(const id of ids){const z=stockOf(id);if(!z||!(z.fair>0))continue;const over=(z.price/z.fair-1)*100;
+    if(over>=10&&fire('over:'+id,{lv:'warn',ic:'🏷️',ti:displayId(z)+' أغلى من قيمته التقديرية',tx:'سعر '+displayId(z)+' أعلى من قيمته العادلة التقديرية بنحو '+over.toFixed(0)+'%. إن كنت تنوي الشراء أكثر فانتظر، وإن كنت تملكه ففكّر في جني جزء من الربح.',ls:'a2'},360))return;}
+  /* 7) التحدي الأسبوعي */
+  try{const ch=getWeeklyChallenge();if(ch&&!weeklyState.claimed){const p=weeklyState.progress||0,r=p/ch.target;
+    if(r>=1&&fire('wk:done',{lv:'good',ic:'🏅',ti:'أكملت تحدي الأسبوع',tx:'«'+ch.name+'» مكتمل. استلم مكافأتك +'+ch.xp+' XP من بطاقة التحدي.',ls:null},720))return;
+    if(r>=0.5&&r<1&&fire('wk:near',{lv:'info',ic:'🎯',ti:'اقتربت من تحدي الأسبوع',tx:'«'+ch.name+'»: أنجزت '+p+' من '+ch.target+' '+(ch.unit||'')+'. بقي القليل للحصول على +'+ch.xp+' XP.',ls:null},720))return;}}catch(e){}
+  /* 8) درس ضعيف */
   let weak=[];try{weak=adaptGetMastery().weak;}catch(e){}
-  if(weak.length){const w=weak[0];const lt=lessonTitle(w);if(lt&&addTip('weak',{lv:'info',ic:'🎯',ti:'درس يستحق المراجعة',tx:'نتيجتك في درس «'+lt+'» أقل من 70%. مراجعته ثم اختبار قصير يرفع مستواك ونقاط الخبرة.',ls:w},{cd:720})){lastScanFloat=Date.now();return;}}
+  if(weak.length){const w=weak[0],lt=lessonTitle(w);if(lt&&fire('weak',{lv:'info',ic:'🎯',ti:'درس يستحق المراجعة',tx:'نتيجتك في درس «'+lt+'» أقل من 70%. مراجعته ثم اختبار قصير يرفع مستواك ونقاط الخبرة.',ls:w},720))return;}
   }catch(e){console.warn('guide scan',e);}}
 setInterval(scan,60000);setTimeout(scan,9000);
 })();
