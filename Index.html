@@ -520,7 +520,7 @@ button[aria-label="More"]{display:none!important}
 #splash,#authScreen{background:#000!important}
 #splash .hero-art{width:min(86vw,380px)!important;max-width:380px;margin:0 auto!important;animation:logoPulse 2.4s ease-in-out infinite}
 #authScreen .auth-content{padding-top:22px}
-.tt-logo-img{display:block;width:100%;height:100%;background:var(--logo-sm) center/cover no-repeat;border-radius:50%}
+.tt-logo-img{display:block;width:100%;height:100%;background:url("1000056746.jpg") center/cover no-repeat;border-radius:inherit}
 .logo{background:none!important;border-radius:50%!important;box-shadow:0 0 0 1.5px rgba(240,185,11,.55),0 0 14px rgba(240,185,11,.25)}
 .auth-logo{background:none!important;border-radius:50%!important;overflow:visible;box-shadow:0 0 0 2px rgba(240,185,11,.6),0 0 28px rgba(240,185,11,.3)!important;animation:none!important}
 .auth-logo::before{display:none!important}
@@ -825,14 +825,14 @@ const SECTORS={'بنوك':{drift:0.000002,vol:0.0025,ret:0},'نسيج':{drift:0.
    STATE
    ============================================================ */
 const STATE={
-  practice:{cash:STARTING_CASH,holdings:{},pendingOrders:[],alerts:[],recentTrades:[],orderSeq:1,valueHistory:[{t:Date.now(),v:STARTING_CASH}],stocks:[],market:{value:9850,open:9850,drift:0.0000008,vol:0.0012,ret:0}},
-  live:{cash:STARTING_CASH,holdings:{},pendingOrders:[],alerts:[],recentTrades:[],orderSeq:1,valueHistory:[{t:Date.now(),v:STARTING_CASH}],stocks:[],market:{value:9850,open:9850,drift:0.0000008,vol:0.0012,ret:0}}
+  practice:{cash:STARTING_CASH,realizedPnl:0,holdings:{},pendingOrders:[],alerts:[],recentTrades:[],orderSeq:1,valueHistory:[{t:Date.now(),v:STARTING_CASH}],stocks:[],market:{value:9850,open:9850,drift:0.0000008,vol:0.0012,ret:0}},
+  live:{cash:STARTING_CASH,realizedPnl:0,holdings:{},pendingOrders:[],alerts:[],recentTrades:[],orderSeq:1,valueHistory:[{t:Date.now(),v:STARTING_CASH}],stocks:[],market:{value:9850,open:9850,drift:0.0000008,vol:0.0012,ret:0}}
 };
 let currentUser=null,appStarted=false,nameMode='pseudo',notifications=[];
 let lessonProgress={completed:{},quiz:{}},sentMessages=[],stateLoaded=false,saveTimer=null;
 let realStats={totalUsers:0,onlineNow:0},presenceInterval=null,currentTimeframe='1m';
 let rankPeriod='all',userXP=0,userBadges=[];
-let cash=STARTING_CASH,holdings={},pendingOrders=[],alerts=[],orderSeq=1;
+let cash=STARTING_CASH,realizedPnl=0,holdings={},pendingOrders=[],alerts=[],orderSeq=1;
 let valueHistory=[{t:Date.now(),v:STARTING_CASH}],recentTrades=[];
 let STOCKS=[],MARKET={value:9850,open:9850,drift:0.0000008,vol:0.0012,ret:0};
 
@@ -884,12 +884,12 @@ function unlockBadge(id){if(userBadges.includes(id))return;const b=BADGES.find(x
 function buildStocksFor(mode){return STOCKS_INIT.map(s=>({...s,price:s.initial,open:s.initial,chg:0,spark:Array.from({length:400},()=>s.initial)}));}
 function loadModeState(mode){
   if(!STATE[mode].stocks.length){STATE[mode].stocks=buildStocksFor(mode);STATE[mode].market={value:9850,open:9850,drift:0.0000008,vol:0.0012,ret:0};}
-  const s=STATE[mode];cash=s.cash;holdings=s.holdings;pendingOrders=s.pendingOrders;alerts=s.alerts;recentTrades=s.recentTrades;orderSeq=s.orderSeq;valueHistory=s.valueHistory;STOCKS=s.stocks;MARKET=s.market;
+  const s=STATE[mode];cash=s.cash;realizedPnl=Number.isFinite(Number(s.realizedPnl))?Number(s.realizedPnl):0;holdings=s.holdings;pendingOrders=s.pendingOrders;alerts=s.alerts;recentTrades=s.recentTrades;orderSeq=s.orderSeq;valueHistory=s.valueHistory;STOCKS=s.stocks;MARKET=s.market;
   if(typeof MARKET.drift!=='number'||isNaN(MARKET.drift))MARKET.drift=0.0000008;
   if(typeof MARKET.vol!=='number'||isNaN(MARKET.vol))MARKET.vol=0.0012;
   if(typeof MARKET.ret!=='number'||isNaN(MARKET.ret))MARKET.ret=0;
 }
-function saveModeState(){try{if(currentUser)localStorage.setItem('tt_last_mode_'+currentUser.id,getMarketMode());}catch(e){}const m=getMarketMode();const s=STATE[m];s.cash=cash;s.holdings=holdings;s.pendingOrders=pendingOrders;s.alerts=alerts;s.recentTrades=recentTrades;s.orderSeq=orderSeq;s.valueHistory=valueHistory;s.stocks=STOCKS;s.market=MARKET;}
+function saveModeState(){try{if(currentUser)localStorage.setItem('tt_last_mode_'+currentUser.id,getMarketMode());}catch(e){}const m=getMarketMode();const s=STATE[m];s.cash=cash;s.realizedPnl=realizedPnl;s.holdings=holdings;s.pendingOrders=pendingOrders;s.alerts=alerts;s.recentTrades=recentTrades;s.orderSeq=orderSeq;s.valueHistory=valueHistory;s.stocks=STOCKS;s.market=MARKET;}
 STATE.practice.stocks=buildStocksFor('practice');
 STATE.live.stocks=buildStocksFor('live');
 loadModeState(getMarketMode());
@@ -1157,7 +1157,7 @@ function clearLocalState(){
   // Prevent a delayed save timer from the previous account running after another user signs in.
   if(_flushTimer){clearTimeout(_flushTimer);_flushTimer=null;}
   _stateDirty=false;
-  ['practice','live'].forEach(m=>{STATE[m]={cash:STARTING_CASH,holdings:{},pendingOrders:[],alerts:[],recentTrades:[],orderSeq:1,valueHistory:[{t:Date.now(),v:STARTING_CASH}],stocks:buildStocksFor(m),market:{value:9850,open:9850,drift:0.0000008,vol:0.0012,ret:0}};});
+  ['practice','live'].forEach(m=>{STATE[m]={cash:STARTING_CASH,realizedPnl:0,holdings:{},pendingOrders:[],alerts:[],recentTrades:[],orderSeq:1,valueHistory:[{t:Date.now(),v:STARTING_CASH}],stocks:buildStocksFor(m),market:{value:9850,open:9850,drift:0.0000008,vol:0.0012,ret:0}};});
   notifications=[];sentMessages=[];lessonProgress={completed:{},quiz:{}};rankPeriod='all';userXP=0;userBadges=[];stateLoaded=false;
   weeklyState={weekKey:null,challengeId:null,baselineValue:0,tradesThisWeek:0,lessonsThisWeek:0,slPlacedThisWeek:0,winnersThisWeek:0,progress:0,claimed:false};
   adaptiveState={attempts:{},lastUpdate:0};
@@ -1168,7 +1168,7 @@ function clearLocalState(){
 async function resetState(){
   if(!(await askConfirm('إعادة تعيين المنصة التعليمية؟ سيتم حذف تقدمك في هذا الوضع والعودة إلى 10,000 TND.')))return;
   const m=getMarketMode();
-  STATE[m]={cash:STARTING_CASH,holdings:{},pendingOrders:[],alerts:[],recentTrades:[],orderSeq:1,valueHistory:[{t:Date.now(),v:STARTING_CASH}],stocks:buildStocksFor(m),market:{value:9850,open:9850,drift:0.0000008,vol:0.0012,ret:0}};
+  STATE[m]={cash:STARTING_CASH,realizedPnl:0,holdings:{},pendingOrders:[],alerts:[],recentTrades:[],orderSeq:1,valueHistory:[{t:Date.now(),v:STARTING_CASH}],stocks:buildStocksFor(m),market:{value:9850,open:9850,drift:0.0000008,vol:0.0012,ret:0}};
   loadModeState(m);closeSheet();currentTab='home';
   document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x.dataset.tab==='home'));
   render();updateHero();updateBellBadge();saveState();toast('تم إعادة التعيين','good');
@@ -1279,8 +1279,8 @@ function startPresenceSystem(){if(presenceInterval)clearInterval(presenceInterva
 function stateDocPath(){return'userStates/'+currentUser.id;}
 function _buildState(){saveModeState();return {
       mode:getMarketMode(),
-      practice:{cash:STATE.practice.cash,holdings:STATE.practice.holdings,pendingOrders:STATE.practice.pendingOrders,alerts:STATE.practice.alerts,orderSeq:STATE.practice.orderSeq,valueHistory:STATE.practice.valueHistory.slice(-500),recentTrades:STATE.practice.recentTrades.slice(0,20),stocks:STATE.practice.stocks.map(s=>({id:s.id,price:s.price,open:s.open,chg:s.chg,spark:s.spark.slice(-120),fair:s.fair||null,initial:s.initial||null})),market:{value:STATE.practice.market.value,open:STATE.practice.market.open}},
-      live:{cash:STATE.live.cash,holdings:STATE.live.holdings,pendingOrders:STATE.live.pendingOrders,alerts:STATE.live.alerts,orderSeq:STATE.live.orderSeq,valueHistory:STATE.live.valueHistory.slice(-500),recentTrades:STATE.live.recentTrades.slice(0,20),stocks:STATE.live.stocks.map(s=>({id:s.id,price:s.price,open:s.open,chg:s.chg,spark:s.spark.slice(-120),fair:s.fair||null,initial:s.initial||null})),market:{value:STATE.live.market.value,open:STATE.live.market.open}},
+      practice:{cash:STATE.practice.cash,realizedPnl:STATE.practice.realizedPnl||0,holdings:STATE.practice.holdings,pendingOrders:STATE.practice.pendingOrders,alerts:STATE.practice.alerts,orderSeq:STATE.practice.orderSeq,valueHistory:STATE.practice.valueHistory.slice(-500),recentTrades:STATE.practice.recentTrades.slice(0,20),stocks:STATE.practice.stocks.map(s=>({id:s.id,price:s.price,open:s.open,chg:s.chg,spark:s.spark.slice(-120),fair:s.fair||null,initial:s.initial||null})),market:{value:STATE.practice.market.value,open:STATE.practice.market.open}},
+      live:{cash:STATE.live.cash,realizedPnl:STATE.live.realizedPnl||0,holdings:STATE.live.holdings,pendingOrders:STATE.live.pendingOrders,alerts:STATE.live.alerts,orderSeq:STATE.live.orderSeq,valueHistory:STATE.live.valueHistory.slice(-500),recentTrades:STATE.live.recentTrades.slice(0,20),stocks:STATE.live.stocks.map(s=>({id:s.id,price:s.price,open:s.open,chg:s.chg,spark:s.spark.slice(-120),fair:s.fair||null,initial:s.initial||null})),market:{value:STATE.live.market.value,open:STATE.live.market.open}},
       rankPeriod,notifications:notifications.slice(0,50),lessonProgress,
       sentMessages:sentMessages.slice(0,30),userXP,userBadges,
       weekly:weeklyState,adaptive:adaptiveState,
@@ -1331,13 +1331,14 @@ let _stateDirty=false;
 let _flushTimer=null;
 const SAVE_THROTTLE_MS=5*60*1000;
 
-function saveState(){
+function saveState(forceNow=false){
   if(!stateLoaded||!currentUser)return;
   try{const snapshot=_buildState();snapshot.updatedAt=Date.now();snapshot.unsynced=true;localStorage.setItem('tt_bk_'+currentUser.id,JSON.stringify(snapshot));}catch(e){console.warn('local save failed',e);}
   if(!fbDb)return;
   _stateDirty=true;
   if(_flushTimer)clearTimeout(_flushTimer);
-  _flushTimer=setTimeout(()=>{_flushTimer=null;_flushState();},1800);
+  if(forceNow){_flushTimer=null;_flushState(true).catch(e=>console.warn('urgent save failed',e));}
+  else _flushTimer=setTimeout(()=>{_flushTimer=null;_flushState();},1800);
 }
 
 async function _flushState(force=false){
@@ -1377,7 +1378,7 @@ if(window._loadAborted)return false;
 if(!s){if(lerr)throw lerr;return false;}
     ['practice','live'].forEach(m=>{
       const d=s[m];if(!d)return;
-      STATE[m]={cash:(typeof d.cash==='number')?d.cash:STARTING_CASH,holdings:d.holdings||{},pendingOrders:d.pendingOrders||[],alerts:d.alerts||[],recentTrades:d.recentTrades||[],orderSeq:d.orderSeq||1,valueHistory:d.valueHistory||[{t:Date.now(),v:STARTING_CASH}],stocks:buildStocksFor(m),market:{value:9850,open:9850,drift:0.0000008,vol:0.0012,ret:0}};
+      STATE[m]={cash:(typeof d.cash==='number')?d.cash:STARTING_CASH,realizedPnl:Number.isFinite(Number(d.realizedPnl))?Number(d.realizedPnl):0,holdings:d.holdings||{},pendingOrders:d.pendingOrders||[],alerts:d.alerts||[],recentTrades:d.recentTrades||[],orderSeq:d.orderSeq||1,valueHistory:d.valueHistory||[{t:Date.now(),v:STARTING_CASH}],stocks:buildStocksFor(m),market:{value:9850,open:9850,drift:0.0000008,vol:0.0012,ret:0}};
       if(Array.isArray(d.stocks)){d.stocks.forEach(sv=>{const st=STATE[m].stocks.find(x=>x.id===sv.id);if(st){st.price=sv.price;st.open=sv.open;st.chg=sv.chg;if(sv.fair>0)st.fair=sv.fair;if(sv.initial>0)st.initial=sv.initial;if(sv.spark)st.spark=sv.spark;}});}
       if(d.market){STATE[m].market.value=d.market.value??9850;STATE[m].market.open=d.market.open??9850;}
     });
@@ -1912,40 +1913,69 @@ function updateSheetPrice(){
   const feeSaved=document.getElementById('feeSaved');if(feeSaved)feeSaved.textContent=fmt(f.saved)+' TND';
 }
 
-async function doBuy(){
+async function _doBuyCore(){
   if(!isTradingAllowed())return toast('السوق مغلق','warn');
-  const s=STOCKS.find(x=>x.id===openStockId);const q=currentQty();
-  if(q<=0)return toast('الكمية غير صحيحة','warn');
-  const f=ttCalculateFees(s.price,q);const tc=f.stockValue+f.totalFees;
-  if(tc>cash)return toast('الكاش غير كافٍ','warn');
+  const s=STOCKS.find(x=>x.id===openStockId);const q=Number(currentQty());
+  if(!s||!Number.isFinite(Number(s.price))||Number(s.price)<=0)return toast('تعذّر التحقق من سعر السهم. حدّث الأسعار ثم أعد المحاولة.','warn');
+  if(!Number.isFinite(q)||q<=0)return toast('الكمية غير صحيحة','warn');
+  const f=ttCalculateFees(s.price,q);const tc=Number(f.stockValue)+Number(f.totalFees);
+  if(!Number.isFinite(tc)||tc<=0)return toast('تعذّر حساب قيمة الأمر، لم يتم تنفيذ الشراء.','warn');
+  if(tc>cash+1e-8)return toast('الكاش غير كافٍ','warn');
   if(!(await askConfirm(`تأكيد الشراء؟\n${displayId(s)}\nالكمية: ${fmtQty(q)}\nالإجمالي: ${fmt(tc)} TND`)))return; if(tc>cash)return toast('الرصيد لم يعد كافيًا','warn');
-  const h=holdings[s.id];if(h){h.avg=(h.avg*h.qty+tc)/(h.qty+q);h.qty+=q;}else holdings[s.id]={qty:q,avg:tc/q};
+  const h=holdings[s.id];if(h&&(!Number.isFinite(Number(h.qty))||Number(h.qty)<0||!Number.isFinite(Number(h.avg))||Number(h.avg)<0))return toast('بيانات المركز غير سليمة؛ أوقفنا الأمر لحماية رصيدك.','warn');
+  if(h){h.avg=(h.avg*h.qty+tc)/(h.qty+q);h.qty+=q;}else holdings[s.id]={qty:q,avg:tc/q};
   cash-=tc;addTrade(s.id,'buy',q,s.price);
   trackWeeklyEvent('trade');unlockBadge('first_trade');
   toast(`تم شراء ${fmtQty(q)} × ${displayId(s)}`,'good');
-  addXP(10,'buy');inputVal=buyMode==='qty'?1:50;saveState();renderSheet();updateHero();
+  addXP(10,'buy');inputVal=buyMode==='qty'?1:50;saveState(true);renderSheet();updateHero();
   if(recentTrades.length>=10)unlockBadge('ten_trades');
 }
-async function doSell(){
+async function _doSellCore(){
   if(!isTradingAllowed())return toast('السوق مغلق','warn');
-  const s=STOCKS.find(x=>x.id===openStockId);const h=holdings[s.id];const q=currentQty();
-  if(!h||h.qty<q-0.0001)return toast('لا تملك كمية كافية','warn');
-  const f=ttCalculateFees(s.price,q);const net=f.stockValue-f.totalFees;
+  const s=STOCKS.find(x=>x.id===openStockId);if(!s||!Number.isFinite(Number(s.price))||Number(s.price)<=0)return toast('تعذّر التحقق من سعر السهم. لم يتم البيع.','warn');
+  const h=holdings[s.id];const q=Number(currentQty());
+  if(!Number.isFinite(q)||q<=0)return toast('الكمية غير صحيحة','warn');
+  if(!h||!Number.isFinite(Number(h.qty))||h.qty<q-0.0001)return toast('لا تملك كمية كافية','warn');
+  if(!Number.isFinite(Number(h.avg))||Number(h.avg)<0)return toast('تكلفة الشراء المسجلة غير سليمة؛ أوقفنا البيع لحماية سجلّك.','warn');
+  const f=ttCalculateFees(s.price,q);const net=Number(f.stockValue)-Number(f.totalFees);
+  if(!Number.isFinite(net)||net<0)return toast('تعذّر حساب صافي البيع؛ لم يتم تنفيذ الأمر.','warn');
   const profit=net-h.avg*q;
+  if(!Number.isFinite(profit))return toast('تعذّر التحقق من نتيجة البيع؛ لم يتم تنفيذ الأمر.','warn');
   if(!(await askConfirm(`تأكيد البيع؟\n${displayId(s)}\nالكمية: ${fmtQty(q)}\nالمستلم: ${fmt(net)} TND`)))return;
-  cash+=net;h.qty-=q;
+  cash+=net;realizedPnl+=profit;h.qty-=q;
   if(h.qty<0.0001){delete holdings[s.id];pendingOrders=pendingOrders.filter(o=>!(o.type==='sl'&&o.stockId===s.id));}
   addTrade(s.id,'sell',q,s.price);
   trackWeeklyEvent('trade');
   if(profit>0){unlockBadge('first_profit');awardPnL(profit,h.avg*q);trackWeeklyEvent('winner');}else if(profit<0){awardPnL(profit,h.avg*q);}
   toast(`تم بيع ${fmtQty(q)} × ${displayId(s)}`,'warn');
-  inputVal=buyMode==='qty'?1:50;saveState();renderSheet();updateHero();
+  inputVal=buyMode==='qty'?1:50;saveState(true);renderSheet();updateHero();
   if(recentTrades.length>=10)unlockBadge('ten_trades');
+}
+
+/* يمنع النقر المزدوج من تنفيذ عمليتين متتاليتين قبل اكتمال الأولى. */
+let _tradeActionBusy=false;
+async function doBuy(){
+  if(_tradeActionBusy)return toast('الأمر السابق قيد المعالجة، انتظر لحظة.','warn');
+  _tradeActionBusy=true;
+  try{await _doBuyCore();}finally{_tradeActionBusy=false;}
+}
+async function doSell(){
+  if(_tradeActionBusy)return toast('الأمر السابق قيد المعالجة، انتظر لحظة.','warn');
+  _tradeActionBusy=true;
+  try{await _doSellCore();}finally{_tradeActionBusy=false;}
 }
 
 /* ============================================================
    PORTFOLIO (FIX #1 + E5)
    ============================================================ */
+/* Safety net: persist the latest local snapshot when the page is hidden or closed.
+   This is a local backup only; it does not claim that a cloud write has completed. */
+(function installLocalSafetyBackup(){
+  const backup=()=>{try{if(currentUser&&stateLoaded){const snap=_buildState();snap.updatedAt=Date.now();snap.unsynced=true;localStorage.setItem('tt_bk_'+currentUser.id,JSON.stringify(snap));}}catch(e){console.warn('local safety backup failed',e);}};
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')backup();});
+  window.addEventListener('pagehide',backup);
+})();
+
 /* ===== المرشد الذكي: تحليل محلي لمحفظتك وصفقاتك (تعليمي، ليس نصيحة استثمارية) ===== */
 function ttCoachInsights(){
   const out=[];
@@ -1981,12 +2011,21 @@ function ttCoachHTML(){
 }
 function renderPortfolio(){
   const entries=Object.entries(holdings);
-  const hv=holdingsValue(),total=portfolioTotalValue(),totalPnl=total-STARTING_CASH,totalPct=(totalPnl/STARTING_CASH)*100;
+  const hv=holdingsValue(),reserved=reservedOrderValue(),total=portfolioTotalValue(),totalPnl=total-STARTING_CASH,totalPct=(totalPnl/STARTING_CASH)*100;
+  // realizedPnl is tracked from sales made after this field was introduced; legacy sales cannot be reconstructed reliably.
+  const unrealizedPnl=entries.reduce((sum,[id,h])=>{const st=STOCKS.find(x=>x.id===id);return sum+(st?((Number(st.price)||0)-(Number(h.avg)||0))*Number(h.qty||0):0);},0);
   let wc=0,lc=0,wp=0,lp=0,wcost=0,lcst=0;
   entries.forEach(([id,h])=>{const s=STOCKS.find(x=>x.id===id);if(!s)return;const v=s.price*h.qty,c=h.avg*h.qty,p=v-c;if(p>0){wc++;wp+=p;wcost+=c;}else if(p<0){lc++;lp+=p;lcst+=c;}});
   const wpct=wcost>0?(wp/wcost)*100:0,lpct=lcst>0?(lp/lcst)*100:0,exitAmount=cash+hv;
   view.innerHTML=`
-    <div class="pf-total-bar"><div><div class="pt-l">إجمالي الأصول</div><div style="font-size:13px;font-weight:800;margin-top:3px" id="pfTotalAssets">${fmt(total)} TND</div></div><div style="text-align:left"><div class="pt-l">صافي الربح/الخسارة</div><div class="pt-r ${cls(totalPnl)}" id="pfTotalPnl" style="margin-top:3px">${totalPnl>=0?'+':''}${fmt(totalPnl)} TND</div><div id="pfTotalPct" style="font-size:10px;color:#7b8494;margin-top:2px">(${totalPct>=0?'+':''}${totalPct.toFixed(2)}%)</div></div></div>
+    <div class="pf-total-bar"><div><div class="pt-l">إجمالي الأصول</div><div style="font-size:13px;font-weight:800;margin-top:3px" id="pfTotalAssets">${fmt(total)} TND</div></div><div style="text-align:left"><div class="pt-l">صافي الربح/الخسارة الكلي</div><div class="pt-r ${cls(totalPnl)}" id="pfTotalPnl" style="margin-top:3px">${totalPnl>=0?'+':''}${fmt(totalPnl)} TND</div><div id="pfTotalPct" style="font-size:10px;color:#7b8494;margin-top:2px">(${totalPct>=0?'+':''}${totalPct.toFixed(2)}%)</div></div></div>
+    <div class="pf-grid-2" style="margin-top:8px">
+      <div class="pf-btn-mini" style="cursor:default"><div class="pm-title">💧 السيولة المتاحة</div><div class="pm-main">${fmt(cash)} TND</div><div class="pm-sub">الرصيد القابل للاستخدام</div></div>
+      <div class="pf-btn-mini" style="cursor:default"><div class="pm-title">🔒 السيولة المحجوزة</div><div class="pm-main">${fmt(reserved)} TND</div><div class="pm-sub">ضمن الأوامر المعلّقة</div></div>
+      <div class="pf-btn-mini" style="cursor:default"><div class="pm-title">📈 قيمة الأسهم</div><div class="pm-main">${fmt(hv)} TND</div><div class="pm-sub">حسب الأسعار الحالية داخل المحاكاة</div></div>
+      <div class="pf-btn-mini" style="cursor:default"><div class="pm-title">${unrealizedPnl>=0?'🟢':'🔴'} الربح/الخسارة غير المحققة</div><div class="pm-main ${cls(unrealizedPnl)}">${unrealizedPnl>=0?'+':''}${fmt(unrealizedPnl)} TND</div><div class="pm-sub">على المراكز المفتوحة فقط</div></div>
+      <div class="pf-btn-mini" style="cursor:default"><div class="pm-title">${realizedPnl>=0?'🟢':'🔴'} الربح/الخسارة المحققة</div><div class="pm-main ${cls(realizedPnl)}">${realizedPnl>=0?'+':''}${fmt(realizedPnl)} TND</div><div class="pm-sub">من المبيعات المنفذة منذ تفعيل هذا التتبع</div></div>
+    </div>
     ${ttCoachHTML()}
     ${entries.length===0?`<div class="pf-empty" style="padding:60px 20px"><div class="ico" style="font-size:38px">📊</div><div style="font-size:12.5px">لا تملك أي مركز بعد</div><div class="sub">اذهب إلى «السوق» وابدأ التداول</div></div>`:`
       <div class="pf-list">${entries.map(([id,h])=>{const s=STOCKS.find(x=>x.id===id);if(!s)return'';const v=s.price*h.qty,c=h.avg*h.qty,p=v-c,pct=(p/c)*100;const sl=pendingOrders.find(o=>o.type==='sl'&&o.stockId===id);const ico=SECTOR_ICONS[s.sector]||'📊';return`<div class="pf-row" data-pfid="${id}" onclick="openTrade('${id}')"><div class="pr-ico">${ico}</div><div class="pr-sym">${displayId(s)}${sl?' 🛑':''}</div><div class="pr-cols"><div><span style="font-size:9px;color:#5e6673;display:block;margin-bottom:2px">الكمية</span><span style="font-size:11.5px;font-weight:800;color:#eaecef">${fmtQty(h.qty)}</span></div><div><span style="font-size:9px;color:#5e6673;display:block;margin-bottom:2px">متوسط الشراء</span><span style="font-size:11.5px;font-weight:800;color:#eaecef">${fmt(h.avg,3)}</span></div></div><div class="pr-pnl"><div class="pv ${cls(p)}">${p>=0?'+':''}${fmt(p)}</div><div class="pp ${cls(p)}">${pct>=0?'+':''}${pct.toFixed(2)}%</div></div></div>`;}).join('')}</div>`}
@@ -2369,6 +2408,41 @@ function openTermsGlossary(){
   sheet.classList.add('on');backdrop.classList.add('on');
 }
 
+
+/* سيناريوهات تاريخية مُبسّطة: مسارات تعليمية افتراضية وليست بيانات تاريخية فعلية أو توقعات. */
+const TT_HISTORY_SCENARIOS={
+  bull:{title:'سوق صاعد',desc:'ارتفاع تدريجي ثم تذبذب؛ راقب خطر مطاردة الأسعار.',steps:[1.8,2.4,1.2,-1.1,2.0]},
+  bear:{title:'سوق هابط',desc:'هبوط متتابع مع ارتدادات قصيرة؛ راقب السيولة وحجم المركز.',steps:[-2.2,-1.7,0.8,-3.0,-1.1]},
+  crash:{title:'صدمة ثم تعافٍ',desc:'هبوط حاد يتبعه تعافٍ غير مضمون؛ لا تفترض أن القاع معروف.',steps:[-6.5,-3.0,1.4,-1.8,3.2,2.0]},
+  volatile:{title:'سوق متذبذب',desc:'حركات متعاكسة تختبر الانضباط وتكاليف التداول.',steps:[3.0,-3.8,2.7,-2.4,1.6,-1.2]}
+};
+let _historyRun=null;
+function openHistoryScenarios(){
+  sheetBody.innerHTML=`<div class="sh-head"><div><div class="sh-tk">📉 مختبر السوق</div><div class="sh-nm">سيناريوهات تعليمية افتراضية</div></div><button class="sh-close" onclick="closeSheet()">×</button></div>
+  <div style="font-size:11.5px;color:#aab3c2;line-height:1.8;margin-bottom:12px">اختر مسارًا، ثم طبّق خطوة واحدة في كل مرة. تتغير أسعار المحاكاة في الوضع الحالي فقط. هذه مسارات تعليمية مُنشأة وليست أسعارًا تاريخية حقيقية أو توصيات.</div>
+  ${Object.entries(TT_HISTORY_SCENARIOS).map(([k,v])=>`<button class="btn-primary" style="width:100%;text-align:right;margin:7px 0;background:#121820;border:1px solid #2a323c;color:#eaecef;box-shadow:none" onclick="startHistoryScenario('${k}')"><b>${v.title}</b><div style="font-size:10.5px;color:#8b95a5;margin-top:4px">${v.desc}</div></button>`).join('')}
+  <div id="ttHistoryProgress" style="margin-top:12px"></div>`;
+  openSheet();
+}
+function startHistoryScenario(key){
+  const sc=TT_HISTORY_SCENARIOS[key];if(!sc)return;
+  _historyRun={key,index:0,steps:sc.steps.slice(),startValue:portfolioTotalValue()};
+  renderHistoryProgress();
+}
+function renderHistoryProgress(){
+  const e=document.getElementById('ttHistoryProgress');if(!e||!_historyRun)return;
+  const sc=TT_HISTORY_SCENARIOS[_historyRun.key],done=_historyRun.index>=_historyRun.steps.length;
+  e.innerHTML=`<div style="padding:12px;border:1px solid #333b45;border-radius:12px;line-height:1.8"><b>${sc.title}</b><div style="font-size:11px;color:#8b95a5">الخطوة ${Math.min(_historyRun.index+1,_historyRun.steps.length)} من ${_historyRun.steps.length}</div><div style="font-size:12px;margin:8px 0">${done?'انتهى السيناريو. قارن قيمة محفظتك قبل المسار وبعده.':'الحركة التالية: '+(_historyRun.steps[_historyRun.index]>0?'+':'')+_historyRun.steps[_historyRun.index]+'% على أسعار الأسهم الافتراضية.'}</div><button class="btn-primary" style="width:100%;background:#f0b90b;color:#0b0e11" ${done?'disabled':''} onclick="advanceHistoryScenario()">${done?'اكتمل السيناريو':'تطبيق الخطوة التالية'}</button><button class="btn-primary" style="width:100%;margin-top:7px;background:#1e252d;color:#eaecef;box-shadow:none" onclick="openHistoryScenarios()">اختيار سيناريو آخر</button></div>`;
+}
+function advanceHistoryScenario(){
+  if(!_historyRun||_historyRun.index>=_historyRun.steps.length)return;
+  const pct=_historyRun.steps[_historyRun.index++]/100;
+  STOCKS.forEach(st=>{const factor=Math.max(.05,1+pct*(.65+((st.id.charCodeAt(0)||1)%6)/10));st.price=Math.max(.01,st.price*factor);st.chg=st.open?((st.price-st.open)/st.open)*100:st.chg;if(Array.isArray(st.spark)){st.spark.push(st.price);if(st.spark.length>120)st.spark.shift();}});
+  MARKET.value=Math.max(1,MARKET.value*(1+pct));
+  valueHistory.push({t:Date.now(),v:portfolioTotalValue()});if(valueHistory.length>2000)valueHistory.shift();
+  saveState(true);renderHistoryProgress();updateHero();renderPortfolio();
+}
+
 /* ============================================================
    MORE + PHILOSOPHY
    ============================================================ */
@@ -2386,6 +2460,7 @@ function renderMore(){
     ${moreItem('🎯','التدريب الذكي','أسئلة تتكيّف مع مستواك','openAdaptive()')}
     ${moreItem('📖','قاموس المصطلحات',TERMS.length+' مصطلح مبسّط','openTermsGlossary()')}
     ${moreItem('🇹🇳','السوق التونسي','كيف يعمل؟ الرسوم والقوانين','openTunisianMarket()')}
+    ${moreItem('📉','سيناريوهات تاريخية تعليمية','تدرّب على الصعود والهبوط والتعافي','openHistoryScenarios()')}
     ${moreItem('🎓','شهادة الإتمام','تحصل عليها بعد إكمال الدروس','openCertificate()')}
     ${moreItem('📜','فلسفتنا التعليمية','لماذا وُجد TounsiTrade؟','openPhilosophy()',true)}
     <div class="more-group">🧠 المرشد الذكي</div>
@@ -2431,7 +2506,7 @@ function openAbout(){
   sheetBody.innerHTML=`<div class="sh-head"><div><div class="sh-tk">ℹ️ حول TounsiTrade</div><div class="sh-nm">معلومات قانونية</div></div><button class="sh-close" onclick="closeSheet()">×</button></div>
     <div style="background:#12161b;border:1px solid #1c222a;border-radius:14px;padding:16px;margin-top:16px"><h3 style="font-size:14px;font-weight:800;margin-bottom:10px;color:#f0b90b">ما هي TounsiTrade؟</h3><p style="font-size:12px;color:#c3cad4;line-height:1.75">محاكي تعليمي للتداول، يهدف إلى تعليم المستخدمين مبادئ الاستثمار وبورصة الأوراق المالية، بلغة عربية مبسّطة وبيئة افتراضية آمنة.</p><div style="margin-top:12px;padding-top:12px;border-top:1px solid #1c222a"><div style="font-size:11.5px;font-weight:800;color:#f0b90b;margin-bottom:8px">🎯 فلسفتنا</div><div style="font-size:11.5px;color:#c3cad4;line-height:1.8"><b style="color:#0ecb81">المال وحده لا يصنع محترفاً.</b><br><b style="color:#0ecb81">المعرفة وحدها لا تكفي.</b><br>المحترف الكامل = <b style="color:#f0b90b">توازن</b> بين: 📚 المعرفة · 💰 الربح · 🎯 الانضباط · 🏅 الاستمرارية.</div></div></div>
     <div class="about-slogan-card"><div class="asc-main">«المعرفة لا تُثريك بسرعة<br>لكنها تمنعك من الإفلاس»</div><div class="asc-sub">المقامر يفوز 5 مرات… ويفقد كل شيء في السادسة.<br>المتعلّم يفوز 6 ويخسر 4… <b>ويعيش للأبد</b>.</div></div>
-    <div style="background:#12161b;border:1px solid #1c222a;border-radius:14px;padding:16px;margin-top:12px"><h3 style="font-size:14px;font-weight:800;margin-bottom:10px;color:#f0b90b">⚠️ إخلاء المسؤولية</h3><div style="font-size:11.5px;color:#c3cad4;line-height:1.8"><b style="color:#f6465d">1. منصة غير رسمية:</b> TounsiTrade ليست منصة تداول حقيقية.<br><br><b style="color:#f6465d">2. أسعار افتراضية 100%.</b><br><br><b style="color:#f6465d">3. أسماء الشركات خيالية.</b><br><br><b style="color:#f6465d">4. لا نصائح استثمارية.</b><br><br><b style="color:#f6465d">5. الأرصدة وهمية (10,000 TND).</b></div></div>
+    <div style="background:#12161b;border:1px solid #1c222a;border-radius:14px;padding:16px;margin-top:12px"><h3 style="font-size:14px;font-weight:800;margin-bottom:10px;color:#f0b90b">⚠️ إخلاء المسؤولية</h3><div style="font-size:11.5px;color:#c3cad4;line-height:1.8"><b style="color:#f6465d">1. محاكاة تعليمية فقط:</b> لا تنفّذ المنصة شراءً أو بيعًا حقيقيًا ولا تتصل بوسيط تداول.<br><br><b style="color:#f6465d">2. لا اعتماد رسمي مُدّعى:</b> لا تمثل المنصة البورصة التونسية أو أي بنك أو جهة رسمية، ولا يُفهم منها وجود شراكة أو اعتماد دون موافقة مكتوبة.<br><br><b style="color:#f6465d">3. أسعار افتراضية 100%.</b><br><br><b style="color:#f6465d">4. أسماء الشركات خيالية.</b><br><br><b style="color:#f6465d">5. لا نصائح استثمارية.</b><br><br><b style="color:#f6465d">6. الأرصدة افتراضية (10,000 TND عند إنشاء حساب محاكاة جديد).</b></div></div>
     <div class="disc">🇹🇳 صُنع في تونس</div>`;
   sheet.classList.add('on');backdrop.classList.add('on');
 }
