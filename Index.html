@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes">
 <meta name="theme-color" content="#0b0e11"><link rel="apple-touch-icon" href="1000056746.jpg"><meta name="mobile-web-app-capable" content="yes">
 <meta name="description" content="TounsiTrade: محاكي تعليمي للتداول في البورصة التونسية برصيد افتراضي ودروس عربية مبسّطة.">
 <title>TounsiTrade — محاكي التداول التونسي</title>
@@ -568,6 +568,94 @@ button[aria-label="More"]{display:none!important}
 .advh-log{font-size:11px;line-height:1.7;color:#aab2bf;padding:6px 0;border-bottom:1px solid #1a2027}
 .advh-log:last-child{border-bottom:none}
 .advh-log small{color:#5e6673;font-size:9.5px;margin-right:6px}
+
+
+/* =========================================================
+   TounsiTrade UI Refresh — unified premium dark interface
+   Arabic-first, responsive, original Tunisian logo preserved.
+   CSS-only redesign: keeps existing DOM and app logic intact.
+   ========================================================= */
+:root{
+  --tt-bg:#07111f;--tt-surface:#0d1b2b;--tt-surface-2:#122338;
+  --tt-line:rgba(158,190,220,.14);--tt-text:#f3f7fc;--tt-muted:#91a4ba;
+  --tt-green:#19d69a;--tt-red:#ff667a;--tt-gold:#e8bd65;--tt-blue:#69a9ff;
+  --tt-radius:18px;--tt-shadow:0 12px 30px rgba(0,0,0,.22);
+}
+html{background:var(--tt-bg);color-scheme:dark;scroll-behavior:smooth}
+body{background:radial-gradient(ellipse at 50% -10%,#15365a 0%,#07111f 48%,#050b14 100%)!important;color:var(--tt-text)!important;font-family:Tahoma,"Segoe UI",system-ui,sans-serif!important}
+.app,#mainApp{background:linear-gradient(180deg,#091727 0%,#07111f 100%)!important;color:var(--tt-text)!important;box-shadow:0 0 0 1px rgba(157,192,225,.08),0 24px 80px rgba(0,0,0,.35)}
+#mainApp>div:first-child{background:rgba(7,17,31,.96)!important;backdrop-filter:blur(16px);border-bottom:1px solid var(--tt-line)}
+.topbar{padding:15px 17px 12px!important;gap:12px!important}
+.logo,.auth-logo{border-radius:15px!important;box-shadow:0 0 0 1px rgba(232,189,101,.55),0 5px 18px rgba(232,189,101,.13)!important;overflow:hidden}
+.brand-name{font-size:16px!important;letter-spacing:.1px!important;color:#f8fbff}
+.brand-sub{color:var(--tt-muted)!important}
+.icon-btn{width:42px!important;height:42px!important;border-radius:14px!important;background:linear-gradient(145deg,#14263b,#0d1a2a)!important;border:1px solid var(--tt-line)!important;box-shadow:0 5px 14px rgba(0,0,0,.16)}
+.users-strip{margin:0 16px 9px!important;background:rgba(25,214,154,.07)!important;border-color:rgba(25,214,154,.18)!important;color:#80f0c8!important;border-radius:12px!important;padding:8px 12px!important;font-size:10.5px!important}
+.wclk{gap:8px!important;padding:0 16px!important}
+.wclk .c{background:rgba(18,35,56,.76)!important;border:1px solid var(--tt-line)!important;border-radius:13px!important;padding:8px 4px!important}
+.wclk .n{color:var(--tt-muted)!important}
+.wclk .t{color:#edf5ff!important;font-size:14px!important}
+.tabs{margin:0 14px 12px!important;padding:5px!important;gap:5px!important;border-radius:16px!important;background:#0d1a2a!important;border:1px solid var(--tt-line)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.025)}
+.tab{border-radius:12px!important;padding:9px 2px!important;color:#8ca0b8!important;font-size:10.5px!important;gap:4px!important}
+.tab .ticon{font-size:17px!important}
+.tab.on{background:linear-gradient(145deg,#1c3854,#142941)!important;color:#fff!important;box-shadow:inset 0 0 0 1px rgba(105,169,255,.22),0 3px 10px rgba(0,0,0,.16)}
+.market-status{margin:0 15px 12px!important;padding:11px 14px!important;border-radius:14px!important;border:1px solid var(--tt-line)!important;box-shadow:0 4px 14px rgba(0,0,0,.12);background:rgba(18,35,56,.7)!important}
+.market-status.practice{border-color:rgba(232,189,101,.22)!important;background:linear-gradient(100deg,rgba(232,189,101,.10),rgba(18,35,56,.78))!important}
+.market-status.live{border-color:rgba(25,214,154,.22)!important;background:linear-gradient(100deg,rgba(25,214,154,.10),rgba(18,35,56,.78))!important}
+.hero{margin:0 15px 15px!important;padding:18px!important;border-radius:22px!important;background:radial-gradient(circle at 0% 0%,rgba(55,122,190,.24),transparent 45%),linear-gradient(145deg,#142a43,#0c1b2d 72%)!important;border:1px solid rgba(120,170,220,.2)!important;box-shadow:var(--tt-shadow)!important}
+.hero::after{background:radial-gradient(circle,rgba(105,169,255,.16),transparent 70%)!important;opacity:.8}
+.hero-l{color:#afc2d7!important;font-size:12px!important;font-weight:700}
+.hero-v{font-size:clamp(27px,7vw,34px)!important;font-weight:900!important;letter-spacing:-.6px!important;color:#fff!important;line-height:1.35}
+.hero-v span{color:#a7bad0!important;font-size:13px!important;letter-spacing:0}
+.hero-rank{color:#f0d18a!important}
+.hero-avatar{background:linear-gradient(145deg,#f0d18a,#b98532)!important;box-shadow:0 0 0 4px rgba(232,189,101,.11),0 5px 14px rgba(0,0,0,.22)}
+.pill{border-radius:10px!important;padding:6px 9px!important;font-size:10.5px!important}
+#view{padding-bottom:24px}
+/* Shared cards and panels across every app section */
+.card,.panel,.box-card,.lesson-card,.course-card,.profile-card,.settings-card,.stat-card,.summary-card,.trade-card,.order-card,.history-card,.leader-card,.quiz-card,.news-card,.challenge-card,.achievement-card,.modal-card{
+  border-radius:17px!important;border-color:var(--tt-line)!important;background:linear-gradient(145deg,rgba(17,35,55,.97),rgba(11,25,41,.97))!important;box-shadow:0 7px 20px rgba(0,0,0,.13)!important
+}
+.section-title,.sec-title,.page-title,.view-title{color:#f1f6fc!important;font-weight:900!important;letter-spacing:-.15px}
+.stock-row{background:linear-gradient(110deg,#10243a,#0c1b2d)!important;border:1px solid var(--tt-line)!important;border-radius:15px!important;padding:12px 13px!important;box-shadow:0 4px 12px rgba(0,0,0,.1);transition:transform .16s ease,border-color .16s ease,background .16s ease!important}
+.stock-row:active{transform:scale(.985)!important;background:#17304a!important}
+.sr-ico{border-radius:12px!important}
+button,.btn-primary,.btn-secondary,.btn-social{transition:transform .15s ease,filter .15s ease,box-shadow .15s ease}
+button:active{filter:brightness(1.08)}
+.btn-primary{background:linear-gradient(135deg,#20d6a0,#0caa7c)!important;color:#041b18!important;box-shadow:0 7px 20px rgba(25,214,154,.17)!important;border-radius:13px!important}
+.btn-secondary{background:#15283d!important;border:1px solid var(--tt-line)!important;color:#e3edf8!important;border-radius:13px!important}
+button.y{background:linear-gradient(135deg,#f0d18a,#c69442)!important;color:#1d1609!important;border-radius:14px!important;box-shadow:0 8px 22px rgba(232,189,101,.18)!important}
+button.g{background:rgba(16,34,53,.92)!important;color:#edf5ff!important;border:1px solid rgba(155,190,225,.2)!important;border-radius:14px!important}
+input,select,textarea,.auth-input{background:#091827!important;color:#f2f7fd!important;border:1px solid rgba(144,178,211,.24)!important;border-radius:12px!important;outline:none}
+input:focus,select:focus,textarea:focus,.auth-input:focus{border-color:rgba(105,169,255,.75)!important;box-shadow:0 0 0 3px rgba(105,169,255,.12)!important}
+label,.auth-label{color:#b7c8da!important}
+.sheet{background:linear-gradient(180deg,#12253a,#0a1726)!important;border-top:1px solid rgba(144,178,211,.22)!important;border-radius:24px 24px 0 0!important;box-shadow:0 -16px 45px rgba(0,0,0,.32)!important}
+.grab{background:#51677e!important;width:42px!important;height:4px!important;border-radius:5px!important}
+.backdrop{backdrop-filter:blur(4px);background:rgba(2,8,16,.68)!important}
+.toast{border:1px solid var(--tt-line)!important;border-radius:14px!important;box-shadow:0 12px 28px rgba(0,0,0,.3)!important}
+.pf-btn-mini,.pf-btn-blue{border-radius:17px!important;box-shadow:0 9px 20px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.2)!important}
+.mkt-seg{background:#0c1a2a!important;border-color:var(--tt-line)!important;border-radius:15px!important}
+.mkt-seg-row button{border-radius:11px!important}
+.mkt-seg-row button.on.prac{background:rgba(25,214,154,.13)!important;border-color:rgba(25,214,154,.4)!important;color:#53e8b9!important}
+.mkt-seg-row button.on.live{background:rgba(255,102,122,.12)!important;border-color:rgba(255,102,122,.38)!important;color:#ff9aa8!important}
+.adv-card{background:rgba(12,27,44,.98)!important;border-color:var(--tt-line)!important;border-radius:16px!important;box-shadow:0 12px 30px rgba(0,0,0,.32)!important}
+.advh-box,.advh-pat div{background:#0c1a2a!important;border-color:var(--tt-line)!important;border-radius:14px!important}
+.advh-t,.advh-st b{color:#eef5fd!important}
+.auth-screen{background:radial-gradient(ellipse at 50% 0%,#183858 0%,#07111f 60%,#030912 100%)!important}
+#authScreen,#splash{background-color:#07111f!important}
+.auth-content{width:100%;max-width:460px;padding-left:18px!important;padding-right:18px!important}
+.auth-title{color:#f5f8fd!important;text-shadow:none!important}
+.auth-tag{color:#9fb4ca!important}
+.auth-form{background:rgba(12,27,44,.7)!important;border:1px solid rgba(144,178,211,.16)!important;border-radius:20px!important;padding:15px!important;box-shadow:0 12px 30px rgba(0,0,0,.18)}
+#authScreen .auth-form{background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important}
+#ttDisclaimer{border-color:rgba(232,189,101,.3)!important;background:rgba(232,189,101,.08)!important;color:#f0d89d!important;border-radius:13px!important}
+.auth-error{border-radius:12px!important}
+#splash .hero-art{filter:drop-shadow(0 10px 34px rgba(232,189,101,.15));}
+:focus-visible{outline:2px solid #69a9ff!important;outline-offset:3px!important}
+*{scrollbar-color:#2b4763 transparent;scrollbar-width:thin}
+@media(min-width:600px){body{padding:20px 0!important}.app,#mainApp{max-width:500px!important;height:min(94dvh,980px)!important;border-radius:25px!important;border:1px solid rgba(158,190,220,.13);overflow:hidden}.auth-screen{padding:16px!important}.auth-content{max-width:470px!important}}
+@media(max-width:380px){.topbar{padding:12px 13px 10px!important}.tabs{margin-left:10px!important;margin-right:10px!important}.tab{font-size:9.5px!important}.hero{margin-left:11px!important;margin-right:11px!important;padding:14px!important}.hero-v{font-size:25px!important}.users-strip{margin-left:11px!important;margin-right:11px!important}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
 </style>
 <script>
   // ⚠️ بدّل YOUR_FORM_ID بمعرّف Formspree
