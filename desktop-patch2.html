@@ -1,0 +1,34 @@
+<script id="ttDesktopV2">
+/* تعديل سطح المكتب v2: يفرض الأنماط مباشرة ويُظهر شارة للتأكد من التحميل */
+(function(){
+  var S=function(el,p,v){try{el.style.setProperty(p,v,'important');}catch(e){}};
+  function frame(){
+    var a=document.getElementById('mainApp')||document.querySelector('.app');
+    if(a)return a;
+    var k=document.body.children;
+    for(var i=0;i<k.length;i++){try{if(getComputedStyle(k[i]).borderTopLeftRadius==='34px')return k[i];}catch(e){}}
+    return null;
+  }
+  function apply(){
+    if(window.innerWidth<700)return;
+    var a=frame();if(!a)return;
+    S(a,'width','100%');S(a,'max-width','min(1040px,100%)');
+    S(a,'height','100vh');S(a,'height','100dvh');
+    S(a,'border','0');S(a,'border-radius','0');S(a,'transform','none');
+    S(a,'box-shadow','0 0 90px rgba(0,0,0,.6)');
+    var b=document.body;S(b,'display','flex');S(b,'justify-content','center');S(b,'align-items','stretch');
+  }
+  function badge(){
+    if(window.innerWidth<700)return;
+    var d=document.createElement('div');
+    d.textContent='✅ تعديل سطح المكتب v2 يعمل';
+    d.style.cssText='position:fixed;top:10px;left:10px;z-index:99999;background:#0ecb81;color:#04130c;font:700 13px sans-serif;padding:8px 14px;border-radius:10px;transition:opacity .6s';
+    document.body.appendChild(d);
+    setTimeout(function(){d.style.opacity='0';},6000);
+    setTimeout(function(){d.remove();},6800);
+  }
+  function start(){apply();badge();var n=0,t=setInterval(function(){apply();if(++n>20)clearInterval(t);},1000);}
+  window.addEventListener('resize',apply);
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
+})();
+</script>
