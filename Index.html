@@ -657,9 +657,55 @@ label,.auth-label{color:#b7c8da!important}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 
 
-/* TounsiTrade homepage refresh: inspired by the requested mobile reference */
-.tt-home-summary{margin:0 12px 16px;padding:19px;border-radius:26px;background:radial-gradient(circle at 0 0,rgba(240,185,11,.10),transparent 34%),linear-gradient(145deg,#191d22,#101419);border:1px solid #262d34;box-shadow:0 12px 28px rgba(0,0,0,.22);color:#f4f6fa}
-.tt-home-summary-head{display:flex;align-items:center;justify-content:space-between;gap:12px}.tt-home-eyebrow{font-size:11px;color:#13d69a;font-weight:800}.tt-home-summary h2{font-size:19px;margin:5px 0 0;font-weight:900}.tt-home-avatar{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#f6d12d,#d69b00);color:#111;font-size:23px;font-weight:900;border:2px solid #f3c72f}.tt-home-total{margin-top:20px}.tt-home-total span{display:block;color:#9ba5b3;font-size:12px}.tt-home-total strong{display:block;font-size:clamp(29px,7vw,39px);font-weight:900;direction:ltr;text-align:right;margin-top:3px;letter-spacing:-.7px}.tt-home-total small{font-size:15px;color:#8e99a7;letter-spacing:0}.tt-home-metrics{display:grid;gap:8px;margin-top:14px}.tt-home-metrics div{display:flex;align-items:center;justify-content:space-between;gap:10px;border-top:1px solid rgba(255,255,255,.055);padding-top:9px;font-size:12px}.tt-home-metrics span{color:#9ca6b4}.tt-home-metrics b{color:#e3e8ee;font-size:12px;direction:ltr}.tt-home-summary-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:17px}.tt-home-summary-actions button{border:1px solid #2b343d;border-radius:14px;background:#202831;color:#f4f6fa;padding:10px 12px;font:inherit;font-size:12px;font-weight:800;cursor:pointer}.tt-home-summary-actions button:last-child{background:#07352b;border-color:#155b46;color:#4ce0ae}.tt-home-foot{margin-top:15px;font-size:10px;line-height:1.7;color:#8f9aa7}.tt-home-shortcuts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:0 12px 17px}.tt-home-shortcuts button{min-width:0;border:1px solid #222a32;border-radius:17px;background:#14191f;color:#aeb8c5;padding:12px 3px;font:inherit;font-size:11px;font-weight:800;cursor:pointer}.tt-home-shortcuts span{display:block;font-size:23px;margin-bottom:5px}.wk-card,.podium-wrap{margin-left:12px!important;margin-right:12px!important}
+/* TounsiTrade: إصلاح تمرير الصفحات على الهاتف */
+html, body {
+  width: 100%;
+  min-height: 100%;
+}
+body {
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+}
+#mainApp {
+  height: 100dvh;
+  min-height: 0;
+  max-height: 100dvh;
+  overflow: hidden;
+}
+#mainApp > div:nth-of-type(2) {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  height: auto !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  touch-action: pan-y;
+  scrollbar-width: thin;
+}
+/* السماح بمحتوى الصفحات أن يتمدّد دون دفع الشريط الثابت */
+#view {
+  flex: 0 0 auto;
+  min-height: 0;
+  overflow: visible;
+  padding-bottom: max(18px, env(safe-area-inset-bottom));
+}
+#mainApp > div[style*="flex-shrink: 0"] {
+  flex-shrink: 0 !important;
+}
+/* إذا كانت بعض الصفحات الداخلية لها حاويات قابلة للتمرير */
+#view .page,
+#view .page-content,
+#view .screen-content,
+#view .section-content,
+#view .scroll-content {
+  min-height: 0;
+  max-width: 100%;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
 </style>
 <script>
   // ⚠️ بدّل YOUR_FORM_ID بمعرّف Formspree
@@ -1626,14 +1672,6 @@ function renderMarket(){
 /* ===== الرئيسية: تحدي الأسبوع + أفضل 10 متداولين ===== */
 function renderHome(){
   view.innerHTML=`
-    <section class="tt-home-summary" aria-label="ملخص المحفظة">
-      <div class="tt-home-summary-head"><div><div class="tt-home-eyebrow">🇹🇳 TounsiTrade · وضع التدريب</div><h2>محفظتك التجريبية</h2></div><div class="tt-home-avatar">${esc((currentUser&& (currentUser.displayName||currentUser.name))?String(currentUser.displayName||currentUser.name).trim().slice(0,1).toUpperCase():'T')}</div></div>
-      <div class="tt-home-total"><span>إجمالي قيمة المحفظة</span><strong id="ttHomeTotal">${fmt(portfolioTotalValue())} <small>TND</small></strong></div>
-      <div class="tt-home-metrics"><div><span>💧 السيولة</span><b id="ttHomeCash">${fmt(cash)} TND</b></div><div><span>📈 قيمة الأسهم</span><b id="ttHomeStocks">${fmt(holdingsValue())} TND</b></div><div><span>🔒 محجوز</span><b id="ttHomeReserved">${fmt(reservedOrderValue())} TND</b></div></div>
-      <div class="tt-home-summary-actions"><button onclick="currentTab='portfolio';document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x.dataset.tab==='portfolio'));render()">📒 دفتر صفقاتي</button><button onclick="hubTab='cal';renderHub()">📅 التقويم</button><button onclick="currentTab='market';document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x.dataset.tab==='market'));render()">📊 افتح السوق</button></div>
-      <div class="tt-home-foot">☁️ حساب تدريبي · الأسعار والأرباح افتراضية وليست أسعارًا مباشرة</div>
-    </section>
-    <div class="tt-home-shortcuts"><button onclick="currentTab='market';document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x.dataset.tab==='market'));render()"><span>📈</span>السوق</button><button onclick="currentTab='lessons';document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x.dataset.tab==='lessons'));render()"><span>📚</span>الدروس</button><button onclick="currentTab='portfolio';document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x.dataset.tab==='portfolio'));render()"><span>💼</span>المحفظة</button><button onclick="currentTab='more';document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x.dataset.tab==='more'));render()"><span>☰</span>المزيد</button></div>
     ${renderWeeklyCard()}
     <div class="podium-wrap"><div class="podium-head"><div class="podium-title">🏆 أفضل 10 متداولين <span style="font-size:10px;color:#7b8494;font-weight:600;margin-right:4px">— الترتيب التونسي</span></div><button class="podium-view-all" onclick="switchToRank()">عرض الكل ←</button></div><div id="podiumList">${ttSkeleton(3)}</div></div>
     <div class="disc">جميع أسماء الشركات خيالية. الأسعار افتراضية 100%.</div>`;
@@ -1660,7 +1698,6 @@ function updateHero(){
   const total=portfolioTotalValue(),pnl=total-STARTING_CASH,pct=(pnl/STARTING_CASH)*100;
   const hidden=isBalanceHidden(),mask='••••••',show=v=>hidden?mask:fmt(v);
   const hv=document.getElementById('heroVal');if(hv)hv.innerHTML=show(total)+' <span>TND</span>';
-  const th=document.getElementById('ttHomeTotal');if(th)th.innerHTML=show(total)+' <small>TND</small>';const tc=document.getElementById('ttHomeCash');if(tc)tc.textContent=show(cash)+' TND';const ts=document.getElementById('ttHomeStocks');if(ts)ts.textContent=show(holdingsValue())+' TND';const tr=document.getElementById('ttHomeReserved');if(tr)tr.textContent=show(reservedOrderValue())+' TND';
   const vb=document.getElementById('balanceVisibilityBtn');if(vb){vb.textContent=hidden?'🙈':'👁';vb.title=hidden?'إظهار الرصيد':'إخفاء الرصيد';vb.setAttribute('aria-pressed',hidden?'true':'false');}
   const pp=document.getElementById('heroPnl');if(pp){pp.textContent=hidden?mask:`${pnl>=0?'+':''}${fmt(pnl)} (${fmtPct(pct)})`;pp.className='pill '+(pnl>0?'':(pnl<0?'dn':'nu'));}
   const hh=document.getElementById('heroHold');if(hh)hh.textContent=`${Object.keys(holdings).length} مركز`;
