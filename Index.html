@@ -657,55 +657,66 @@ label,.auth-label{color:#b7c8da!important}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 
 
-/* TounsiTrade: إصلاح تمرير الصفحات على الهاتف */
+/* TounsiTrade: تمرير الصفحة كاملة بما فيها الشريط العلوي والتبويبات */
 html, body {
   width: 100%;
   min-height: 100%;
+  height: auto !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
 }
 body {
-  height: 100dvh;
-  min-height: 0;
-  overflow: hidden;
+  position: static !important;
+  min-height: 100dvh;
+  height: auto !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: auto;
 }
 #mainApp {
-  height: 100dvh;
-  min-height: 0;
-  max-height: 100dvh;
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: auto !important;
+  min-height: 100dvh;
+  max-height: none !important;
+  overflow: visible !important;
 }
+/* لا تثبّت منطقة المحتوى أو الشريط السفلي؛ دع الصفحة كلها تتحرك */
 #mainApp > div:nth-of-type(2) {
-  flex: 1 1 auto !important;
+  flex: 0 0 auto !important;
   min-height: 0 !important;
   height: auto !important;
-  overflow-y: auto !important;
-  overflow-x: hidden !important;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior-y: contain;
-  touch-action: pan-y;
-  scrollbar-width: thin;
+  max-height: none !important;
+  overflow: visible !important;
+  -webkit-overflow-scrolling: auto;
+  touch-action: auto;
 }
-/* السماح بمحتوى الصفحات أن يتمدّد دون دفع الشريط الثابت */
 #view {
-  flex: 0 0 auto;
+  flex: 0 0 auto !important;
   min-height: 0;
-  overflow: visible;
+  height: auto !important;
+  overflow: visible !important;
   padding-bottom: max(18px, env(safe-area-inset-bottom));
 }
-#mainApp > div[style*="flex-shrink: 0"] {
-  flex-shrink: 0 !important;
+/* إلغاء أي تثبيت أو تقييد ارتفاع لعناصر الواجهة */
+#mainApp header,
+#mainApp nav,
+#mainApp .top-bar,
+#mainApp .bottom-nav,
+#mainApp .nav-bar {
+  position: static !important;
+  inset: auto !important;
 }
-/* إذا كانت بعض الصفحات الداخلية لها حاويات قابلة للتمرير */
-#view .page,
-#view .page-content,
-#view .screen-content,
-#view .section-content,
-#view .scroll-content {
-  min-height: 0;
-  max-width: 100%;
-  overscroll-behavior-y: contain;
-  -webkit-overflow-scrolling: touch;
+#mainApp .page,
+#mainApp .page-content,
+#mainApp .screen-content,
+#mainApp .section-content,
+#mainApp .scroll-content {
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
 }
-
 </style>
 <script>
   // ⚠️ بدّل YOUR_FORM_ID بمعرّف Formspree
