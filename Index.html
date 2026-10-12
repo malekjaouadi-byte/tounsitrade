@@ -2513,6 +2513,7 @@ updateMarketStatus();
 setInterval(updateMarketStatus,1000);
 window.addEventListener('beforeunload',()=>{_flushState();});
 document.addEventListener('visibilitychange',()=>{if(document.hidden){_flushState();}});window.addEventListener('pagehide',()=>{_flushState();});
+</script>
 
 /* TounsiTrade Community Forum — bilingual Arabic/French */
 let ttForumLang='ar',ttForumPosts=[],ttForumBusy=false;
@@ -2539,7 +2540,7 @@ async function ttForumLike(id){if(!currentUser){toast(ttForumText('سجّل ال
 async function ttForumShowComments(id){const box=document.getElementById('ttForumComments_'+id);if(!box)return;box.innerHTML=`<div style="color:#8b95a5;font-size:11px;padding:6px">${ttForumText('جارٍ تحميل التعليقات…','Chargement des commentaires…')}</div>`;try{const snap=await fbDb.collection('forumPosts').doc(id).collection('comments').orderBy('createdAt','asc').limit(30).get();const rows=[];snap.forEach(d=>rows.push(d.data()));box.innerHTML=(rows.length?rows.map(c=>`<div style="border-top:1px solid #252d36;padding:7px 2px;font-size:11px;line-height:1.7"><b style="color:#f0b90b">${ttForumEsc(c.author||'Trader')}</b><div style="white-space:pre-wrap;overflow-wrap:anywhere">${ttForumEsc(c.text)}</div></div>`).join(''):`<div style="font-size:11px;color:#8b95a5;padding:6px">${ttForumText('لا توجد تعليقات بعد.','Aucun commentaire pour le moment.')}</div>`)+`<button onclick="ttForumComment('${id}')" style="margin-top:7px;padding:8px 10px;border:1px solid #303842;border-radius:9px;background:#1c222a;color:#f0b90b;font:inherit;font-size:11px">＋ ${ttForumText('أضف تعليقًا','Ajouter un commentaire')}</button>`;}catch(e){box.innerHTML=`<div style="font-size:11px;color:#f6465d">${ttForumText('تعذّر تحميل التعليقات.','Impossible de charger les commentaires.')}</div>`;}}
 async function ttForumComment(id){if(!currentUser){toast(ttForumText('سجّل الدخول أولًا','Connectez-vous d’abord'),'warn');return;}const msg=prompt(ttForumText('اكتب تعليقك (حتى 500 حرف):','Votre commentaire (500 caractères max) :'));if(!msg||!msg.trim())return;try{await fbDb.collection('forumPosts').doc(id).collection('comments').add({uid:currentUser.id,author:cleanText(currentUser.name||'Trader',60),text:msg.trim().slice(0,500),createdAt:firebase.firestore.FieldValue.serverTimestamp()});const box=document.getElementById('ttForumComments_'+id);if(box)box.innerHTML=`<div style="font-size:11px;color:#0ecb81">${ttForumText('تم إرسال التعليق','Commentaire envoyé')}</div>`;}catch(e){toast(ttForumText('تعذّر إرسال التعليق','Impossible d’envoyer le commentaire'),'warn');}}
 async function ttForumDelete(id){if(!currentUser||!confirm(ttForumText('هل تريد حذف رسالتك؟','Supprimer votre message ?')))return;try{const r=fbDb.collection('forumPosts').doc(id),d=await r.get();if(!d.exists||d.data().uid!==currentUser.id){toast(ttForumText('لا يمكنك حذف هذه الرسالة','Vous ne pouvez pas supprimer ce message'),'warn');return;}await r.delete();await ttForumLoad();}catch(e){toast(ttForumText('تعذّر الحذف','Suppression impossible'),'warn');}}
-</script>
+
 </body>
 <!--
 ===== Optional Realtime Database Rules (only if USE_RTDDB_PRESENCE=true) =====
